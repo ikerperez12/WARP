@@ -1597,7 +1597,8 @@ export function initThreeScene() {
   if (!canvas) return;
 
   const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-  let prefersReducedMotion = reducedMotionQuery.matches;
+  let manualReducedMotion = document.body?.dataset.motion === 'reduced';
+  let prefersReducedMotion = reducedMotionQuery.matches || manualReducedMotion;
 
   const isMobile = window.innerWidth < 920;
   const SCENE_TUNING = {
@@ -1872,7 +1873,13 @@ export function initThreeScene() {
   }
 
   function onReducedMotionChange(event) {
-    prefersReducedMotion = event.matches;
+    prefersReducedMotion = event.matches || manualReducedMotion;
+  }
+
+  function onMotionModeChange(event) {
+    const mode = event?.detail?.mode;
+    manualReducedMotion = mode === 'reduced' || document.body?.dataset.motion === 'reduced';
+    prefersReducedMotion = reducedMotionQuery.matches || manualReducedMotion;
   }
 
   function onVisibilityChange() {
@@ -1896,6 +1903,7 @@ export function initThreeScene() {
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onResize);
   window.addEventListener('keydown', onKeyDown);
+  window.addEventListener('warp:motion-mode', onMotionModeChange);
 
   if (reducedMotionQuery.addEventListener) {
     reducedMotionQuery.addEventListener('change', onReducedMotionChange);
@@ -2094,6 +2102,7 @@ export function initThreeScene() {
     window.removeEventListener('scroll', onScroll);
     window.removeEventListener('resize', onResize);
     window.removeEventListener('keydown', onKeyDown);
+    window.removeEventListener('warp:motion-mode', onMotionModeChange);
 
     if (reducedMotionQuery.removeEventListener) {
       reducedMotionQuery.removeEventListener('change', onReducedMotionChange);

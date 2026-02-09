@@ -52,11 +52,27 @@
         <a href="#experience" class="nav-link" data-section="experience">Formación</a>
         <a href="#contact" class="nav-link" data-section="contact">Contacto</a>
       </div>
+      <button class="ui-toggle" id="ui-toggle" aria-label="Abrir ajustes visuales">Visual</button>
       <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">
         <span></span><span></span><span></span>
       </button>
     </div>
   </nav>
+
+  <aside class="ui-panel" id="ui-panel" aria-label="Ajustes visuales" aria-hidden="true">
+    <button class="ui-option" type="button" data-action="toggle-grain">
+      <span>Grano</span>
+      <span id="grain-state">On</span>
+    </button>
+    <button class="ui-option" type="button" data-action="toggle-cursor">
+      <span>Cursor</span>
+      <span id="cursor-state">On</span>
+    </button>
+    <button class="ui-option" type="button" data-action="toggle-motion">
+      <span>Motion</span>
+      <span id="motion-state">Full</span>
+    </button>
+  </aside>
 
   <!-- Mobile Menu -->
   <div class="mobile-menu" id="mobile-menu">
