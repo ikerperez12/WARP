@@ -92,7 +92,32 @@
       <span>Motion</span>
       <span id="motion-state">Full</span>
     </button>
+    <button class="ui-option" type="button" data-action="open-project-list">
+      <span>Proyectos</span>
+      <span>Lista</span>
+    </button>
   </aside>
+
+  <section
+    class="project-modal"
+    id="project-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="project-modal-title"
+    aria-hidden="true"
+  >
+    <div class="project-modal-card">
+      <div class="project-modal-head">
+        <h2 id="project-modal-title">Proyectos interactivos</h2>
+        <button type="button" class="project-modal-close" id="project-modal-close" aria-label="Cerrar lista de proyectos">&times;</button>
+      </div>
+      <p class="project-modal-copy">
+        Modo accesible para lanzar proyectos sin depender del icono 3D.
+      </p>
+      <div class="project-modal-list" id="project-modal-list"></div>
+    </div>
+  </section>
+  <div id="app-live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
   <!-- Mobile Menu -->
   <div class="mobile-menu" id="mobile-menu" aria-hidden="true">

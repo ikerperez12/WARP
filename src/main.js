@@ -60,6 +60,71 @@ document.addEventListener('DOMContentLoaded', () => {
     return document.body.dataset.motion === 'reduced' || reducedMotionMedia.matches;
   }
 
+  const FALLBACK_PROJECTS = [
+    {
+      id: 'hero_motion_engine',
+      name: 'Hero Motion Engine',
+      description: 'Coreografia del hero: intro, loops y parallax.',
+      language: 'JavaScript',
+      stack: ['Three.js', 'Anime.js'],
+    },
+    {
+      id: 'scene_laptop_render',
+      name: 'Laptop Scene Render',
+      description: 'Pipeline visual del portatil 3D con materiales y luces.',
+      language: 'JavaScript',
+      stack: ['Three.js', 'PBR'],
+    },
+    {
+      id: 'scroll_driven_fx',
+      name: 'Scroll Driven FX',
+      description: 'Transiciones por scroll y narrativa visual.',
+      language: 'JavaScript',
+      stack: ['Timeline', 'IntersectionObserver'],
+    },
+    {
+      id: 'terminal_runtime',
+      name: 'Terminal Runtime',
+      description: 'Terminal simulada con comandos y estado.',
+      language: 'JavaScript',
+      stack: ['Canvas UI'],
+    },
+  ];
+
+  let projectRegistry = FALLBACK_PROJECTS.slice();
+  const liveRegion = document.getElementById('app-live-region');
+  let liveTimer = 0;
+
+  function announceLive(message) {
+    if (!liveRegion || !message) return;
+    window.clearTimeout(liveTimer);
+    liveRegion.textContent = '';
+    liveTimer = window.setTimeout(() => {
+      liveRegion.textContent = message;
+    }, 30);
+  }
+
+  function normalizeProjects(raw) {
+    if (!Array.isArray(raw)) return FALLBACK_PROJECTS.slice();
+    const cleaned = raw
+      .map((item) => {
+        if (!item || typeof item !== 'object') return null;
+        const id = typeof item.id === 'string' ? item.id.trim() : '';
+        const name = typeof item.name === 'string' ? item.name.trim() : '';
+        if (!id || !name) return null;
+        return {
+          id,
+          name,
+          description: typeof item.description === 'string' ? item.description : '',
+          language: typeof item.language === 'string' ? item.language : 'N/A',
+          stack: Array.isArray(item.stack) ? item.stack.filter((v) => typeof v === 'string') : [],
+        };
+      })
+      .filter(Boolean);
+
+    return cleaned.length > 0 ? cleaned : FALLBACK_PROJECTS.slice();
+  }
+
   // ========================================
   // Preloader
   // ========================================
@@ -80,6 +145,52 @@ document.addEventListener('DOMContentLoaded', () => {
   const grainState = document.getElementById('grain-state');
   const cursorState = document.getElementById('cursor-state');
   const motionState = document.getElementById('motion-state');
+  const projectModal = document.getElementById('project-modal');
+  const projectModalClose = document.getElementById('project-modal-close');
+  const projectModalList = document.getElementById('project-modal-list');
+
+  function renderProjectList() {
+    if (!projectModalList) return;
+    projectModalList.innerHTML = projectRegistry
+      .map((project) => {
+        const stack = project.stack.length > 0 ? project.stack.join(' · ') : 'Stack no definido';
+        const safeDesc = project.description || 'Proyecto interactivo disponible en terminal.';
+        return `
+          <button class="project-launch" type="button" data-project-id="${project.id}">
+            <span class="project-launch-title">${project.name}</span>
+            <span class="project-launch-meta">${project.language} · ${stack}</span>
+            <span class="project-launch-meta">${safeDesc}</span>
+          </button>
+        `;
+      })
+      .join('');
+
+    projectModalList.querySelectorAll('.project-launch').forEach((button) => {
+      button.addEventListener('click', () => {
+        const projectId = button.getAttribute('data-project-id');
+        if (!projectId) return;
+        window.dispatchEvent(new CustomEvent('warp:terminal-run-project', { detail: { projectId, source: 'list' } }));
+        announceLive(`Ejecutando proyecto ${projectId}`);
+        closeProjectModal();
+      });
+    });
+  }
+
+  function openProjectModal() {
+    if (!projectModal) return;
+    projectModal.classList.add('open');
+    projectModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    const firstButton = projectModalList?.querySelector('.project-launch');
+    if (firstButton) firstButton.focus();
+  }
+
+  function closeProjectModal() {
+    if (!projectModal) return;
+    projectModal.classList.remove('open');
+    projectModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
 
   function syncVisualLabels() {
     if (grainState) grainState.textContent = visualPrefs.grain === 'on' ? 'On' : 'Off';
@@ -108,14 +219,23 @@ document.addEventListener('DOMContentLoaded', () => {
     uiPanel.querySelectorAll('.ui-option').forEach((button) => {
       button.addEventListener('click', () => {
         const action = button.dataset.action;
+        let shouldCommit = false;
         if (action === 'toggle-grain') {
           visualPrefs.grain = visualPrefs.grain === 'on' ? 'off' : 'on';
+          shouldCommit = true;
         } else if (action === 'toggle-cursor') {
           visualPrefs.cursor = visualPrefs.cursor === 'on' ? 'off' : 'on';
+          shouldCommit = true;
         } else if (action === 'toggle-motion') {
           visualPrefs.motion = visualPrefs.motion === 'full' ? 'reduced' : 'full';
+          shouldCommit = true;
+        } else if (action === 'open-project-list') {
+          uiPanel.classList.remove('open');
+          uiPanel.setAttribute('aria-hidden', 'true');
+          uiToggle.setAttribute('aria-expanded', 'false');
+          openProjectModal();
         }
-        commitVisualPrefs();
+        if (shouldCommit) commitVisualPrefs();
       });
     });
 
@@ -136,6 +256,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  if (projectModalClose) {
+    projectModalClose.addEventListener('click', closeProjectModal);
+  }
+
+  if (projectModal) {
+    projectModal.addEventListener('click', (event) => {
+      if (event.target === projectModal) closeProjectModal();
+    });
+  }
+
+  window.addEventListener('warp:open-project-list', () => {
+    openProjectModal();
+  });
+
   // ========================================
   // Custom cursor
   // ========================================
@@ -153,6 +287,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
   enableCursor();
   commitVisualPrefs();
+
+  async function bootstrapProjectRegistry() {
+    try {
+      const response = await fetch('/projects.json', { cache: 'no-store' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      projectRegistry = normalizeProjects(data);
+    } catch (error) {
+      projectRegistry = FALLBACK_PROJECTS.slice();
+      console.warn('[main] project registry fallback in use:', error);
+    }
+
+    renderProjectList();
+    window.dispatchEvent(new CustomEvent('warp:project-registry', { detail: { projects: projectRegistry } }));
+  }
+
+  let lastTerminalStatus = '';
+  window.addEventListener('warp:terminal-status', (event) => {
+    const detail = event?.detail || {};
+    const status = typeof detail.status === 'string' ? detail.status : '';
+    const projectName = typeof detail.projectName === 'string' ? detail.projectName : '';
+    const statusKey = `${status}:${projectName}`;
+    if (!status || statusKey === lastTerminalStatus) return;
+    lastTerminalStatus = statusKey;
+
+    if (status === 'loading' && projectName) announceLive(`Cargando ${projectName}`);
+    if (status === 'running' && projectName) announceLive(`${projectName} en ejecucion`);
+    if (status === 'idle' && projectName) announceLive(`${projectName} finalizado`);
+    if (status === 'focus-on') announceLive('Terminal activa');
+    if (status === 'focus-off') announceLive('Terminal desactivada');
+    if (status === 'registry-loaded') announceLive('Registro de proyectos actualizado');
+  });
+
+  renderProjectList();
+  bootstrapProjectRegistry();
 
   window.addEventListener('pointermove', (event) => {
     if (!document.body.classList.contains('cursor-enabled')) return;
@@ -546,6 +715,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
+    if (projectModal?.classList.contains('open')) {
+      closeProjectModal();
+      return;
+    }
     if (!mobileMenu.classList.contains('open')) return;
     setMobileMenuState(false);
   });

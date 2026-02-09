@@ -390,6 +390,37 @@ function createScreenTexture() {
     { label: 'terminal/live.log', accent: 'rgba(247, 189, 146, 0.88)' },
   ];
 
+  const defaultProjectRegistry = [
+    {
+      id: 'hero_motion_engine',
+      name: 'Hero Motion Engine',
+      description: 'Coreografia del hero: intro, loops y parallax.',
+      language: 'JavaScript',
+      stack: ['Three.js', 'Anime.js'],
+    },
+    {
+      id: 'scene_laptop_render',
+      name: 'Laptop Scene Render',
+      description: 'Pipeline visual del portatil 3D con materiales y luces.',
+      language: 'JavaScript',
+      stack: ['Three.js', 'PBR'],
+    },
+    {
+      id: 'scroll_driven_fx',
+      name: 'Scroll Driven FX',
+      description: 'Transiciones por scroll y narrativa visual.',
+      language: 'JavaScript',
+      stack: ['Timeline', 'IntersectionObserver'],
+    },
+    {
+      id: 'terminal_runtime',
+      name: 'Terminal Runtime',
+      description: 'Terminal simulada con comandos y estado.',
+      language: 'JavaScript',
+      stack: ['Canvas UI'],
+    },
+  ];
+
   const codeBanks = [
     [
       'import { animate } from "animejs";',
@@ -442,7 +473,7 @@ function createScreenTexture() {
     ],
     [
       'visitor@warp:~$ help',
-      'commands: help, status, stack, sections, glow, clear, ping',
+      'commands: help, status, runtime, projects, run <id>, about <id>, demo, launcher, stop',
       '',
       'visitor@warp:~$ status',
       'scene: online | stars: synced | hero: active',
@@ -488,11 +519,241 @@ function createScreenTexture() {
     },
   };
 
+  let projectRegistry = defaultProjectRegistry.slice();
+  const runtime = {
+    phase: 'idle',
+    activeProject: null,
+    profile: null,
+    queue: [],
+    queueIndex: 0,
+    queueClock: 0,
+    traceClock: 0,
+    traceIndex: 0,
+    startedAtMs: 0,
+    completedRuns: 0,
+    autoHintClock: 0,
+  };
+
+  function getProjectProfile(projectId) {
+    switch (projectId) {
+      case 'hero_motion_engine':
+        return {
+          boot: [
+            'Loading hero timeline assets...',
+            'Binding parallax and pointer easing...',
+          ],
+          traces: [
+            'timeline intro ready',
+            'hero text stagger synced',
+            'cta micro-interactions online',
+            'pointer smoothing stable',
+          ],
+        };
+      case 'scene_laptop_render':
+        return {
+          boot: [
+            'Compiling material graph...',
+            'Calibrating rim/key/fill lights...',
+          ],
+          traces: [
+            'pbr roughness tuned',
+            'panel reflection pass stable',
+            'keyboard emissive wave running',
+            'accessory anchors locked',
+          ],
+        };
+      case 'scroll_driven_fx':
+        return {
+          boot: [
+            'Building scroll timeline...',
+            'Registering section progress markers...',
+          ],
+          traces: [
+            'hero fade transition active',
+            'mouse pad reveal threshold reached',
+            'terminal tab synced to scroll',
+            'velocity damping healthy',
+          ],
+        };
+      case 'terminal_runtime':
+        return {
+          boot: [
+            'Bootstrapping command parser...',
+            'Attaching runtime telemetry bridge...',
+          ],
+          traces: [
+            'command queue idling',
+            'history buffer stable',
+            'live status bridge active',
+            'interactive mode responsive',
+          ],
+        };
+      default:
+        return {
+          boot: ['Initializing generic project runtime...'],
+          traces: ['runtime stable', 'render loop nominal'],
+        };
+    }
+  }
+
+  function buildProjectTraceLine(project, traceIndex, metrics) {
+    const profile = runtime.profile || getProjectProfile(project.id);
+    const samples = profile.traces || [];
+    const sample = samples.length > 0 ? samples[traceIndex % samples.length] : 'runtime stable';
+    const scrollPct = (metrics.scroll * 100).toFixed(1);
+    const velocity = metrics.velocity.toFixed(2);
+    const glow = metrics.energy.toFixed(2);
+    return `[${project.id}] ${sample} | scroll ${scrollPct}% | vel ${velocity} | glow ${glow}`;
+  }
+
+  function getRuntimeUptimeSec() {
+    if (!runtime.startedAtMs) return 0;
+    return Math.max(0, (performance.now() - runtime.startedAtMs) / 1000);
+  }
+
+  function runNextProjectDemo() {
+    if (!projectRegistry.length) return null;
+    const next = projectRegistry[runtime.completedRuns % projectRegistry.length];
+    queueProjectBoot(next);
+    return next;
+  }
+
   function pushLine(text, type = 'info') {
     terminal.lines.push({ text, type, at: performance.now() });
     if (terminal.lines.length > 72) terminal.lines.shift();
   }
 
+  function emitTerminalStatus(status, extra = {}) {
+    if (typeof window === 'undefined') return;
+    window.dispatchEvent(
+      new CustomEvent('warp:terminal-status', {
+        detail: { status, ...extra },
+      })
+    );
+  }
+
+  function normalizeProjects(raw) {
+    if (!Array.isArray(raw)) return defaultProjectRegistry.slice();
+    const cleaned = raw
+      .map((item) => {
+        if (!item || typeof item !== 'object') return null;
+        const id = typeof item.id === 'string' ? item.id.trim() : '';
+        const name = typeof item.name === 'string' ? item.name.trim() : '';
+        if (!id || !name) return null;
+        return {
+          id,
+          name,
+          description: typeof item.description === 'string' ? item.description : '',
+          language: typeof item.language === 'string' ? item.language : 'N/A',
+          stack: Array.isArray(item.stack) ? item.stack.filter((v) => typeof v === 'string') : [],
+        };
+      })
+      .filter(Boolean);
+
+    return cleaned.length > 0 ? cleaned : defaultProjectRegistry.slice();
+  }
+
+  function setProjects(raw) {
+    projectRegistry = normalizeProjects(raw);
+    pushLine(`[registry] ${projectRegistry.length} project(s) loaded`, 'ok');
+    if (runtime.activeProject) {
+      const stillAvailable = projectRegistry.some((project) => project.id === runtime.activeProject.id);
+      if (!stillAvailable) stopProject('removed from registry');
+    }
+    emitTerminalStatus('registry-loaded', { count: projectRegistry.length });
+  }
+
+  function getProjects() {
+    return projectRegistry.slice();
+  }
+
+  function findProject(identifier) {
+    if (!identifier) return null;
+    const query = String(identifier).trim().toLowerCase();
+    return (
+      projectRegistry.find((project) => project.id.toLowerCase() === query) ||
+      projectRegistry.find((project) => project.name.toLowerCase() === query) ||
+      null
+    );
+  }
+
+  function printProjects() {
+    pushLine(`projects (${projectRegistry.length}):`, 'ok');
+    projectRegistry.forEach((project) => {
+      pushLine(`- ${project.id} :: ${project.name} [${project.language}]`, 'hint');
+    });
+    pushLine('tip: run <id>  |  about <id>  |  demo', 'hint');
+  }
+
+  function stopProject(reason = 'stopped by user') {
+    if (!runtime.activeProject) return;
+    const current = runtime.activeProject;
+    pushLine(`[runtime] ${current.name} ${reason}`, 'warn');
+    emitTerminalStatus('idle', { projectId: current.id, projectName: current.name });
+    runtime.completedRuns += 1;
+    runtime.phase = 'idle';
+    runtime.activeProject = null;
+    runtime.profile = null;
+    runtime.queue = [];
+    runtime.queueIndex = 0;
+    runtime.queueClock = 0;
+    runtime.traceClock = 0;
+    runtime.traceIndex = 0;
+    runtime.startedAtMs = 0;
+    runtime.autoHintClock = 0;
+  }
+
+  function queueProjectBoot(project) {
+    if (!project) return;
+    if (runtime.activeProject && runtime.activeProject.id !== project.id) {
+      stopProject('preempted');
+    }
+
+    const profile = getProjectProfile(project.id);
+    runtime.phase = 'booting';
+    runtime.activeProject = project;
+    runtime.profile = profile;
+    runtime.queue = [
+      { t: 0.1, text: 'WARP OS v1.0 Inicializando...', type: 'ok' },
+      { t: 0.35, text: 'Estableciendo entorno virtual...', type: 'ok' },
+      { t: 0.6, text: `Descargando binario [${project.id}.wasm] (simulado)... [##########] 100%`, type: 'ok' },
+      { t: 0.86, text: 'Verificando integridad del paquete... OK', type: 'ok' },
+      { t: 1.12, text: 'Compilando modulo WebAssembly...', type: 'ok' },
+      { t: 1.42, text: 'Montando sistema de archivos virtual (MEMFS)...', type: 'ok' },
+      { t: 1.74, text: 'Enlazando I/O y runtime bridge...', type: 'ok' },
+      { t: 2.0, text: `Entorno listo. Ejecutando proyecto '${project.name}'`, type: 'ok' },
+      { t: 2.2, text: `stack: ${(project.stack || []).join(' + ') || 'n/a'}`, type: 'hint' },
+      { t: 2.4, text: project.description || 'Proyecto en ejecucion.', type: 'hint' },
+      ...profile.boot.map((line, index) => ({
+        t: 2.65 + index * 0.22,
+        text: line,
+        type: 'hint',
+      })),
+    ];
+    runtime.queueIndex = 0;
+    runtime.queueClock = 0;
+    runtime.traceClock = 0;
+    runtime.traceIndex = 0;
+    runtime.startedAtMs = performance.now();
+    runtime.autoHintClock = 0;
+    terminal.metrics.energy = Math.min(2.8, terminal.metrics.energy + 0.34);
+
+    pushLine(`[launch] ${project.name}`, 'cmd');
+    emitTerminalStatus('loading', { projectId: project.id, projectName: project.name });
+  }
+
+  function runProjectById(projectId) {
+    const project = findProject(projectId);
+    if (!project) {
+      pushLine(`project not found: ${projectId}`, 'warn');
+      pushLine('tip: use "projects" to list available ids', 'hint');
+      return false;
+    }
+    queueProjectBoot(project);
+    return true;
+  }
+
+  setProjects(defaultProjectRegistry);
   pushLine('[boot] portfolio scene initialized', 'ok');
   pushLine('[hint] click screen and type "help"', 'hint');
 
@@ -509,19 +770,93 @@ function createScreenTexture() {
 
     switch (command.toLowerCase()) {
       case 'help':
-        pushLine('commands: help, status, stack, sections, focus, clear, glow, ping', 'ok');
+        pushLine(
+          'commands: help, status, runtime, stack, sections, projects, run <id>, about <id>, demo, launcher, stop, focus, clear, glow, ping',
+          'ok'
+        );
         break;
       case 'status':
         pushLine(
-          `scene: online | scroll ${(terminal.metrics.scroll * 100).toFixed(1)}% | velocity ${terminal.metrics.velocity.toFixed(2)} | glow ${terminal.metrics.energy.toFixed(2)}`,
+          `scene: online | scroll ${(terminal.metrics.scroll * 100).toFixed(1)}% | velocity ${terminal.metrics.velocity.toFixed(2)} | glow ${terminal.metrics.energy.toFixed(2)} | runtime ${runtime.phase}`,
           'ok'
         );
+        if (runtime.activeProject) {
+          pushLine(`active project: ${runtime.activeProject.name} (${runtime.activeProject.id})`, 'hint');
+        }
         break;
       case 'stack':
         pushLine('stack: Three.js + Anime.js + Vite + CanvasTexture', 'ok');
         break;
       case 'sections':
         pushLine('sections: hero, about, skills, projects, experience, contact', 'ok');
+        break;
+      case 'projects':
+        printProjects();
+        break;
+      case 'registry':
+        pushLine(`registry entries: ${projectRegistry.length}`, 'ok');
+        break;
+      case 'run': {
+        if (!arg) {
+          pushLine('usage: run <project-id>', 'hint');
+          break;
+        }
+        runProjectById(arg);
+        break;
+      }
+      case 'open': {
+        if (!arg) {
+          pushLine('usage: open <project-id>', 'hint');
+          break;
+        }
+        runProjectById(arg);
+        break;
+      }
+      case 'demo': {
+        const next = runNextProjectDemo();
+        if (!next) {
+          pushLine('no projects available', 'warn');
+        } else {
+          pushLine(`demo launch -> ${next.id}`, 'hint');
+        }
+        break;
+      }
+      case 'about': {
+        if (!arg) {
+          pushLine('usage: about <project-id>', 'hint');
+          break;
+        }
+        const project = findProject(arg);
+        if (!project) {
+          pushLine(`project not found: ${arg}`, 'warn');
+          break;
+        }
+        pushLine(`${project.name} [${project.id}]`, 'ok');
+        pushLine(project.description || 'No description available.', 'hint');
+        pushLine(`lang: ${project.language} | stack: ${(project.stack || []).join(' · ') || 'n/a'}`, 'hint');
+        break;
+      }
+      case 'launcher':
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('warp:open-project-list'));
+          pushLine('opening accessible launcher...', 'ok');
+        }
+        break;
+      case 'runtime': {
+        const uptime = getRuntimeUptimeSec();
+        const active = runtime.activeProject ? runtime.activeProject.id : 'none';
+        pushLine(
+          `runtime: ${runtime.phase} | active: ${active} | uptime: ${uptime.toFixed(1)}s | runs: ${runtime.completedRuns}`,
+          'ok'
+        );
+        break;
+      }
+      case 'stop':
+        if (!runtime.activeProject) {
+          pushLine('runtime idle', 'hint');
+        } else {
+          stopProject('stopped');
+        }
         break;
       case 'focus':
         pushLine('focus target: hero laptop + live IDE overlay', 'ok');
@@ -555,8 +890,10 @@ function createScreenTexture() {
     terminal.focused = focused;
     if (focused) {
       pushLine('[interactive] terminal focus enabled', 'ok');
+      emitTerminalStatus('focus-on');
     } else {
       pushLine('[interactive] terminal focus released', 'hint');
+      emitTerminalStatus('focus-off');
     }
   }
 
@@ -673,6 +1010,27 @@ function createScreenTexture() {
     });
     baseCtx.globalAlpha = 1;
 
+    // Window controls (minimize / maximize / close) for terminal UX cues
+    const controlY = ide.y + 19;
+    const controlX = ide.x + ide.w - 118;
+    roundedRect(baseCtx, controlX, controlY, 90, 16, 8);
+    baseCtx.fillStyle = 'rgba(28, 38, 73, 0.62)';
+    baseCtx.fill();
+    baseCtx.strokeStyle = 'rgba(148, 170, 230, 0.24)';
+    baseCtx.stroke();
+
+    baseCtx.fillStyle = 'rgba(192, 205, 238, 0.74)';
+    baseCtx.fillRect(controlX + 14, controlY + 8, 12, 1.4);
+    baseCtx.strokeStyle = 'rgba(192, 205, 238, 0.78)';
+    baseCtx.strokeRect(controlX + 39, controlY + 5, 9, 7);
+    baseCtx.beginPath();
+    baseCtx.strokeStyle = 'rgba(255, 164, 180, 0.9)';
+    baseCtx.moveTo(controlX + 63, controlY + 5);
+    baseCtx.lineTo(controlX + 76, controlY + 12);
+    baseCtx.moveTo(controlX + 76, controlY + 5);
+    baseCtx.lineTo(controlX + 63, controlY + 12);
+    baseCtx.stroke();
+
     roundedRect(baseCtx, ide.sidebarX, ide.y + 58, 92, ide.h - 126, 8);
     baseCtx.fillStyle = 'rgba(14, 21, 42, 0.72)';
     baseCtx.fill();
@@ -728,6 +1086,7 @@ function createScreenTexture() {
     if (scrollProgress >= 0.3) nextTabIndex = 1;
     if (scrollProgress >= 0.58) nextTabIndex = 2;
     if (scrollProgress >= 0.82) nextTabIndex = 3;
+    if (runtime.phase !== 'idle' && terminal.focused) nextTabIndex = 3;
     if (nextTabIndex !== activeTabIndex) {
       activeTabIndex = nextTabIndex;
       pushLine(`[tab] switched to ${tabDefinitions[activeTabIndex].label}`, 'ok');
@@ -750,6 +1109,46 @@ function createScreenTexture() {
       terminal.milestones.m3 = true;
       pushLine('[event] viewport::docs mode active', 'ok');
     }
+
+    if (runtime.phase === 'booting' && runtime.activeProject) {
+      runtime.queueClock += delta;
+      while (
+        runtime.queueIndex < runtime.queue.length &&
+        runtime.queueClock >= runtime.queue[runtime.queueIndex].t
+      ) {
+        const step = runtime.queue[runtime.queueIndex];
+        pushLine(step.text, step.type || 'info');
+        runtime.queueIndex += 1;
+      }
+
+      if (runtime.queueIndex >= runtime.queue.length) {
+        runtime.phase = 'running';
+        runtime.traceClock = 0;
+        emitTerminalStatus('running', {
+          projectId: runtime.activeProject.id,
+          projectName: runtime.activeProject.name,
+        });
+      }
+    }
+
+    if (runtime.phase === 'running' && runtime.activeProject) {
+      runtime.traceClock += delta;
+      if (runtime.traceClock > 4.8) {
+        runtime.traceClock = 0;
+        const trace = buildProjectTraceLine(runtime.activeProject, runtime.traceIndex, terminal.metrics);
+        runtime.traceIndex += 1;
+        pushLine(trace, 'hint');
+      }
+    }
+
+    if (runtime.phase === 'idle') {
+      runtime.autoHintClock += delta;
+      if (runtime.autoHintClock > 12) {
+        runtime.autoHintClock = 0;
+        pushLine('[hint] use "projects" or "launcher" to explore demos', 'hint');
+      }
+    }
+
     if (!terminal.focused && autoLogTime > 3.2) {
       autoLogTime = 0;
       pushLine(`[trace] orbit ${(0.44 + scrollProgress * 0.7).toFixed(2)} | render stable`, 'hint');
@@ -848,7 +1247,7 @@ function createScreenTexture() {
     if (!terminal.focused) {
       ctx.fillStyle = 'rgba(172, 188, 229, 0.58)';
       ctx.font = '15px "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
-      ctx.fillText('click screen or press Ctrl+I to interact', ide.termX + 480, promptY);
+      ctx.fillText('click screen or press Ctrl+I · type "projects" or "launcher"', ide.termX + 344, promptY);
     }
 
     const activityWidth = 60 + scrollProgress * 420 + (Math.sin(time * 3.2) * 20 + 20);
@@ -883,7 +1282,16 @@ function createScreenTexture() {
 
   update(0, 0, 0, 1 / 60);
 
-  return { texture, update, setFocus, handleKeyDown };
+  return {
+    texture,
+    update,
+    setFocus,
+    handleKeyDown,
+    setProjects,
+    runProjectById,
+    getProjects,
+    isFocused: () => terminal.focused,
+  };
 }
 
 function createStarLayer(config, texture) {
@@ -1823,11 +2231,13 @@ export function initThreeScene() {
 
   function onPointerMove(event) {
     if (prefersReducedMotion) return;
+    if (screenDisplay.isFocused()) return;
     updatePointer(event.clientX, event.clientY);
   }
 
   function onMouseMove(event) {
     if (prefersReducedMotion) return;
+    if (screenDisplay.isFocused()) return;
     updatePointer(event.clientX, event.clientY);
   }
 
@@ -1845,6 +2255,7 @@ export function initThreeScene() {
 
   function onTouchMove(event) {
     if (prefersReducedMotion) return;
+    if (screenDisplay.isFocused()) return;
     if (!event.touches || !event.touches[0]) return;
     updatePointer(event.touches[0].clientX, event.touches[0].clientY);
   }
@@ -1894,6 +2305,18 @@ export function initThreeScene() {
     prefersReducedMotion = reducedMotionQuery.matches || manualReducedMotion;
   }
 
+  function onProjectRegistry(event) {
+    const incoming = event?.detail?.projects;
+    screenDisplay.setProjects(incoming);
+  }
+
+  function onTerminalRunProject(event) {
+    const projectId = event?.detail?.projectId;
+    if (!projectId) return;
+    screenDisplay.setFocus(true);
+    screenDisplay.runProjectById(projectId);
+  }
+
   function onVisibilityChange() {
     if (document.hidden) resetPointer();
   }
@@ -1916,6 +2339,8 @@ export function initThreeScene() {
   window.addEventListener('resize', onResize);
   window.addEventListener('keydown', onKeyDown);
   window.addEventListener('warp:motion-mode', onMotionModeChange);
+  window.addEventListener('warp:project-registry', onProjectRegistry);
+  window.addEventListener('warp:terminal-run-project', onTerminalRunProject);
 
   if (reducedMotionQuery.addEventListener) {
     reducedMotionQuery.addEventListener('change', onReducedMotionChange);
@@ -2115,6 +2540,8 @@ export function initThreeScene() {
     window.removeEventListener('resize', onResize);
     window.removeEventListener('keydown', onKeyDown);
     window.removeEventListener('warp:motion-mode', onMotionModeChange);
+    window.removeEventListener('warp:project-registry', onProjectRegistry);
+    window.removeEventListener('warp:terminal-run-project', onTerminalRunProject);
 
     if (reducedMotionQuery.removeEventListener) {
       reducedMotionQuery.removeEventListener('change', onReducedMotionChange);
