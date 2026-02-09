@@ -267,7 +267,7 @@ function loadAccessoryModel(loader, url, options) {
     metalnessBoost: 0.05,
     envMapIntensity: 1.15,
     glowColor: 0x2ec8ff,
-    glowOpacity: 0.26,
+    glowOpacity: 0.2,
     glowPlane: [0.9, 0.65],
     ...options,
   };
@@ -421,7 +421,7 @@ function createScreenTexture() {
       '});',
       '',
       'renderer.setPixelRatio(Math.min(devicePixelRatio, 1.8));',
-      'renderer.toneMappingExposure = 1.08;',
+      'renderer.toneMappingExposure = 0.98;',
       'renderer.render(scene, camera);',
     ],
     [
@@ -724,7 +724,10 @@ function createScreenTexture() {
     cursorBlink += delta;
     autoLogTime += delta;
 
-    const nextTabIndex = Math.min(tabDefinitions.length - 1, Math.floor(scrollProgress * tabDefinitions.length + 0.0001));
+    let nextTabIndex = 0;
+    if (scrollProgress >= 0.3) nextTabIndex = 1;
+    if (scrollProgress >= 0.58) nextTabIndex = 2;
+    if (scrollProgress >= 0.82) nextTabIndex = 3;
     if (nextTabIndex !== activeTabIndex) {
       activeTabIndex = nextTabIndex;
       pushLine(`[tab] switched to ${tabDefinitions[activeTabIndex].label}`, 'ok');
@@ -935,8 +938,8 @@ function createStarLayer(config, texture) {
     parallax,
     speed,
     phase: Math.random() * Math.PI * 2,
-    twinkleSpeed: 0.42 + Math.random() * 0.4,
-    twinkleAmount: 0.12 + Math.random() * 0.08,
+    twinkleSpeed: 0.34 + Math.random() * 0.28,
+    twinkleAmount: 0.07 + Math.random() * 0.05,
   };
 }
 
@@ -1012,7 +1015,7 @@ function createLaptopModel(textures) {
     new THREE.MeshStandardMaterial({
       color: 0xcda7ff,
       emissive: new THREE.Color(0x7a3cff),
-      emissiveIntensity: 1.15,
+      emissiveIntensity: 0.86,
       metalness: 0.18,
       roughness: 0.3,
     })
@@ -1022,7 +1025,7 @@ function createLaptopModel(textures) {
     new THREE.MeshStandardMaterial({
       color: 0xf6f8ff,
       emissive: new THREE.Color(0x31204f),
-      emissiveIntensity: 0.62,
+      emissiveIntensity: 0.46,
       metalness: 0.12,
       roughness: 0.33,
       vertexColors: true,
@@ -1042,7 +1045,7 @@ function createLaptopModel(textures) {
       map: textures.screen.texture,
       emissiveMap: textures.screen.texture,
       emissive: new THREE.Color(0x5677ff),
-      emissiveIntensity: 0.64,
+      emissiveIntensity: 0.5,
       roughness: 0.15,
       metalness: 0.08,
     })
@@ -1052,7 +1055,7 @@ function createLaptopModel(textures) {
     new THREE.MeshPhysicalMaterial({
       color: 0xb8ccff,
       transparent: true,
-      opacity: 0.028,
+      opacity: 0.022,
       transmission: 0.82,
       roughness: 0.02,
       metalness: 0,
@@ -1075,7 +1078,7 @@ function createLaptopModel(textures) {
     new THREE.MeshBasicMaterial({
       map: textures.glow,
       transparent: true,
-      opacity: 0.48,
+      opacity: 0.3,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
       color: 0x8f57ff,
@@ -1110,7 +1113,7 @@ function createLaptopModel(textures) {
   const keyCols = 16;
   const keyCount = keyRows * keyCols;
 
-  const keyGeometry = useGeometry(new RoundedBoxGeometry(0.104, 0.022, 0.104, 2, 0.01));
+  const keyGeometry = useGeometry(new RoundedBoxGeometry(0.11, 0.024, 0.108, 2, 0.01));
   const keys = new THREE.InstancedMesh(keyGeometry, keyboardMat, keyCount);
   const tmp = new THREE.Object3D();
   const baseColor = new THREE.Color(0x8790a8);
@@ -1121,7 +1124,7 @@ function createLaptopModel(textures) {
   for (let row = 0; row < keyRows; row++) {
     for (let col = 0; col < keyCols; col++) {
       const x = (col - (keyCols - 1) * 0.5) * 0.152;
-      const z = (row - (keyRows - 1) * 0.5) * 0.144 - 0.14;
+      const z = (row - (keyRows - 1) * 0.5) * 0.146 - 0.14;
 
       tmp.position.set(x, 0.112, z);
       tmp.rotation.set(0, 0, 0);
@@ -1151,6 +1154,9 @@ function createLaptopModel(textures) {
   const leftPortA = new THREE.Mesh(useGeometry(new THREE.BoxGeometry(0.016, 0.028, 0.24)), portMat);
   leftPortA.position.set(-1.712, 0.032, 0.32);
   root.add(leftPortA);
+  const leftUsbC = new THREE.Mesh(useGeometry(new THREE.BoxGeometry(0.012, 0.008, 0.08)), portMat);
+  leftUsbC.position.set(-1.71, 0.026, 0.06);
+  root.add(leftUsbC);
   const leftPortB = new THREE.Mesh(useGeometry(new THREE.BoxGeometry(0.012, 0.018, 0.12)), portMat);
   leftPortB.position.set(-1.712, 0.032, -0.02);
   root.add(leftPortB);
@@ -1173,6 +1179,9 @@ function createLaptopModel(textures) {
   const rightPortA = leftPortB.clone();
   rightPortA.position.set(1.712, 0.032, 0.3);
   root.add(rightPortA);
+  const rightUsbC = leftUsbC.clone();
+  rightUsbC.position.set(1.71, 0.026, 0.02);
+  root.add(rightUsbC);
   const rightPortB = new THREE.Mesh(useGeometry(new THREE.BoxGeometry(0.016, 0.028, 0.24)), portMat);
   rightPortB.position.set(1.712, 0.031, -0.06);
   root.add(rightPortB);
@@ -1223,12 +1232,12 @@ function createLaptopModel(textures) {
   root.add(topVentSlots);
 
   const speakerDotGeo = useGeometry(new THREE.CylinderGeometry(0.006, 0.006, 0.003, 10));
-  const speakerDots = new THREE.InstancedMesh(speakerDotGeo, portMat, 96);
+  const speakerDots = new THREE.InstancedMesh(speakerDotGeo, portMat, 120);
   let s = 0;
   for (let side = -1; side <= 1; side += 2) {
-    for (let row = 0; row < 4; row++) {
+    for (let row = 0; row < 5; row++) {
       for (let col = 0; col < 12; col++) {
-        tmp.position.set(side * 1.34, 0.102, -0.55 + col * 0.11 + row * 0.004);
+        tmp.position.set(side * 1.335, 0.102, -0.57 + col * 0.104 + row * 0.004);
         tmp.rotation.set(Math.PI * 0.5, 0, 0);
         tmp.updateMatrix();
         speakerDots.setMatrixAt(s, tmp.matrix);
@@ -1287,21 +1296,24 @@ function createLaptopModel(textures) {
   lidBack.position.set(0, 0.97, -0.01);
   lidPivot.add(lidBack);
 
-  const bezel = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(3.0, 1.8, 0.028, 5, 0.01)), bezelMat);
+  const bezel = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(3.06, 1.84, 0.028, 5, 0.01)), bezelMat);
   bezel.position.set(0, 0.97, 0.026);
   lidPivot.add(bezel);
 
-  const panel = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(2.97, 1.76)), panelMat);
+  const panel = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(3.0, 1.79)), panelMat);
   panel.position.set(0, 0.97, 0.045);
   lidPivot.add(panel);
 
-  const panelGlass = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(2.97, 1.76)), glassMat);
+  const panelGlass = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(3.0, 1.79)), glassMat);
   panelGlass.position.set(0, 0.97, 0.052);
   lidPivot.add(panelGlass);
 
   const camDot = new THREE.Mesh(useGeometry(new THREE.CircleGeometry(0.013, 16)), darkMat);
   camDot.position.set(0, 1.79, 0.054);
   lidPivot.add(camDot);
+  const camNotch = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(0.1, 0.01, 0.006, 3, 0.002)), detailMat);
+  camNotch.position.set(0, 1.79, 0.05);
+  lidPivot.add(camNotch);
 
   const shadow = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(4.2, 2.7)), shadowMat);
   shadow.rotation.x = -Math.PI * 0.5;
@@ -1365,11 +1377,11 @@ function createMousePadAccessory() {
     new THREE.MeshStandardMaterial({
       color: 0x8cd8ff,
       emissive: new THREE.Color(0x2ec8ff),
-      emissiveIntensity: 0.72,
+      emissiveIntensity: 0.5,
       metalness: 0.02,
       roughness: 0.28,
       transparent: true,
-      opacity: 0.74,
+      opacity: 0.56,
     })
   );
 
@@ -1378,7 +1390,7 @@ function createMousePadAccessory() {
     new THREE.MeshBasicMaterial({
       map: glowTexture,
       transparent: true,
-      opacity: 0.28,
+      opacity: 0.2,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       color: 0x2ec8ff,
@@ -1469,11 +1481,11 @@ function createMouseAccessory() {
     new THREE.MeshStandardMaterial({
       color: 0xa7ecff,
       emissive: new THREE.Color(0x2ec8ff),
-      emissiveIntensity: 0.78,
+      emissiveIntensity: 0.56,
       metalness: 0.02,
       roughness: 0.3,
       transparent: true,
-      opacity: 0.82,
+      opacity: 0.62,
     })
   );
 
@@ -1490,7 +1502,7 @@ function createMouseAccessory() {
     new THREE.MeshBasicMaterial({
       map: glowTexture,
       transparent: true,
-      opacity: 0.36,
+      opacity: 0.24,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       color: 0x2ec8ff,
@@ -1603,14 +1615,14 @@ export function initThreeScene() {
   const isMobile = window.innerWidth < 920;
   const SCENE_TUNING = {
     maxPixelRatio: 1.8,
-    heroRangeMultiplier: 1.9,
-    heroViewportKickScale: 1.5,
-    minViewportKickHeight: 980,
+    heroRangeMultiplier: 2.4,
+    heroViewportKickScale: 2.1,
+    minViewportKickHeight: 1380,
     scrollBlendGlobal: 0.26,
     scrollBlendViewport: 0.5,
     laptopBaseXDesktop: 3.98,
     laptopBaseXMobile: 0.56,
-    laptopBaseY: 0.14,
+    laptopBaseY: 0.04,
     laptopBaseZ: -0.4,
   };
 
@@ -1625,10 +1637,10 @@ export function initThreeScene() {
     padRevealStart: 0.015,
     padRevealRange: 0.12,
     padScale: 1.65,
-    padEdgeOpacityBase: 0.2,
-    padEdgeOpacityGain: 0.58,
-    padGlowOpacityBase: 0.08,
-    padGlowOpacityGain: 0.24,
+    padEdgeOpacityBase: 0.12,
+    padEdgeOpacityGain: 0.38,
+    padGlowOpacityBase: 0.05,
+    padGlowOpacityGain: 0.15,
     mouseRevealStart: 0.16,
     mouseRevealRange: 0.16,
     mouseXDesktop: 0.01,
@@ -1653,7 +1665,7 @@ export function initThreeScene() {
   renderer.setSize(window.innerWidth, window.innerHeight, false);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.08;
+  renderer.toneMappingExposure = 0.98;
 
   const pmrem = new THREE.PMREMGenerator(renderer);
   const envRT = pmrem.fromScene(new RoomEnvironment(), 0.05);
@@ -1662,8 +1674,8 @@ export function initThreeScene() {
   scene.environment = envRT.texture;
   scene.fog = new THREE.Fog(0x090b13, 9, 26);
 
-  const camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.1, 90);
-  camera.position.set(0.18, 1.08, 7.12);
+  const camera = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 90);
+  camera.position.set(0.2, 1.26, 7.06);
 
   scene.add(new THREE.AmbientLight(0xffffff, 0.28));
 
@@ -1712,7 +1724,7 @@ export function initThreeScene() {
     metalnessBoost: 0.03,
     envMapIntensity: 1.1,
     glowColor: 0x2ec8ff,
-    glowOpacity: 0.22,
+    glowOpacity: 0.16,
     glowPlane: [1.72, 1.28],
     autoFlat: true,
     longAxis: 'z',
@@ -1739,7 +1751,7 @@ export function initThreeScene() {
     metalnessBoost: 0.02,
     envMapIntensity: 1.18,
     glowColor: 0x39d2ff,
-    glowOpacity: 0.18,
+    glowOpacity: 0.14,
     glowPlane: [0.68, 0.42],
     autoFlat: true,
     longAxis: 'z',
@@ -1764,13 +1776,13 @@ export function initThreeScene() {
 
   const layerConfig = prefersReducedMotion
     ? [
-        { count: isMobile ? 200 : 280, spreadX: 42, spreadY: 24, depth: 22, size: 0.05, opacity: 0.16, parallax: 0.16, speed: 0.02 },
-        { count: isMobile ? 130 : 190, spreadX: 32, spreadY: 18, depth: 16, size: 0.07, opacity: 0.13, parallax: 0.24, speed: 0.028 },
+        { count: isMobile ? 200 : 280, spreadX: 42, spreadY: 24, depth: 22, size: 0.05, opacity: 0.13, parallax: 0.16, speed: 0.02 },
+        { count: isMobile ? 130 : 190, spreadX: 32, spreadY: 18, depth: 16, size: 0.07, opacity: 0.1, parallax: 0.24, speed: 0.028 },
       ]
     : [
-        { count: isMobile ? 320 : 500, spreadX: 46, spreadY: 26, depth: 28, size: 0.045, opacity: 0.19, parallax: 0.12, speed: 0.024 },
-        { count: isMobile ? 220 : 360, spreadX: 36, spreadY: 20, depth: 20, size: 0.062, opacity: 0.15, parallax: 0.22, speed: 0.032 },
-        { count: isMobile ? 100 : 180, spreadX: 26, spreadY: 15, depth: 12, size: 0.085, opacity: 0.12, parallax: 0.32, speed: 0.04 },
+        { count: isMobile ? 320 : 500, spreadX: 46, spreadY: 26, depth: 28, size: 0.045, opacity: 0.15, parallax: 0.12, speed: 0.024 },
+        { count: isMobile ? 220 : 360, spreadX: 36, spreadY: 20, depth: 20, size: 0.062, opacity: 0.12, parallax: 0.22, speed: 0.032 },
+        { count: isMobile ? 100 : 180, spreadX: 26, spreadY: 15, depth: 12, size: 0.085, opacity: 0.095, parallax: 0.32, speed: 0.04 },
       ];
 
   const starLayers = layerConfig.map((cfg) => createStarLayer(cfg, starTexture));
@@ -1943,7 +1955,7 @@ export function initThreeScene() {
     const pointerCurveX = Math.tanh(state.pointerX * 1.22);
     const pointerCurveY = Math.tanh(state.pointerY * 1.25);
 
-    const basePitch = 0.072 + Math.sin(t * 0.58) * 0.008 * motionFactor;
+    const basePitch = 0.046 + Math.sin(t * 0.58) * 0.006 * motionFactor;
     const baseYaw = 0.28 + state.scroll * 0.16;
     const baseRoll = Math.sin(t * 0.45) * 0.006 * motionFactor;
 
@@ -1968,19 +1980,19 @@ export function initThreeScene() {
     laptop.root.position.y = damp(laptop.root.position.y, targetY, 6.4, dt);
     laptop.root.position.z = damp(laptop.root.position.z, targetZ, 6.4, dt);
 
-    const openAngle = -0.47 - state.scroll * 0.05 + Math.sin(t * 0.3) * 0.008 * motionFactor + velocityKick * 0.04;
+    const openAngle = -0.42 - state.scroll * 0.03 + Math.sin(t * 0.3) * 0.006 * motionFactor + velocityKick * 0.03;
     laptop.lidPivot.rotation.x = damp(laptop.lidPivot.rotation.x, openAngle, 5, dt);
 
-    const pulse = 0.82 + Math.sin(t * 2.1) * 0.18 + state.scroll * 0.22 + Math.abs(state.scrollVelocity) * 0.08;
-    laptop.keyboardMat.emissiveIntensity = 0.38 + pulse * 0.36;
-    laptop.panelMat.emissiveIntensity = 0.5 + pulse * 0.24;
-    laptop.ledMat.emissiveIntensity = 0.92 + pulse * 0.62;
-    laptop.underGlowMat.opacity = 0.24 + pulse * 0.22;
+    const pulse = 0.62 + Math.sin(t * 1.75) * 0.12 + state.scroll * 0.16 + Math.abs(state.scrollVelocity) * 0.04;
+    laptop.keyboardMat.emissiveIntensity = 0.28 + pulse * 0.24;
+    laptop.panelMat.emissiveIntensity = 0.34 + pulse * 0.17;
+    laptop.ledMat.emissiveIntensity = 0.58 + pulse * 0.42;
+    laptop.underGlowMat.opacity = 0.12 + pulse * 0.14;
 
     const ledHue = 0.74 + Math.sin(t * 0.44 + state.scroll * 2.2) * 0.04;
     frontLedColor.setHSL(ledHue, 0.74, 0.66);
     laptop.ledMat.color.copy(frontLedColor);
-    laptop.ledMat.emissive.copy(frontLedColor).multiplyScalar(0.54);
+    laptop.ledMat.emissive.copy(frontLedColor).multiplyScalar(0.44);
 
     if (!prefersReducedMotion && t - lastKeyboardColorTick > 0.028) {
       lastKeyboardColorTick = t;
@@ -2026,7 +2038,7 @@ export function initThreeScene() {
         mousePadAccessory.edgeMat.opacity = ACCESSORY_TUNING.padEdgeOpacityBase + mousePadReveal * ACCESSORY_TUNING.padEdgeOpacityGain;
       }
       if ('emissiveIntensity' in mousePadAccessory.edgeMat) {
-        mousePadAccessory.edgeMat.emissiveIntensity = 0.34 + mousePadReveal * 0.68 + pulse * 0.16;
+        mousePadAccessory.edgeMat.emissiveIntensity = 0.24 + mousePadReveal * 0.42 + pulse * 0.1;
       }
     }
     if (mousePadAccessory.glowMat && 'opacity' in mousePadAccessory.glowMat) {
@@ -2050,23 +2062,23 @@ export function initThreeScene() {
       mouseAccessory.wheel.rotation.z += (1.1 + state.scroll * 7 + Math.abs(state.scrollVelocity) * 4) * dt;
     }
     if (mouseAccessory.sideLedMat) {
-      if ('opacity' in mouseAccessory.sideLedMat) mouseAccessory.sideLedMat.opacity = 0.22 + mouseReveal * 0.7;
+      if ('opacity' in mouseAccessory.sideLedMat) mouseAccessory.sideLedMat.opacity = 0.14 + mouseReveal * 0.46;
       if ('emissiveIntensity' in mouseAccessory.sideLedMat) {
-        mouseAccessory.sideLedMat.emissiveIntensity = 0.7 + mouseReveal * 0.95 + pulse * 0.25;
+        mouseAccessory.sideLedMat.emissiveIntensity = 0.5 + mouseReveal * 0.55 + pulse * 0.16;
       }
     }
     if (mouseAccessory.glowMat && 'opacity' in mouseAccessory.glowMat) {
-      mouseAccessory.glowMat.opacity = 0.12 + mouseReveal * 0.45;
+      mouseAccessory.glowMat.opacity = 0.08 + mouseReveal * 0.24;
     }
 
     const camTargetX = (pointerCurveX * 0.34 + (isMobile ? 0.08 : 0.16) + state.scroll * 0.05) * motionFactor;
-    const camTargetY = (0.94 - pointerCurveY * 0.08 - state.scroll * 0.06) * motionFactor + (1 - motionFactor) * 0.28;
-    const camTargetZ = 7.08 + state.scroll * 0.2;
+    const camTargetY = (1.18 - pointerCurveY * 0.062 - state.scroll * 0.055) * motionFactor + (1 - motionFactor) * 0.34;
+    const camTargetZ = 7.0 + state.scroll * 0.17;
 
     camera.position.x = damp(camera.position.x, camTargetX, 4.7, dt);
     camera.position.y = damp(camera.position.y, camTargetY, 4.7, dt);
     camera.position.z = damp(camera.position.z, camTargetZ, 4.2, dt);
-    camera.lookAt(baseX * 0.38, 0.36 - state.scroll * 0.05, -0.08);
+    camera.lookAt(baseX * 0.38, 0.26 - state.scroll * 0.045, -0.06);
 
     starLayers.forEach((layer, index) => {
       const depth = 1 + index * 0.28;

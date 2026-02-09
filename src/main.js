@@ -46,6 +46,15 @@ initThreeScene();
 document.addEventListener('DOMContentLoaded', () => {
   const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
   const supportsFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const MOTION = {
+    easePrimary: 'easeOutCubic',
+    easeSoft: 'easeOutQuad',
+    easeInOut: 'easeInOutSine',
+    durationFast: 360,
+    durationBase: 560,
+    durationMedium: 760,
+    durationSlow: 1100,
+  };
 
   function isMotionReduced() {
     return document.body.dataset.motion === 'reduced' || reducedMotionMedia.matches;
@@ -93,6 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
     uiToggle.addEventListener('click', () => {
       const open = uiPanel.classList.toggle('open');
       uiPanel.setAttribute('aria-hidden', open ? 'false' : 'true');
+      uiToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
 
     uiPanel.querySelectorAll('.ui-option').forEach((button) => {
@@ -114,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (uiPanel.contains(event.target) || uiToggle.contains(event.target)) return;
       uiPanel.classList.remove('open');
       uiPanel.setAttribute('aria-hidden', 'true');
+      uiToggle.setAttribute('aria-expanded', 'false');
     });
 
     document.addEventListener('keydown', (event) => {
@@ -121,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!uiPanel.classList.contains('open')) return;
       uiPanel.classList.remove('open');
       uiPanel.setAttribute('aria-hidden', 'true');
+      uiToggle.setAttribute('aria-expanded', 'false');
     });
   }
 
@@ -254,8 +266,8 @@ document.addEventListener('DOMContentLoaded', () => {
         targets: counter,
         value: target,
         round: 1,
-        easing: 'easeOutExpo',
-        duration: 2000,
+        easing: MOTION.easePrimary,
+        duration: MOTION.durationSlow + 300,
         delay: 500,
         update: () => {
           stat.textContent = String(counter.value);
@@ -303,6 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
     skillBars.forEach((bar) => {
       const width = bar.dataset.width;
       bar.style.width = `${width}%`;
+      bar.setAttribute('aria-valuenow', width);
     });
   }
 
@@ -314,9 +327,12 @@ document.addEventListener('DOMContentLoaded', () => {
           anime({
             targets: entry.target,
             width: `${width}%`,
-            easing: 'easeOutExpo',
-            duration: 1500,
+            easing: MOTION.easePrimary,
+            duration: MOTION.durationSlow,
             delay: 300,
+            update: () => {
+              entry.target.setAttribute('aria-valuenow', width);
+            },
           });
           skillObserver.unobserve(entry.target);
         }
@@ -353,8 +369,8 @@ document.addEventListener('DOMContentLoaded', () => {
             scale: [0.8, 1],
             opacity: [0, 1],
             delay: anime.stagger(50, { start: 200 }),
-            easing: 'easeOutExpo',
-            duration: 600,
+            easing: MOTION.easePrimary,
+            duration: MOTION.durationBase,
           });
           tagObserver.unobserve(entry.target);
         }
@@ -375,11 +391,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (isMotionReduced()) return;
       anime({
         targets: card.querySelectorAll('.project-tags span'),
-        translateY: [-5, 0],
+        translateY: [-4, 0],
         opacity: [0.5, 1],
         delay: anime.stagger(40),
-        easing: 'easeOutExpo',
-        duration: 400,
+        easing: MOTION.easeSoft,
+        duration: MOTION.durationFast,
       });
     });
   });
@@ -417,8 +433,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     navLinks.forEach(link => {
       link.classList.remove('active');
+      link.removeAttribute('aria-current');
       if (link.dataset.section === currentSection) {
         link.classList.add('active');
+        link.setAttribute('aria-current', 'page');
       }
     });
 
@@ -438,38 +456,38 @@ document.addEventListener('DOMContentLoaded', () => {
       const heroRange = Math.max(heroSection.offsetHeight - window.innerHeight * 0.2, window.innerHeight * 0.9);
       const heroProgress = Math.max(0, Math.min(1, (window.scrollY - heroStart) / heroRange));
 
-      const fadeStart = 0.18;
-      const fadeEnd = 0.62;
+      const fadeStart = 0.26;
+      const fadeEnd = 0.84;
       const fadeT = Math.max(0, Math.min(1, (heroProgress - fadeStart) / (fadeEnd - fadeStart)));
 
       if (isMotionReduced()) {
-        heroContent.style.opacity = String(1 - fadeT * 0.35);
+        heroContent.style.opacity = String(1 - fadeT * 0.28);
         heroContent.style.transform = 'none';
         heroContent.style.filter = 'none';
         if (heroBadges) {
-          heroBadges.style.opacity = String(1 - fadeT * 0.45);
+          heroBadges.style.opacity = String(1 - fadeT * 0.35);
           heroBadges.style.transform = 'none';
         }
         if (heroScrollIndicator) {
-          heroScrollIndicator.style.opacity = String(1 - fadeT * 0.7);
+          heroScrollIndicator.style.opacity = String(1 - fadeT * 0.58);
           heroScrollIndicator.style.transform = 'none';
         }
       } else {
         const textOpacity = 1 - fadeT;
-        const translateX = -40 * fadeT;
-        const blurPx = 6 * fadeT;
+        const translateX = -26 * fadeT;
+        const blurPx = 4 * fadeT;
 
         heroContent.style.opacity = String(textOpacity);
         heroContent.style.transform = `translate3d(${translateX}px, 0, 0)`;
         heroContent.style.filter = `blur(${blurPx}px)`;
 
         if (heroBadges) {
-          heroBadges.style.opacity = String(1 - fadeT * 0.9);
+          heroBadges.style.opacity = String(1 - fadeT * 0.75);
           heroBadges.style.transform = `translate3d(${translateX * 0.6}px, 0, 0)`;
         }
 
         if (heroScrollIndicator) {
-          heroScrollIndicator.style.opacity = String(1 - fadeT * 1.2);
+          heroScrollIndicator.style.opacity = String(1 - fadeT);
           heroScrollIndicator.style.transform = `translate3d(0, ${20 * fadeT}px, 0)`;
         }
       }
@@ -489,12 +507,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const mobileMenu = document.getElementById('mobile-menu');
   const mobileLinks = document.querySelectorAll('.mobile-link');
 
-  navToggle.addEventListener('click', () => {
-    navToggle.classList.toggle('active');
-    mobileMenu.classList.toggle('open');
-    document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+  function setMobileMenuState(open) {
+    navToggle.classList.toggle('active', open);
+    mobileMenu.classList.toggle('open', open);
+    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    mobileMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
 
-    if (mobileMenu.classList.contains('open')) {
+  navToggle.addEventListener('click', () => {
+    const open = !mobileMenu.classList.contains('open');
+    setMobileMenuState(open);
+
+    if (open) {
       if (isMotionReduced()) {
         document.querySelectorAll('.mobile-link').forEach((link) => {
           link.style.opacity = '1';
@@ -506,8 +531,8 @@ document.addEventListener('DOMContentLoaded', () => {
           translateX: [50, 0],
           opacity: [0, 1],
           delay: anime.stagger(80, { start: 200 }),
-          easing: 'easeOutExpo',
-          duration: 600,
+          easing: MOTION.easePrimary,
+          duration: MOTION.durationBase,
         });
       }
     }
@@ -515,10 +540,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   mobileLinks.forEach(link => {
     link.addEventListener('click', () => {
-      navToggle.classList.remove('active');
-      mobileMenu.classList.remove('open');
-      document.body.style.overflow = '';
+      setMobileMenuState(false);
     });
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    if (!mobileMenu.classList.contains('open')) return;
+    setMobileMenuState(false);
   });
 
   // ========================================
@@ -549,9 +578,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!isMotionReduced()) {
         anime({
           targets: btn,
-          scale: [1, 1.05, 1],
-          duration: 600,
-          easing: 'easeOutElastic(1, .5)',
+          scale: [1, 1.03, 1],
+          duration: MOTION.durationBase,
+          easing: MOTION.easeInOut,
         });
       }
 
@@ -570,11 +599,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (isMotionReduced()) return;
       anime({
         targets: item.querySelector('.timeline-tags span'),
-        scale: [0.9, 1],
+        scale: [0.94, 1],
         opacity: [0.7, 1],
         delay: anime.stagger(30),
-        easing: 'easeOutExpo',
-        duration: 300,
+        easing: MOTION.easeSoft,
+        duration: MOTION.durationFast,
       });
     });
   });
@@ -596,10 +625,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (entry.isIntersecting) {
           anime({
             targets: entry.target,
-            translateX: [30, 0],
+            translateX: [22, 0],
             opacity: [0, 1],
-            easing: 'easeOutExpo',
-            duration: 800,
+            easing: MOTION.easePrimary,
+            duration: MOTION.durationMedium,
             delay: [...highlights].indexOf(entry.target) * 150,
           });
           highlightObserver.unobserve(entry.target);
@@ -633,9 +662,9 @@ document.addEventListener('DOMContentLoaded', () => {
             anime({
               targets: '.code-content code',
               opacity: [0, 1],
-              translateY: [10, 0],
-              easing: 'easeOutExpo',
-              duration: 800,
+              translateY: [8, 0],
+              easing: MOTION.easePrimary,
+              duration: MOTION.durationMedium,
               delay: 300,
             });
             codeObserver.unobserve(entry.target);
@@ -666,11 +695,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (entry.isIntersecting) {
           anime({
             targets: contactCards,
-            translateX: [-30, 0],
+            translateX: [-24, 0],
             opacity: [0, 1],
             delay: anime.stagger(100, { start: 200 }),
-            easing: 'easeOutExpo',
-            duration: 700,
+            easing: MOTION.easePrimary,
+            duration: MOTION.durationMedium,
           });
           contactObserver.unobserve(entry.target);
         }
