@@ -368,19 +368,19 @@ function createScreenTexture() {
   }
 
   const ide = {
-    x: 74,
-    y: 54,
-    w: 1390,
-    h: 852,
-    sidebarX: 98,
-    codeX: 224,
-    codeY: 124,
-    codeW: 1136,
-    codeH: 552,
-    termX: 224,
-    termY: 700,
-    termW: 1136,
-    termH: 156,
+    x: 22,
+    y: 16,
+    w: 1492,
+    h: 928,
+    sidebarX: 44,
+    codeX: 168,
+    codeY: 104,
+    codeW: 1312,
+    codeH: 590,
+    termX: 168,
+    termY: 716,
+    termW: 1312,
+    termH: 184,
   };
 
   const tabDefinitions = [
@@ -623,13 +623,13 @@ function createScreenTexture() {
   }
 
   function tokenColor(token) {
-    if (!token) return 'rgba(208, 220, 255, 0.7)';
-    if (token.startsWith('//')) return 'rgba(132, 148, 188, 0.66)';
-    if (token[0] === '"' || token[0] === "'" || token[0] === '`') return 'rgba(219, 185, 255, 0.92)';
-    if (keywordTokens.has(token)) return 'rgba(136, 190, 255, 0.95)';
-    if (/^\d+$/.test(token)) return 'rgba(252, 176, 176, 0.9)';
-    if (/^[{}()[\].,;:+\-*/<>!=]+$/.test(token)) return 'rgba(152, 173, 220, 0.82)';
-    return 'rgba(208, 220, 255, 0.88)';
+    if (!token) return 'rgba(224, 234, 255, 0.84)';
+    if (token.startsWith('//')) return 'rgba(160, 176, 215, 0.78)';
+    if (token[0] === '"' || token[0] === "'" || token[0] === '`') return 'rgba(237, 198, 255, 0.97)';
+    if (keywordTokens.has(token)) return 'rgba(162, 212, 255, 0.98)';
+    if (/^\d+$/.test(token)) return 'rgba(255, 196, 196, 0.95)';
+    if (/^[{}()[\].,;:+\-*/<>!=]+$/.test(token)) return 'rgba(176, 196, 238, 0.9)';
+    return 'rgba(228, 236, 255, 0.95)';
   }
 
   function drawBase() {
@@ -652,15 +652,15 @@ function createScreenTexture() {
     baseCtx.fillStyle = nebulaB;
     baseCtx.fillRect(0, 0, width, height);
 
-    roundedRect(baseCtx, ide.x, ide.y, ide.w, ide.h, 16);
-    baseCtx.fillStyle = 'rgba(9, 12, 23, 0.72)';
+    roundedRect(baseCtx, ide.x, ide.y, ide.w, ide.h, 12);
+    baseCtx.fillStyle = 'rgba(7, 10, 20, 0.86)';
     baseCtx.fill();
-    baseCtx.strokeStyle = 'rgba(170, 190, 248, 0.22)';
-    baseCtx.lineWidth = 1.4;
+    baseCtx.strokeStyle = 'rgba(170, 190, 248, 0.1)';
+    baseCtx.lineWidth = 1;
     baseCtx.stroke();
 
-    roundedRect(baseCtx, ide.x + 1, ide.y + 1, ide.w - 2, 50, 14);
-    baseCtx.fillStyle = 'rgba(24, 36, 72, 0.56)';
+    roundedRect(baseCtx, ide.x + 1, ide.y + 1, ide.w - 2, 46, 10);
+    baseCtx.fillStyle = 'rgba(22, 34, 68, 0.72)';
     baseCtx.fill();
 
     const dots = ['#fb7185', '#f59e0b', '#34d399'];
@@ -673,22 +673,22 @@ function createScreenTexture() {
     });
     baseCtx.globalAlpha = 1;
 
-    roundedRect(baseCtx, ide.sidebarX, ide.y + 64, 92, ide.h - 144, 10);
-    baseCtx.fillStyle = 'rgba(16, 23, 46, 0.62)';
+    roundedRect(baseCtx, ide.sidebarX, ide.y + 58, 92, ide.h - 126, 8);
+    baseCtx.fillStyle = 'rgba(14, 21, 42, 0.72)';
     baseCtx.fill();
 
     for (let i = 0; i < 14; i++) {
-      roundedRect(baseCtx, ide.sidebarX + 17, ide.y + 88 + i * 42, 58, 8, 4);
-      baseCtx.fillStyle = i === 2 ? 'rgba(194, 164, 255, 0.78)' : 'rgba(130, 150, 206, 0.36)';
+      roundedRect(baseCtx, ide.sidebarX + 17, ide.y + 82 + i * 42, 58, 8, 4);
+      baseCtx.fillStyle = i === 2 ? 'rgba(194, 164, 255, 0.88)' : 'rgba(130, 150, 206, 0.42)';
       baseCtx.fill();
     }
 
-    roundedRect(baseCtx, ide.codeX - 18, ide.codeY - 16, ide.codeW, ide.codeH + 12, 11);
-    baseCtx.fillStyle = 'rgba(8, 13, 29, 0.74)';
+    roundedRect(baseCtx, ide.codeX - 18, ide.codeY - 16, ide.codeW, ide.codeH + 12, 8);
+    baseCtx.fillStyle = 'rgba(7, 11, 24, 0.88)';
     baseCtx.fill();
 
-    roundedRect(baseCtx, ide.termX - 18, ide.termY - 12, ide.termW, ide.termH, 10);
-    baseCtx.fillStyle = 'rgba(7, 12, 24, 0.84)';
+    roundedRect(baseCtx, ide.termX - 18, ide.termY - 12, ide.termW, ide.termH, 8);
+    baseCtx.fillStyle = 'rgba(7, 12, 24, 0.9)';
     baseCtx.fill();
 
     roundedRect(baseCtx, ide.x + ide.w - 34, ide.codeY - 10, 10, ide.codeH - 20, 3);
@@ -763,19 +763,19 @@ function createScreenTexture() {
       const x = tabX + index * (tabW - 8);
       roundedRect(ctx, x, tabY, tabW, tabH, 8);
       const selected = index === activeTabIndex;
-      ctx.fillStyle = selected ? `rgba(25, 37, 74, ${0.78 + energy * 0.08})` : 'rgba(11, 16, 31, 0.66)';
+      ctx.fillStyle = selected ? `rgba(25, 37, 74, ${0.84 + energy * 0.06})` : 'rgba(11, 16, 31, 0.72)';
       ctx.fill();
       ctx.strokeStyle = selected ? tab.accent : 'rgba(142, 164, 220, 0.2)';
       ctx.lineWidth = selected ? 1.4 : 1;
       ctx.stroke();
-      ctx.fillStyle = selected ? 'rgba(226, 235, 255, 0.92)' : 'rgba(142, 160, 208, 0.68)';
-      ctx.font = '15px "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+      ctx.fillStyle = selected ? 'rgba(234, 241, 255, 0.95)' : 'rgba(162, 178, 222, 0.76)';
+      ctx.font = '16px "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
       ctx.fillText(tab.label, x + 12, tabY + 20);
     });
 
     const activeCode = codeBanks[activeTabIndex] || codeBanks[0];
 
-    const lineHeight = 30;
+    const lineHeight = 31;
     const firstLine = Math.floor(visualScroll / lineHeight);
     const offsetY = visualScroll % lineHeight;
     const visibleLines = 17;
@@ -785,7 +785,7 @@ function createScreenTexture() {
     roundedRect(ctx, ide.codeX - 18, ide.codeY - 16, ide.codeW, ide.codeH + 12, 11);
     ctx.clip();
 
-    ctx.font = '18px "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+    ctx.font = '19px "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
     ctx.textBaseline = 'middle';
 
     for (let i = -1; i < visibleLines; i++) {
@@ -795,18 +795,18 @@ function createScreenTexture() {
 
       if (lineIndex === 4 || lineIndex === 5 || lineIndex === 6) {
         roundedRect(ctx, ide.codeX + 8, y - 11, ide.codeW - 68, 22, 7);
-        ctx.fillStyle = `rgba(120, 92, 255, ${0.07 + energy * 0.03})`;
+        ctx.fillStyle = `rgba(120, 92, 255, ${0.11 + energy * 0.04})`;
         ctx.fill();
       }
 
-      ctx.fillStyle = 'rgba(132, 146, 188, 0.58)';
+      ctx.fillStyle = 'rgba(152, 168, 206, 0.72)';
       ctx.fillText(String(((lineIndex % 54) + 1)).padStart(2, ' '), ide.codeX + 8, y);
 
       let cursorX = ide.codeX + 50;
       const tokens = tokenizeCode(line);
       tokens.forEach((token) => {
         ctx.fillStyle = tokenColor(token);
-        ctx.globalAlpha = 0.64 + energy * 0.22;
+        ctx.globalAlpha = 0.86 + energy * 0.1;
         ctx.fillText(token, cursorX, y);
         cursorX += ctx.measureText(token).width + 8;
       });
@@ -861,13 +861,13 @@ function createScreenTexture() {
 
     const reflect = ctx.createLinearGradient(width * 0.08, height * 0.14, width * 0.86, height * 0.86);
     reflect.addColorStop(0, 'rgba(255,255,255,0)');
-    reflect.addColorStop(0.45, `rgba(255,255,255,${0.07 + energy * 0.03})`);
-    reflect.addColorStop(0.58, 'rgba(255,255,255,0.02)');
+    reflect.addColorStop(0.45, `rgba(255,255,255,${0.04 + energy * 0.02})`);
+    reflect.addColorStop(0.58, 'rgba(255,255,255,0.01)');
     reflect.addColorStop(1, 'rgba(255,255,255,0)');
     ctx.fillStyle = reflect;
     ctx.fillRect(0, 0, width, height);
 
-    ctx.globalAlpha = 0.13 + energy * 0.08;
+    ctx.globalAlpha = 0.05 + energy * 0.04;
     for (let i = 0; i < 36; i++) {
       const y = (i / 35) * height;
       ctx.fillStyle = i % 2 === 0 ? '#cbc4ff' : '#8eb6ff';
@@ -1052,9 +1052,9 @@ function createLaptopModel(textures) {
     new THREE.MeshPhysicalMaterial({
       color: 0xb8ccff,
       transparent: true,
-      opacity: 0.05,
-      transmission: 0.9,
-      roughness: 0.03,
+      opacity: 0.028,
+      transmission: 0.82,
+      roughness: 0.02,
       metalness: 0,
       ior: 1.28,
       thickness: 0.03,
@@ -1287,15 +1287,15 @@ function createLaptopModel(textures) {
   lidBack.position.set(0, 0.97, -0.01);
   lidPivot.add(lidBack);
 
-  const bezel = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(3.04, 1.84, 0.028, 5, 0.012)), bezelMat);
+  const bezel = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(3.0, 1.8, 0.028, 5, 0.01)), bezelMat);
   bezel.position.set(0, 0.97, 0.026);
   lidPivot.add(bezel);
 
-  const panel = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(2.9, 1.66)), panelMat);
+  const panel = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(2.97, 1.76)), panelMat);
   panel.position.set(0, 0.97, 0.045);
   lidPivot.add(panel);
 
-  const panelGlass = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(2.9, 1.66)), glassMat);
+  const panelGlass = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(2.97, 1.76)), glassMat);
   panelGlass.position.set(0, 0.97, 0.052);
   lidPivot.add(panelGlass);
 
@@ -1600,6 +1600,46 @@ export function initThreeScene() {
   let prefersReducedMotion = reducedMotionQuery.matches;
 
   const isMobile = window.innerWidth < 920;
+  const SCENE_TUNING = {
+    maxPixelRatio: 1.8,
+    heroRangeMultiplier: 1.9,
+    heroViewportKickScale: 1.5,
+    minViewportKickHeight: 980,
+    scrollBlendGlobal: 0.26,
+    scrollBlendViewport: 0.5,
+    laptopBaseXDesktop: 3.98,
+    laptopBaseXMobile: 0.56,
+    laptopBaseY: 0.14,
+    laptopBaseZ: -0.4,
+  };
+
+  const ACCESSORY_TUNING = {
+    minScale: 0.001,
+    carrierXDesktop: -2.32,
+    carrierXMobile: -5.36,
+    carrierYBase: -0.074,
+    carrierYScrollFactor: -0.01,
+    carrierZDesktop: -0.38,
+    carrierZMobile: 0.88,
+    padRevealStart: 0.015,
+    padRevealRange: 0.12,
+    padScale: 1.65,
+    padEdgeOpacityBase: 0.2,
+    padEdgeOpacityGain: 0.58,
+    padGlowOpacityBase: 0.08,
+    padGlowOpacityGain: 0.24,
+    mouseRevealStart: 0.16,
+    mouseRevealRange: 0.16,
+    mouseXDesktop: 0.01,
+    mouseXMobile: 0.08,
+    mouseHiddenOffsetX: -0.06,
+    mouseY: 0.016,
+    mouseZ: 0.01,
+    mouseScale: 0.92,
+    mouseRotX: 0.01,
+    mouseRotY: Math.PI + 0.06,
+    mouseRotZ: 0.015,
+  };
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -1608,7 +1648,7 @@ export function initThreeScene() {
     powerPreference: 'high-performance',
   });
 
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, SCENE_TUNING.maxPixelRatio));
   renderer.setSize(window.innerWidth, window.innerHeight, false);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -1717,8 +1757,8 @@ export function initThreeScene() {
       console.warn('[three-scene] mouse GLB load failed, using fallback.', error);
     });
 
-  const baseX = isMobile ? 0.56 : 3.98;
-  laptop.root.position.set(baseX, 0.14, -0.4);
+  const baseX = isMobile ? SCENE_TUNING.laptopBaseXMobile : SCENE_TUNING.laptopBaseXDesktop;
+  laptop.root.position.set(baseX, SCENE_TUNING.laptopBaseY, SCENE_TUNING.laptopBaseZ);
   laptop.root.add(accessoryCarrier);
 
   const layerConfig = prefersReducedMotion
@@ -1809,17 +1849,23 @@ export function initThreeScene() {
     // Hero-local progress (strong response in first viewport) + global fallback.
     const heroSection = document.getElementById('hero');
     const heroStart = heroSection ? heroSection.offsetTop : 0;
-    const heroRange = heroSection ? Math.max(heroSection.offsetHeight * 1.9, window.innerHeight * 1.9) : Math.max(window.innerHeight * 1.9, 1200);
+    const heroRange = heroSection
+      ? Math.max(heroSection.offsetHeight * SCENE_TUNING.heroRangeMultiplier, window.innerHeight * SCENE_TUNING.heroRangeMultiplier)
+      : Math.max(window.innerHeight * SCENE_TUNING.heroRangeMultiplier, 1200);
     const heroProgress = clamp01((window.scrollY - heroStart) / heroRange);
-    const viewportKick = clamp01(window.scrollY / Math.max(window.innerHeight * 1.5, 980));
+    const viewportKick = clamp01(
+      window.scrollY / Math.max(window.innerHeight * SCENE_TUNING.heroViewportKickScale, SCENE_TUNING.minViewportKickHeight)
+    );
 
-    state.scrollTarget = clamp01(Math.max(globalProgress * 0.26, heroProgress, viewportKick * 0.5));
+    state.scrollTarget = clamp01(
+      Math.max(globalProgress * SCENE_TUNING.scrollBlendGlobal, heroProgress, viewportKick * SCENE_TUNING.scrollBlendViewport)
+    );
   }
 
   function onResize() {
     const width = window.innerWidth;
     const height = window.innerHeight;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, SCENE_TUNING.maxPixelRatio));
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
@@ -1943,13 +1989,13 @@ export function initThreeScene() {
 
     screenDisplay.update(t, state.scroll, state.scrollVelocity, dt);
 
-    const mousePadReveal = clamp01((state.scroll - 0.015) / 0.12) * (prefersReducedMotion ? 0.72 : 1);
-    const mouseReveal = clamp01((state.scroll - 0.16) / 0.16) * (prefersReducedMotion ? 0.65 : 1);
+    const mousePadReveal = clamp01((state.scroll - ACCESSORY_TUNING.padRevealStart) / ACCESSORY_TUNING.padRevealRange) * (prefersReducedMotion ? 0.72 : 1);
+    const mouseReveal = clamp01((state.scroll - ACCESSORY_TUNING.mouseRevealStart) / ACCESSORY_TUNING.mouseRevealRange) * (prefersReducedMotion ? 0.65 : 1);
 
     // Keep accessories rigidly anchored to the laptop so they move exactly with it.
-    const carrierTargetX = isMobile ? -5.36 : -2.32;
-    const carrierTargetY = -0.074 - state.scroll * 0.01;
-    const carrierTargetZ = isMobile ? 0.88 : -0.38;
+    const carrierTargetX = isMobile ? ACCESSORY_TUNING.carrierXMobile : ACCESSORY_TUNING.carrierXDesktop;
+    const carrierTargetY = ACCESSORY_TUNING.carrierYBase + state.scroll * ACCESSORY_TUNING.carrierYScrollFactor;
+    const carrierTargetZ = isMobile ? ACCESSORY_TUNING.carrierZMobile : ACCESSORY_TUNING.carrierZDesktop;
 
     accessoryCarrier.position.x = damp(accessoryCarrier.position.x, carrierTargetX, 7.2, dt);
     accessoryCarrier.position.y = damp(accessoryCarrier.position.y, carrierTargetY, 7.2, dt);
@@ -1965,31 +2011,33 @@ export function initThreeScene() {
     mousePadAccessory.group.rotation.y = damp(mousePadAccessory.group.rotation.y, 0, 7.2, dt);
     mousePadAccessory.group.rotation.z = damp(mousePadAccessory.group.rotation.z, 0, 7.2, dt);
 
-    const padScale = 0.001 + mousePadReveal * 1.65;
+    const padScale = ACCESSORY_TUNING.minScale + mousePadReveal * ACCESSORY_TUNING.padScale;
     mousePadAccessory.group.scale.set(padScale, padScale, padScale);
     if (mousePadAccessory.edgeMat) {
-      if ('opacity' in mousePadAccessory.edgeMat) mousePadAccessory.edgeMat.opacity = 0.2 + mousePadReveal * 0.58;
+      if ('opacity' in mousePadAccessory.edgeMat) {
+        mousePadAccessory.edgeMat.opacity = ACCESSORY_TUNING.padEdgeOpacityBase + mousePadReveal * ACCESSORY_TUNING.padEdgeOpacityGain;
+      }
       if ('emissiveIntensity' in mousePadAccessory.edgeMat) {
         mousePadAccessory.edgeMat.emissiveIntensity = 0.34 + mousePadReveal * 0.68 + pulse * 0.16;
       }
     }
     if (mousePadAccessory.glowMat && 'opacity' in mousePadAccessory.glowMat) {
-      mousePadAccessory.glowMat.opacity = 0.08 + mousePadReveal * 0.24;
+      mousePadAccessory.glowMat.opacity = ACCESSORY_TUNING.padGlowOpacityBase + mousePadReveal * ACCESSORY_TUNING.padGlowOpacityGain;
     }
 
-    const mouseLocalX = (isMobile ? 0.08 : 0.01) + (1 - mouseReveal) * -0.06;
-    const mouseLocalY = 0.016;
-    const mouseLocalZ = 0.01;
+    const mouseLocalX = (isMobile ? ACCESSORY_TUNING.mouseXMobile : ACCESSORY_TUNING.mouseXDesktop) + (1 - mouseReveal) * ACCESSORY_TUNING.mouseHiddenOffsetX;
+    const mouseLocalY = ACCESSORY_TUNING.mouseY;
+    const mouseLocalZ = ACCESSORY_TUNING.mouseZ;
 
     mouseAccessory.group.position.x = damp(mouseAccessory.group.position.x, mouseLocalX, 7.2, dt);
     mouseAccessory.group.position.y = damp(mouseAccessory.group.position.y, mouseLocalY, 7.2, dt);
     mouseAccessory.group.position.z = damp(mouseAccessory.group.position.z, mouseLocalZ, 7.2, dt);
 
-    const mouseScale = 0.001 + mouseReveal * 0.92;
+    const mouseScale = ACCESSORY_TUNING.minScale + mouseReveal * ACCESSORY_TUNING.mouseScale;
     mouseAccessory.group.scale.setScalar(mouseScale);
-    mouseAccessory.group.rotation.x = damp(mouseAccessory.group.rotation.x, 0.01, 7.2, dt);
-    mouseAccessory.group.rotation.y = damp(mouseAccessory.group.rotation.y, Math.PI + 0.06, 7.2, dt);
-    mouseAccessory.group.rotation.z = damp(mouseAccessory.group.rotation.z, 0.015, 7.2, dt);
+    mouseAccessory.group.rotation.x = damp(mouseAccessory.group.rotation.x, ACCESSORY_TUNING.mouseRotX, 7.2, dt);
+    mouseAccessory.group.rotation.y = damp(mouseAccessory.group.rotation.y, ACCESSORY_TUNING.mouseRotY, 7.2, dt);
+    mouseAccessory.group.rotation.z = damp(mouseAccessory.group.rotation.z, ACCESSORY_TUNING.mouseRotZ, 7.2, dt);
     if (mouseAccessory.wheel && mouseAccessory.wheel.rotation) {
       mouseAccessory.wheel.rotation.z += (1.1 + state.scroll * 7 + Math.abs(state.scrollVelocity) * 4) * dt;
     }

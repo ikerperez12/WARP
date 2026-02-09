@@ -75,13 +75,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     statNumbers.forEach(stat => {
       const target = parseInt(stat.dataset.target, 10);
+      const counter = { value: 0 };
       anime({
-        targets: stat,
-        innerHTML: [0, target],
+        targets: counter,
+        value: target,
         round: 1,
         easing: 'easeOutExpo',
         duration: 2000,
         delay: 500,
+        update: () => {
+          stat.textContent = String(counter.value);
+        },
       });
     });
   }

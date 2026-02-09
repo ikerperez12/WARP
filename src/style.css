@@ -557,9 +557,9 @@ img {
   line-height: 1.8;
 }
 
-.about-intro {
-  font-size: 1.25rem !important;
-  color: var(--text-primary) !important;
+.about-text .about-intro {
+  font-size: 1.25rem;
+  color: var(--text-primary);
 }
 
 .about-intro strong {
@@ -605,9 +605,9 @@ img {
 }
 
 .highlight p {
-  font-size: 0.875rem !important;
-  margin-bottom: 0 !important;
-  color: var(--text-tertiary) !important;
+  font-size: 0.875rem;
+  margin-bottom: 0;
+  color: var(--text-tertiary);
 }
 
 /* Code Window */
@@ -1388,4 +1388,59 @@ img {
 ::selection {
   background: rgba(192, 132, 252, 0.3);
   color: white;
+}
+
+/* ========================================
+   Accessibility
+   ======================================== */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent-secondary);
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+
+.nav-link:focus-visible,
+.mobile-link:focus-visible {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.btn:focus-visible,
+.project-link:focus-visible,
+.contact-card a:focus-visible {
+  box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.28);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .badge-dot,
+  .cursor,
+  .mouse-wheel,
+  .anim-fade-up.animated,
+  .anim-reveal.visible {
+    animation: none;
+  }
+
+  .anim-fade-up,
+  .anim-reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  .btn,
+  .nav-link,
+  .mobile-link,
+  .project-card,
+  .highlight,
+  .timeline-content,
+  .contact-card,
+  .scroll-progress {
+    transition: none;
+  }
 }
