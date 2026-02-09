@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Anime-style Landing (Three + Anime)</title>
+  </head>
+  <body>
+    <canvas id="bg"></canvas>
+
+    <div class="ui">
+      <header class="topbar">
+        <div class="brand">anime-style</div>
+        <nav class="nav">
+          <a href="#features">Features</a>
+          <a href="#docs">Docs</a>
+          <a href="#learn">Learn</a>
+        </nav>
+        <button class="btn ghost" id="btnTheme">Theme</button>
+      </header>
+
+      <main class="hero">
+        <div class="hero-left">
+          <div class="kicker">All-in-one animation engine</div>
+
+          <h1 class="headline">
+            Web 3D + UI animada<br />
+            como Anime.js (estilo)
+          </h1>
+
+          <p class="subhead">
+            Escena 3D en WebGL (Three.js) + orquestacion de animaciones con Anime.js:
+            entradas, loops, parallax y scroll-driven.
+          </p>
+
+          <div class="cta-row">
+            <button class="btn primary" id="btnPlay">Play intro</button>
+            <button class="btn" id="btnBurst">Burst</button>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-num" id="statFps">60</div>
+              <div class="stat-label">fps target</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" id="statScroll">0%</div>
+              <div class="stat-label">scroll</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-right">
+          <div class="card-grid" id="cards"></div>
+        </div>
+      </main>
+
+      <section class="section" id="features">
+        <h2>Features</h2>
+        <p>
+          Esta seccion existe para que tengas scroll y puedas ver efectos
+          sincronizados con la escena 3D.
+        </p>
+        <div class="feature-grid">
+          <div class="feature">Intro timeline</div>
+          <div class="feature">Loop 3D</div>
+          <div class="feature">Pointer parallax</div>
+          <div class="feature">Scroll-driven</div>
+        </div>
+      </section>
+
+      <section class="section" id="docs">
+        <h2>Docs-style mini demos</h2>
+        <p>Abajo tienes una demo SVG opcional (draw + motion path).</p>
+
+        <div class="demo">
+          <svg id="demoSvg" viewBox="0 0 600 160" width="100%" height="160">
+            <path
+              id="demoPath"
+              d="M 30 120 C 140 30, 220 30, 320 120 S 500 210, 570 70"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="4"
+              stroke-linecap="round"
+            />
+            <circle id="demoDot" cx="30" cy="120" r="7" />
+          </svg>
+
+          <div class="demo-actions">
+            <button class="btn" id="btnSvgDraw">Draw</button>
+            <button class="btn" id="btnSvgMove">Move dot</button>
+            <button class="btn ghost" id="btnSvgReset">Reset</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="learn">
+        <h2>Learn</h2>
+        <p>
+          Aqui podrias meter contenido largo y la escena 3D sigue viva. El estilo
+          "animejs.com" se basa en capas + micro-animacion constante.
+        </p>
+      </section>
+
+      <footer class="footer">
+        <div>© 2026 - anime-style landing demo</div>
+      </footer>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

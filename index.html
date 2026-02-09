@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Iker Pérez | Ingeniero Informático — Portfolio</title>
+  <meta name="description" content="Portfolio profesional de Iker Pérez, estudiante de Ingeniería Informática en la Universidade da Coruña. Desarrollador full-stack, IA y Cloud." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <!-- Preloader -->
+  <div class="preloader" id="preloader">
+    <div class="preloader-inner">
+      <div class="preloader-logo">
+        <span class="logo-bracket">&lt;</span>IP<span class="logo-bracket">/&gt;</span>
+      </div>
+      <div class="preloader-bar">
+        <div class="preloader-bar-fill" id="preloader-fill"></div>
+      </div>
+      <span class="preloader-text">Cargando experiencia...</span>
+    </div>
+  </div>
+
+  <!-- Custom Cursor -->
+  <div class="custom-cursor" id="custom-cursor"></div>
+  <div class="custom-cursor-dot" id="custom-cursor-dot"></div>
+
+  <!-- Grain Overlay -->
+  <div class="grain-overlay"></div>
+
+  <!-- Back to Top -->
+  <button class="back-to-top" id="back-to-top" aria-label="Volver arriba">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+  </button>
+
+  <!-- Three.js Canvas (background) -->
+  <canvas id="three-canvas"></canvas>
+
+  <!-- Navigation -->
+  <nav id="navbar" class="navbar">
+    <div class="nav-container">
+      <a href="#hero" class="nav-logo">
+        <span class="logo-bracket">&lt;</span>IP<span class="logo-bracket">/&gt;</span>
+      </a>
+      <div class="nav-links">
+        <a href="#about" class="nav-link" data-section="about">Sobre mí</a>
+        <a href="#skills" class="nav-link" data-section="skills">Skills</a>
+        <a href="#projects" class="nav-link" data-section="projects">Proyectos</a>
+        <a href="#experience" class="nav-link" data-section="experience">Formación</a>
+        <a href="#contact" class="nav-link" data-section="contact">Contacto</a>
+      </div>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="#about" class="mobile-link">Sobre mí</a>
+    <a href="#skills" class="mobile-link">Skills</a>
+    <a href="#projects" class="mobile-link">Proyectos</a>
+    <a href="#experience" class="mobile-link">Formación</a>
+    <a href="#contact" class="mobile-link">Contacto</a>
+  </div>
+
+  <!-- Scroll Progress Bar -->
+  <div class="scroll-progress" id="scroll-progress"></div>
+
+  <!-- Main Content -->
+  <main>
+    <!-- HERO SECTION -->
+    <section id="hero" class="section hero-section">
+      <!-- Floating Tech Badges -->
+      <div class="floating-badges">
+        <div class="floating-badge">Cloud · IA · Seguridad · Alto rendimiento</div>
+      </div>
+      <div class="hero-content">
+        <div class="hero-badge anim-fade-up">
+          <span class="badge-dot"></span>
+          Abierto a prácticas y colaboraciones
+        </div>
+        <h1 class="hero-title">
+          <span class="hero-line anim-fade-up" style="--delay: 0.1s">Iker Pérez</span>
+          <span class="hero-line anim-fade-up gradient-text" style="--delay: 0.2s">Ingeniero</span>
+          <span class="hero-line anim-fade-up" style="--delay: 0.3s">Informático</span>
+        </h1>
+        <p class="hero-description anim-fade-up" style="--delay: 0.4s">
+          Estudiante de Ingeniería Informática en la UDC. <br />
+          Apasionado por <span class="typed-text" id="typed-text"></span><span class="cursor">|</span>
+        </p>
+        <div class="hero-cta anim-fade-up" style="--delay: 0.5s">
+          <a href="#projects" class="btn btn-primary">
+            <span>Ver proyectos</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="#contact" class="btn btn-secondary">
+            <span>Contactar</span>
+          </a>
+        </div>
+        <div class="hero-stats anim-fade-up" style="--delay: 0.6s">
+          <div class="stat">
+            <span class="stat-number" data-target="4">0</span><span class="stat-plus">º</span>
+            <span class="stat-label">Año de carrera</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-number" data-target="15">0</span><span class="stat-plus">+</span>
+            <span class="stat-label">Proyectos</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-number" data-target="10">0</span><span class="stat-plus">+</span>
+            <span class="stat-label">Tecnologías</span>
+          </div>
+        </div>
+      </div>
+      <div class="scroll-indicator anim-fade-up" style="--delay: 0.8s">
+        <div class="mouse">
+          <div class="mouse-wheel"></div>
+        </div>
+        <span>Scroll para explorar</span>
+      </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section id="about" class="section about-section">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-tag anim-reveal">01</span>
+          <h2 class="section-title anim-reveal">Sobre <span class="gradient-text">mí</span></h2>
+        </div>
+        <div class="about-grid">
+          <div class="about-text anim-reveal">
+            <p class="about-intro">
+              Soy <strong>Iker Pérez</strong>, estudiante de Ingeniería Informática en la Universidade da Coruña con pasión por la tecnología y la innovación.
+            </p>
+            <p>
+              Actualmente cursando el último tramo de mi grado, me especializo en desarrollo de software, inteligencia artificial y sistemas distribuidos. Mi formación abarca desde algoritmos y estructuras de datos hasta diseño de software, redes, bases de datos y seguridad informática.
+            </p>
+            <p>
+              Me apasiona explorar nuevas tecnologías — desde modelos de IA con Ollama y Kaggle hasta despliegues cloud con Docker, AWS y Azure. Busco constantemente aplicar lo aprendido en proyectos prácticos que resuelvan problemas reales.
+            </p>
+            <div class="about-highlights">
+              <div class="highlight">
+                <div class="highlight-icon">🎓</div>
+                <div>
+                  <h4>Universidade da Coruña</h4>
+                  <p>Grado en Ingeniería Informática</p>
+                </div>
+              </div>
+              <div class="highlight">
+                <div class="highlight-icon">🤖</div>
+                <div>
+                  <h4>IA & Machine Learning</h4>
+                  <p>Kaggle, Ollama, TensorFlow, Streamlit</p>
+                </div>
+              </div>
+              <div class="highlight">
+                <div class="highlight-icon">☁️</div>
+                <div>
+                  <h4>Cloud & DevOps</h4>
+                  <p>Docker, AWS, Azure, CI/CD</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="about-visual anim-reveal">
+            <div class="code-window">
+              <div class="code-header">
+                <div class="code-dots">
+                  <span class="dot red"></span>
+                  <span class="dot yellow"></span>
+                  <span class="dot green"></span>
+                </div>
+                <span class="code-title">iker.config.ts</span>
+              </div>
+              <pre class="code-content"><code><span class="code-keyword">const</span> <span class="code-var">iker</span> = {
+  <span class="code-prop">name</span>: <span class="code-string">"Iker Pérez"</span>,
+  <span class="code-prop">role</span>: <span class="code-string">"Ing. Informático"</span>,
+  <span class="code-prop">university</span>: <span class="code-string">"UDC 🇪🇸"</span>,
+  <span class="code-prop">location</span>: <span class="code-string">"A Coruña, Galicia"</span>,
+  <span class="code-prop">languages</span>: [<span class="code-string">"ES"</span>, <span class="code-string">"GL"</span>, <span class="code-string">"EN"</span>],
+  <span class="code-prop">stack</span>: {
+    <span class="code-prop">langs</span>: [<span class="code-string">"Java"</span>, <span class="code-string">"Python"</span>, <span class="code-string">"C"</span>, <span class="code-string">"JS"</span>],
+    <span class="code-prop">cloud</span>: [<span class="code-string">"Docker"</span>, <span class="code-string">"AWS"</span>, <span class="code-string">"Azure"</span>],
+    <span class="code-prop">ai</span>: [<span class="code-string">"Kaggle"</span>, <span class="code-string">"Ollama"</span>, <span class="code-string">"Streamlit"</span>]
+  },
+  <span class="code-prop">interests</span>: [
+    <span class="code-string">"Inteligencia Artificial"</span>,
+    <span class="code-string">"Sistemas Distribuidos"</span>,
+    <span class="code-string">"Ciberseguridad"</span>,
+    <span class="code-string">"Open Source"</span>
+  ],
+  <span class="code-prop">status</span>: <span class="code-string">"Building the future 🚀"</span>
+};</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS SECTION -->
+    <section id="skills" class="section skills-section">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-tag anim-reveal">02</span>
+          <h2 class="section-title anim-reveal">Tech <span class="gradient-text">Stack</span></h2>
+          <p class="section-subtitle anim-reveal">Tecnologías y herramientas con las que trabajo</p>
+        </div>
+
+        <div class="skills-grid">
+          <!-- Languages -->
+          <div class="skill-category anim-reveal">
+            <div class="skill-category-header">
+              <div class="skill-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              </div>
+              <h3>Lenguajes</h3>
+            </div>
+            <div class="skill-tags">
+              <span class="skill-tag">Java</span>
+              <span class="skill-tag">Python</span>
+              <span class="skill-tag">C / C++</span>
+              <span class="skill-tag">JavaScript</span>
+              <span class="skill-tag">TypeScript</span>
+              <span class="skill-tag">SQL</span>
+              <span class="skill-tag">HTML / CSS</span>
+              <span class="skill-tag">Bash</span>
+            </div>
+            <div class="skill-bar">
+              <div class="skill-bar-fill" data-width="90"></div>
+            </div>
+          </div>
+
+          <!-- Frameworks -->
+          <div class="skill-category anim-reveal">
+            <div class="skill-category-header">
+              <div class="skill-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              </div>
+              <h3>Frameworks & Web</h3>
+            </div>
+            <div class="skill-tags">
+              <span class="skill-tag">Node.js</span>
+              <span class="skill-tag">React</span>
+              <span class="skill-tag">Spring Boot</span>
+              <span class="skill-tag">Three.js</span>
+              <span class="skill-tag">Streamlit</span>
+              <span class="skill-tag">REST APIs</span>
+              <span class="skill-tag">Vite</span>
+              <span class="skill-tag">Anime.js</span>
+            </div>
+            <div class="skill-bar">
+              <div class="skill-bar-fill" data-width="82"></div>
+            </div>
+          </div>
+
+          <!-- Cloud -->
+          <div class="skill-category anim-reveal">
+            <div class="skill-category-header">
+              <div class="skill-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+              </div>
+              <h3>Cloud & DevOps</h3>
+            </div>
+            <div class="skill-tags">
+              <span class="skill-tag">Docker</span>
+              <span class="skill-tag">AWS</span>
+              <span class="skill-tag">Azure</span>
+              <span class="skill-tag">Git / GitHub</span>
+              <span class="skill-tag">Linux</span>
+              <span class="skill-tag">CI/CD</span>
+              <span class="skill-tag">Nginx</span>
+              <span class="skill-tag">Terraform</span>
+            </div>
+            <div class="skill-bar">
+              <div class="skill-bar-fill" data-width="78"></div>
+            </div>
+          </div>
+
+          <!-- Data & AI -->
+          <div class="skill-category anim-reveal">
+            <div class="skill-category-header">
+              <div class="skill-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              </div>
+              <h3>Data & IA</h3>
+            </div>
+            <div class="skill-tags">
+              <span class="skill-tag">Kaggle</span>
+              <span class="skill-tag">Ollama</span>
+              <span class="skill-tag">TensorFlow</span>
+              <span class="skill-tag">Pandas</span>
+              <span class="skill-tag">PostgreSQL</span>
+              <span class="skill-tag">MongoDB</span>
+              <span class="skill-tag">Anaconda</span>
+              <span class="skill-tag">Jupyter</span>
+            </div>
+            <div class="skill-bar">
+              <div class="skill-bar-fill" data-width="75"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS SECTION -->
+    <section id="projects" class="section projects-section">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-tag anim-reveal">03</span>
+          <h2 class="section-title anim-reveal">Proyectos <span class="gradient-text">destacados</span></h2>
+          <p class="section-subtitle anim-reveal">Proyectos académicos y personales que demuestran mis habilidades</p>
+        </div>
+
+        <div class="projects-grid">
+          <div class="project-card anim-reveal">
+            <div class="project-image">
+              <div class="project-image-placeholder">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+              </div>
+              <div class="project-overlay">
+                <a href="https://github.com/ikerperez12" target="_blank" class="project-link">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                </a>
+              </div>
+            </div>
+            <div class="project-info">
+              <div class="project-tags">
+                <span>Java</span><span>Spring Boot</span><span>REST API</span><span>Docker</span>
+              </div>
+              <h3 class="project-title">Internet & Sistemas Distribuidos</h3>
+              <p class="project-desc">Servicios web con arquitectura REST y despliegue containerizado. APIs escalables con Spring Boot y Docker.</p>
+            </div>
+          </div>
+
+          <div class="project-card anim-reveal">
+            <div class="project-image">
+              <div class="project-image-placeholder accent-2">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              </div>
+              <div class="project-overlay">
+                <a href="https://github.com/ikerperez12" target="_blank" class="project-link">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                </a>
+              </div>
+            </div>
+            <div class="project-info">
+              <div class="project-tags">
+                <span>Python</span><span>Kaggle</span><span>TensorFlow</span><span>Pandas</span>
+              </div>
+              <h3 class="project-title">Modelos de IA & ML</h3>
+              <p class="project-desc">Machine learning para clasificación y predicción. Competiciones en Kaggle y experimentación con LLMs locales vía Ollama.</p>
+            </div>
+          </div>
+
+          <div class="project-card anim-reveal">
+            <div class="project-image">
+              <div class="project-image-placeholder accent-3">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div class="project-overlay">
+                <a href="https://github.com/ikerperez12" target="_blank" class="project-link">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                </a>
+              </div>
+            </div>
+            <div class="project-info">
+              <div class="project-tags">
+                <span>Python</span><span>Redes</span><span>Criptografía</span><span>Wireshark</span>
+              </div>
+              <h3 class="project-title">Seguridad en Sistemas</h3>
+              <p class="project-desc">Proyecto tutelado de ciberseguridad: análisis de tráfico, criptografía post-cuántica y detección de vulnerabilidades.</p>
+            </div>
+          </div>
+
+          <div class="project-card anim-reveal">
+            <div class="project-image">
+              <div class="project-image-placeholder accent-4">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+              </div>
+              <div class="project-overlay">
+                <a href="https://github.com/ikerperez12" target="_blank" class="project-link">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                </a>
+              </div>
+            </div>
+            <div class="project-info">
+              <div class="project-tags">
+                <span>C / C++</span><span>Algoritmos</span><span>Linux</span><span>SO</span>
+              </div>
+              <h3 class="project-title">Algoritmos & Sistemas Operativos</h3>
+              <p class="project-desc">Algoritmos de ordenación optimizados. Programación de sistemas a bajo nivel, gestión de procesos e hilos en Linux.</p>
+            </div>
+          </div>
+
+          <div class="project-card anim-reveal">
+            <div class="project-image">
+              <div class="project-image-placeholder">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              </div>
+              <div class="project-overlay">
+                <a href="https://github.com/ikerperez12" target="_blank" class="project-link">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                </a>
+              </div>
+            </div>
+            <div class="project-info">
+              <div class="project-tags">
+                <span>Three.js</span><span>Anime.js</span><span>Vite</span><span>CSS</span>
+              </div>
+              <h3 class="project-title">Portfolio 3D Interactivo</h3>
+              <p class="project-desc">Este portfolio: partículas 3D que mutan entre geometrías con scroll, animaciones con Anime.js y shaders custom.</p>
+            </div>
+          </div>
+
+          <div class="project-card anim-reveal">
+            <div class="project-image">
+              <div class="project-image-placeholder accent-2">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+              </div>
+              <div class="project-overlay">
+                <a href="https://github.com/ikerperez12" target="_blank" class="project-link">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                </a>
+              </div>
+            </div>
+            <div class="project-info">
+              <div class="project-tags">
+                <span>SQL</span><span>PostgreSQL</span><span>DataGrip</span><span>Modelado</span>
+              </div>
+              <h3 class="project-title">Diseño de Bases de Datos</h3>
+              <p class="project-desc">Modelado relacional y diseño de BBDD complejas. Consultas optimizadas, triggers y normalización avanzada.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDUCATION / EXPERIENCE SECTION -->
+    <section id="experience" class="section experience-section">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-tag anim-reveal">04</span>
+          <h2 class="section-title anim-reveal">Formación <span class="gradient-text">& trayectoria</span></h2>
+        </div>
+
+        <div class="timeline">
+          <div class="timeline-item anim-reveal">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div>
+                  <h3>Grado en Ingeniería Informática</h3>
+                  <span class="timeline-company">Universidade da Coruña (UDC)</span>
+                </div>
+                <span class="timeline-date">2022 — Presente</span>
+              </div>
+              <p>Formación integral: algoritmos, diseño de software, bases de datos, redes, sistemas operativos, inteligencia artificial, sistemas distribuidos y seguridad informática.</p>
+              <div class="timeline-tags">
+                <span>Java</span><span>Python</span><span>C</span><span>SQL</span><span>Redes</span><span>IA</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item anim-reveal">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div>
+                  <h3>Seguridad en Sistemas — Tutelado</h3>
+                  <span class="timeline-company">UDC — SSI</span>
+                </div>
+                <span class="timeline-date">2024 — 2025</span>
+              </div>
+              <p>Trabajo tutelado en ciberseguridad: análisis de protocolos criptográficos post-cuánticos, captura y análisis de tráfico de red, evaluación de vulnerabilidades.</p>
+              <div class="timeline-tags">
+                <span>Criptografía</span><span>Wireshark</span><span>Python</span><span>PQC</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item anim-reveal">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div>
+                  <h3>Proyectos personales & Autoformación</h3>
+                  <span class="timeline-company">Kaggle · Ollama · GitHub</span>
+                </div>
+                <span class="timeline-date">2023 — Presente</span>
+              </div>
+              <p>Aprendizaje continuo en IA/ML con Kaggle, modelos LLM locales con Ollama, dashboards con Streamlit, y despliegues cloud con Docker, AWS y Azure.</p>
+              <div class="timeline-tags">
+                <span>Kaggle</span><span>Ollama</span><span>Docker</span><span>AWS</span><span>Azure</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item anim-reveal">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div>
+                  <h3>Internet y Sistemas Distribuidos</h3>
+                  <span class="timeline-company">UDC — ISD</span>
+                </div>
+                <span class="timeline-date">2023 — 2024</span>
+              </div>
+              <p>Aplicaciones web distribuidas con microservicios. APIs REST con Java/Spring, despliegue containerizado con Docker y PostgreSQL.</p>
+              <div class="timeline-tags">
+                <span>Java</span><span>Spring</span><span>REST</span><span>Docker</span><span>PostgreSQL</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section id="contact" class="section contact-section">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-tag anim-reveal">05</span>
+          <h2 class="section-title anim-reveal">¿Hablamos<span class="gradient-text">?</span></h2>
+          <p class="section-subtitle anim-reveal">Busco prácticas, colaboraciones y proyectos interesantes</p>
+        </div>
+
+        <div class="contact-grid">
+          <div class="contact-info anim-reveal">
+            <div class="contact-card">
+              <div class="contact-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <div>
+                <h4>Email</h4>
+                <a href="mailto:iker.perez@udc.es">iker.perez@udc.es</a>
+              </div>
+            </div>
+            <div class="contact-card">
+              <div class="contact-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+              </div>
+              <div>
+                <h4>GitHub</h4>
+                <a href="https://github.com/ikerperez12" target="_blank">github.com/ikerperez12</a>
+              </div>
+            </div>
+            <div class="contact-card">
+              <div class="contact-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+              </div>
+              <div>
+                <h4>LinkedIn</h4>
+                <a href="https://linkedin.com/in/ikerperez" target="_blank">linkedin.com/in/ikerperez</a>
+              </div>
+            </div>
+            <div class="contact-card">
+              <div class="contact-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div>
+                <h4>Ubicación</h4>
+                <span style="font-weight:600">A Coruña, Galicia</span>
+              </div>
+            </div>
+          </div>
+
+          <form class="contact-form anim-reveal" id="contact-form">
+            <div class="form-group">
+              <input type="text" id="name" placeholder="Tu nombre" required />
+              <label for="name">Nombre</label>
+            </div>
+            <div class="form-group">
+              <input type="email" id="email" placeholder="tu@email.com" required />
+              <label for="email">Email</label>
+            </div>
+            <div class="form-group">
+              <textarea id="message" rows="5" placeholder="Cuéntame tu propuesta..." required></textarea>
+              <label for="message">Mensaje</label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+              <span>Enviar mensaje</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-left">
+        <span class="footer-logo">
+          <span class="logo-bracket">&lt;</span>IP<span class="logo-bracket">/&gt;</span>
+        </span>
+        <p>Diseñado y desarrollado por Iker Pérez</p>
+      </div>
+      <div class="footer-right">
+        <p>&copy; 2026 Iker Pérez — UDC</p>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
