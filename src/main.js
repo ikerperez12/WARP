@@ -67,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
       description: 'Coreografia del hero: intro, loops y parallax.',
       language: 'JavaScript',
       stack: ['Three.js', 'Anime.js'],
+      githubUrl: 'https://github.com/ikerperez12',
     },
     {
       id: 'scene_laptop_render',
@@ -74,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
       description: 'Pipeline visual del portatil 3D con materiales y luces.',
       language: 'JavaScript',
       stack: ['Three.js', 'PBR'],
+      githubUrl: 'https://github.com/ikerperez12',
     },
     {
       id: 'scroll_driven_fx',
@@ -81,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
       description: 'Transiciones por scroll y narrativa visual.',
       language: 'JavaScript',
       stack: ['Timeline', 'IntersectionObserver'],
+      githubUrl: 'https://github.com/ikerperez12',
     },
     {
       id: 'terminal_runtime',
@@ -88,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
       description: 'Terminal simulada con comandos y estado.',
       language: 'JavaScript',
       stack: ['Canvas UI'],
+      githubUrl: 'https://github.com/ikerperez12',
     },
   ];
 
@@ -118,6 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
           description: typeof item.description === 'string' ? item.description : '',
           language: typeof item.language === 'string' ? item.language : 'N/A',
           stack: Array.isArray(item.stack) ? item.stack.filter((v) => typeof v === 'string') : [],
+          githubUrl: typeof item.githubUrl === 'string' ? item.githubUrl : 'https://github.com/ikerperez12',
         };
       })
       .filter(Boolean);
@@ -148,6 +153,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const projectModal = document.getElementById('project-modal');
   const projectModalClose = document.getElementById('project-modal-close');
   const projectModalList = document.getElementById('project-modal-list');
+  const pcShell = document.getElementById('pc-shell');
+  const pcShellClose = document.getElementById('pc-shell-close');
+  const pcShellProjects = document.getElementById('pc-shell-projects');
+  const pcShellFocusTerminal = document.getElementById('pc-shell-focus-terminal');
+  const pcShellOpenList = document.getElementById('pc-shell-open-list');
+  const CARD_PROJECT_IDS = [
+    'hero_motion_engine',
+    'scene_laptop_render',
+    'terminal_runtime',
+    'scroll_driven_fx',
+    'hero_motion_engine',
+    'scene_laptop_render',
+  ];
 
   function renderProjectList() {
     if (!projectModalList) return;
@@ -169,6 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
       button.addEventListener('click', () => {
         const projectId = button.getAttribute('data-project-id');
         if (!projectId) return;
+        openPcShell();
         window.dispatchEvent(new CustomEvent('warp:terminal-run-project', { detail: { projectId, source: 'list' } }));
         announceLive(`Ejecutando proyecto ${projectId}`);
         closeProjectModal();
@@ -190,6 +209,78 @@ document.addEventListener('DOMContentLoaded', () => {
     projectModal.classList.remove('open');
     projectModal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+  }
+
+  function openPcShell() {
+    if (!pcShell) return;
+    pcShell.classList.add('open');
+    pcShell.setAttribute('aria-hidden', 'false');
+  }
+
+  function closePcShell() {
+    if (!pcShell) return;
+    pcShell.classList.remove('open');
+    pcShell.setAttribute('aria-hidden', 'true');
+  }
+
+  function renderPcShellProjects() {
+    if (!pcShellProjects) return;
+    pcShellProjects.innerHTML = projectRegistry
+      .map((project) => {
+        const stack = project.stack.length ? project.stack.join(' · ') : 'Stack';
+        return `
+          <article class="pc-shell-project">
+            <span class="pc-shell-project-name">${project.name}</span>
+            <span class="pc-shell-project-meta">${project.language} · ${stack}</span>
+            <div class="pc-shell-project-actions">
+              <button type="button" class="pc-shell-project-btn" data-run-project="${project.id}">Abrir en PC 3D</button>
+              <a href="${project.githubUrl}" target="_blank" rel="noopener noreferrer" class="pc-shell-project-link">Ver GitHub</a>
+            </div>
+          </article>
+        `;
+      })
+      .join('');
+
+    pcShellProjects.querySelectorAll('[data-run-project]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const projectId = button.getAttribute('data-run-project');
+        if (!projectId) return;
+        openPcShell();
+        window.dispatchEvent(new CustomEvent('warp:terminal-run-project', { detail: { projectId, source: 'pc-shell' } }));
+        announceLive(`Proyecto ${projectId} abierto en PC 3D`);
+      });
+    });
+  }
+
+  function bindProjectCards() {
+    const cards = Array.from(document.querySelectorAll('.projects-grid .project-card'));
+    cards.forEach((card, index) => {
+      const projectId = card.getAttribute('data-project-id') || CARD_PROJECT_IDS[index] || CARD_PROJECT_IDS[index % CARD_PROJECT_IDS.length];
+      card.setAttribute('data-project-id', projectId);
+
+      const overlay = card.querySelector('.project-overlay');
+      const githubLink = card.querySelector('.project-link');
+      if (githubLink) {
+        githubLink.setAttribute('aria-label', 'Abrir repositorio en GitHub');
+        githubLink.setAttribute('title', 'Abrir GitHub');
+      }
+      if (!overlay) return;
+      if (overlay.querySelector('.project-open-3d')) return;
+
+      const openBtn = document.createElement('button');
+      openBtn.type = 'button';
+      openBtn.className = 'project-open-3d';
+      openBtn.textContent = 'Abrir en PC 3D';
+      openBtn.setAttribute('aria-label', `Abrir ${projectId} en el PC 3D`);
+      openBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        openPcShell();
+        window.dispatchEvent(new CustomEvent('warp:terminal-run-project', { detail: { projectId, source: 'project-card' } }));
+        announceLive(`Abriendo ${projectId} en PC 3D`);
+      });
+      overlay.appendChild(openBtn);
+    });
   }
 
   function syncVisualLabels() {
@@ -267,7 +358,33 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   window.addEventListener('warp:open-project-list', () => {
+    closePcShell();
     openProjectModal();
+  });
+
+  if (pcShellClose) {
+    pcShellClose.addEventListener('click', closePcShell);
+  }
+
+  if (pcShellFocusTerminal) {
+    pcShellFocusTerminal.addEventListener('click', () => {
+      openPcShell();
+      window.dispatchEvent(new CustomEvent('warp:terminal-focus', { detail: { source: 'pc-shell' } }));
+      announceLive('Terminal activa en el PC 3D');
+    });
+  }
+
+  if (pcShellOpenList) {
+    pcShellOpenList.addEventListener('click', () => {
+      closePcShell();
+      openProjectModal();
+      announceLive('Lista completa de proyectos abierta');
+    });
+  }
+
+  window.addEventListener('warp:pc-open', () => {
+    openPcShell();
+    renderPcShellProjects();
   });
 
   // ========================================
@@ -300,6 +417,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     renderProjectList();
+    renderPcShellProjects();
+    bindProjectCards();
     window.dispatchEvent(new CustomEvent('warp:project-registry', { detail: { projects: projectRegistry } }));
   }
 
@@ -321,6 +440,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   renderProjectList();
+  renderPcShellProjects();
+  bindProjectCards();
   bootstrapProjectRegistry();
 
   window.addEventListener('pointermove', (event) => {
@@ -717,6 +838,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (event.key !== 'Escape') return;
     if (projectModal?.classList.contains('open')) {
       closeProjectModal();
+      return;
+    }
+    if (pcShell?.classList.contains('open')) {
+      closePcShell();
       return;
     }
     if (!mobileMenu.classList.contains('open')) return;

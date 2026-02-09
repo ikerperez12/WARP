@@ -2223,6 +2223,13 @@ export function initThreeScene() {
     return raycaster.intersectObjects(screenTargets, false).length > 0;
   }
 
+  function isLaptopHit(clientX, clientY) {
+    pointerNdc.x = (clientX / window.innerWidth) * 2 - 1;
+    pointerNdc.y = -(clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(pointerNdc, camera);
+    return raycaster.intersectObject(laptop.root, true).length > 0;
+  }
+
   function updatePointer(clientX, clientY) {
     state.pointerTargetX = (clientX / window.innerWidth) * 2 - 1;
     state.pointerTargetY = (clientY / window.innerHeight) * 2 - 1;
@@ -2243,14 +2250,24 @@ export function initThreeScene() {
 
   function onPointerDown(event) {
     updatePointer(event.clientX, event.clientY);
-    screenDisplay.setFocus(isScreenHit(event.clientX, event.clientY));
+    const screenHit = isScreenHit(event.clientX, event.clientY);
+    const laptopHit = isLaptopHit(event.clientX, event.clientY);
+    screenDisplay.setFocus(screenHit || laptopHit);
+    if ((screenHit || laptopHit) && typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('warp:pc-open', { detail: { source: 'scene' } }));
+    }
   }
 
   function onTouchStart(event) {
     if (!event.touches || !event.touches[0]) return;
     const touch = event.touches[0];
     updatePointer(touch.clientX, touch.clientY);
-    screenDisplay.setFocus(isScreenHit(touch.clientX, touch.clientY));
+    const screenHit = isScreenHit(touch.clientX, touch.clientY);
+    const laptopHit = isLaptopHit(touch.clientX, touch.clientY);
+    screenDisplay.setFocus(screenHit || laptopHit);
+    if ((screenHit || laptopHit) && typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('warp:pc-open', { detail: { source: 'scene-touch' } }));
+    }
   }
 
   function onTouchMove(event) {
@@ -2317,6 +2334,10 @@ export function initThreeScene() {
     screenDisplay.runProjectById(projectId);
   }
 
+  function onTerminalFocus() {
+    screenDisplay.setFocus(true);
+  }
+
   function onVisibilityChange() {
     if (document.hidden) resetPointer();
   }
@@ -2341,6 +2362,7 @@ export function initThreeScene() {
   window.addEventListener('warp:motion-mode', onMotionModeChange);
   window.addEventListener('warp:project-registry', onProjectRegistry);
   window.addEventListener('warp:terminal-run-project', onTerminalRunProject);
+  window.addEventListener('warp:terminal-focus', onTerminalFocus);
 
   if (reducedMotionQuery.addEventListener) {
     reducedMotionQuery.addEventListener('change', onReducedMotionChange);
@@ -2542,6 +2564,7 @@ export function initThreeScene() {
     window.removeEventListener('warp:motion-mode', onMotionModeChange);
     window.removeEventListener('warp:project-registry', onProjectRegistry);
     window.removeEventListener('warp:terminal-run-project', onTerminalRunProject);
+    window.removeEventListener('warp:terminal-focus', onTerminalFocus);
 
     if (reducedMotionQuery.removeEventListener) {
       reducedMotionQuery.removeEventListener('change', onReducedMotionChange);

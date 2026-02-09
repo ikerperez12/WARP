@@ -5,6 +5,7 @@
     "description": "Coreografia del hero: intro, loops, parallax y respuesta al puntero.",
     "language": "JavaScript",
     "stack": ["Three.js", "Anime.js", "Vite"],
+    "githubUrl": "https://github.com/ikerperez12",
     "assets": {
       "jsUrl": "/wasm/hero-motion/hero_motion.js",
       "wasmUrl": "/wasm/hero-motion/hero_motion.wasm"
@@ -16,6 +17,7 @@
     "description": "Pipeline visual del portatil 3D con materiales, luces y detalles premium.",
     "language": "JavaScript",
     "stack": ["Three.js", "PBR", "CanvasTexture"],
+    "githubUrl": "https://github.com/ikerperez12",
     "assets": {
       "jsUrl": "/wasm/scene-laptop/scene_laptop.js",
       "wasmUrl": "/wasm/scene-laptop/scene_laptop.wasm"
@@ -27,6 +29,7 @@
     "description": "Sistema de transiciones por scroll con reveal de accesorios y narrativa visual.",
     "language": "JavaScript",
     "stack": ["IntersectionObserver", "Animation timeline"],
+    "githubUrl": "https://github.com/ikerperez12",
     "assets": {
       "jsUrl": "/wasm/scroll-fx/scroll_fx.js",
       "wasmUrl": "/wasm/scroll-fx/scroll_fx.wasm"
@@ -38,6 +41,7 @@
     "description": "Terminal isomorfa simulada con comandos, estado y secuencia de arranque.",
     "language": "JavaScript",
     "stack": ["Canvas UI", "Runtime state machine"],
+    "githubUrl": "https://github.com/ikerperez12",
     "assets": {
       "jsUrl": "/wasm/terminal-runtime/terminal_runtime.js",
       "wasmUrl": "/wasm/terminal-runtime/terminal_runtime.wasm"

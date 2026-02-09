@@ -92,3 +92,16 @@ Este informe resume los hallazgos y propone una hoja de ruta clara para elevar l
 - **Web Components**: Dado el enfoque modular, los componentes de UI podrían encapsularse como Web Components, haciéndolos reutilizables en cualquier proyecto web, independientemente del framework.
 - **Interacciones más Complejas**: Explorar interacciones más avanzadas con la escena 3D, como la física (usando `ammo.js` o `rapier`) o el post-procesamiento para añadir efectos visuales como `bloom`, `aberración cromática`, etc.
 - **Versión en React/Svelte**: El proyecto `anime-landing` es un candidato perfecto para ser migrado a un framework declarativo como React (con `react-three-fiber`) o Svelte. Esto simplificaría enormemente la gestión del estado y la UI.
+
+
+
+Ohara TCG
+Arelia TCG 
+Tequila TCG 
+Nakama TCG (amigo y lore op)
+Kaizoku TCG (pirata en japo)
+Reiki TCG
+Yomi TCG (lectura)
+Kiru TCG (cortar(espada))
+Hihō TCG 
+Meki TCG 
