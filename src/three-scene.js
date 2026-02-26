@@ -1,16 +1,7 @@
 ﻿import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
-
-function clamp01(value) {
-  if (value < 0) return 0;
-  if (value > 1) return 1;
-  return value;
-}
-
-function damp(current, target, lambda, delta) {
-  return current + (target - current) * (1 - Math.exp(-lambda * delta));
-}
+import { clamp, clamp01, damp } from './utils/math.js';
 
 function createStarTexture() {
   const size = 96;
@@ -783,7 +774,7 @@ function createScreenTexture() {
   let activeTabIndex = 0;
 
   function update(time, scrollProgress, scrollVelocity = 0, dt = 1 / 60) {
-    const delta = Math.min(Math.max(dt, 1 / 180), 1 / 20);
+    const delta = clamp(dt, 1 / 180, 1 / 20);
     if (time - lastTick < 0.032 && Math.abs(scrollProgress - lastScroll) < 0.002 && Math.abs(scrollVelocity) < 0.01 && !terminal.focused) return;
     lastTick = time;
     lastScroll = scrollProgress;
@@ -1816,7 +1807,7 @@ export function initThreeScene() {
     const baseYaw = 0.28 + state.scroll * 0.16;
     const baseRoll = Math.sin(t * 0.42) * 0.004 * motionFactor;
 
-    const velocityKick = THREE.MathUtils.clamp(state.scrollVelocity * 0.2, -0.11, 0.11);
+    const velocityKick = clamp(state.scrollVelocity * 0.2, -0.11, 0.11);
     const targetPitch = basePitch - pointerCurveY * 0.082 * motionFactor - velocityKick * 0.14;
     const targetYaw = baseYaw + pointerCurveX * 0.22 * motionFactor;
     const targetRoll = baseRoll - pointerCurveX * 0.026 * motionFactor + velocityKick * 0.12;
@@ -1858,7 +1849,7 @@ export function initThreeScene() {
         const col = i % laptop.keyCols;
         const hue = 0.58 + (col / (laptop.keyCols - 1)) * 0.16 + Math.sin(t * 0.82 + row * 0.56 + state.scroll * 2.1) * 0.018;
         const lightness = 0.48 + Math.sin(t * 1.42 + col * 0.36 + row * 0.2 + state.scroll * 4.8) * 0.065;
-        keyboardColor.setHSL((hue % 1 + 1) % 1, 0.56, THREE.MathUtils.clamp(lightness, 0.39, 0.66));
+        keyboardColor.setHSL((hue % 1 + 1) % 1, 0.56, clamp(lightness, 0.39, 0.66));
         laptop.keys.setColorAt(i, keyboardColor);
       }
       if (laptop.keys.instanceColor) laptop.keys.instanceColor.needsUpdate = true;
