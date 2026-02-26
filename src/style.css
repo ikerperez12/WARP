@@ -796,6 +796,33 @@ body[data-cursor='off'] .custom-cursor-dot {
   will-change: transform;
 }
 
+/* Button Loading State */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.icon-spinner {
+  display: none;
+  animation: spin 1s linear infinite;
+}
+
+.btn .icon-spinner {
+  display: none;
+}
+
+.btn.is-loading .icon-spinner {
+  display: block;
+}
+
+.btn.is-loading .icon-send {
+  display: none;
+}
+
+.btn.is-loading {
+  pointer-events: none;
+  opacity: 0.8;
+}
+
 /* Hero Stats */
 .hero-stats {
   display: flex;

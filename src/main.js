@@ -653,7 +653,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      if (submitButton) submitButton.disabled = true;
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.classList.add('is-loading');
+      }
       if (submitText) submitText.textContent = 'Enviando...';
       setFormStatus('Enviando mensaje de forma segura...', '');
 
@@ -708,7 +711,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (contactError) contactError.classList.remove('is-hidden');
         announce('Message send failed.');
       } finally {
-        if (submitButton) submitButton.disabled = false;
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.classList.remove('is-loading');
+        }
         if (submitText) submitText.textContent = idleText;
       }
     });
