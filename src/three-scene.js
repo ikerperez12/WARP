@@ -251,6 +251,11 @@ export function initThreeScene() {
     prefersReducedMotion = reducedMotionQuery.matches || manualReducedMotion;
   }
 
+  function onProjectRegistry(event) {
+    const incoming = event?.detail?.projects;
+    screenDisplay.setProjects(incoming);
+  }
+
 
   function onTerminalRunProject(event) {
     const projectId = event?.detail?.projectId;
@@ -285,6 +290,7 @@ export function initThreeScene() {
   window.addEventListener('resize', onResize);
   window.addEventListener('keydown', onKeyDown);
   window.addEventListener('warp:motion-mode', onMotionModeChange);
+  window.addEventListener('warp:project-registry', onProjectRegistry);
   window.addEventListener('warp:terminal-run-project', onTerminalRunProject);
   window.addEventListener('warp:terminal-focus', onTerminalFocus);
 
@@ -439,6 +445,7 @@ export function initThreeScene() {
     window.removeEventListener('resize', onResize);
     window.removeEventListener('keydown', onKeyDown);
     window.removeEventListener('warp:motion-mode', onMotionModeChange);
+    window.removeEventListener('warp:project-registry', onProjectRegistry);
     window.removeEventListener('warp:terminal-run-project', onTerminalRunProject);
     window.removeEventListener('warp:terminal-focus', onTerminalFocus);
 
