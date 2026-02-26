@@ -1,4 +1,7 @@
 import "./style.css";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "@studio-freight/lenis";
 
 import { createScene } from "./three/scene.js";
 import { bindResize } from "./three/resize.js";
@@ -10,14 +13,25 @@ import { $, $all } from "./ui/dom.js";
 
 import { makeIntro } from "./anim/intro.js";
 import { startLoops } from "./anim/loop.js";
-import { bindPointerParallax, burst } from "./anim/interactions.js";
+import { bindPointerParallax, burst, bindCardHover } from "./anim/interactions.js";
 import { bindScrollEffects } from "./anim/scroll.js";
 
 import { setupSvgDemo } from "./demos/svgDemo.js";
 
+gsap.registerPlugin(ScrollTrigger);
+
+// 1. Smooth Scroll (Lenis)
+const lenis = new Lenis();
+function raf(time) {
+  lenis.raf(time);
+  requestAnimationFrame(raf);
+}
+requestAnimationFrame(raf);
+
+// 2. Scene Setup
 const canvas = document.querySelector("#bg");
-const { renderer, scene, camera } = createScene(canvas);
-bindResize(renderer, camera);
+const { renderer, scene, camera, composer } = createScene(canvas);
+bindResize(renderer, camera, composer);
 
 const orb = addOrb(scene);
 
@@ -48,6 +62,7 @@ introTL.play();
 startLoops({ orb, state });
 
 bindPointerParallax({ orb, state });
+bindCardHover(ui.cards);
 
 bindScrollEffects({
   orb,
@@ -68,16 +83,13 @@ $("#btnBurst")?.addEventListener("click", () => {
   burst({ orb, state });
 });
 
-let theme = 0;
+let theme = localStorage.getItem("theme") || "dark";
+document.documentElement.setAttribute("data-theme", theme);
+
 $("#btnTheme")?.addEventListener("click", () => {
-  theme = (theme + 1) % 2;
-  if (theme === 1) {
-    document.documentElement.style.setProperty("--bg", "#090a10");
-    document.documentElement.style.setProperty("--accent", "#7cf7ff");
-  } else {
-    document.documentElement.style.setProperty("--bg", "#0b0f14");
-    document.documentElement.style.setProperty("--accent", "#b6ff3b");
-  }
+  theme = theme === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("theme", theme);
 });
 
 let acc = 0;
@@ -86,6 +98,7 @@ startRenderLoop({
   renderer,
   scene,
   camera,
+  composer,
   onTick: ({ dt }) => {
     acc += dt;
     frames += 1;

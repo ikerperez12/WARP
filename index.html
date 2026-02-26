@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -8,8 +8,14 @@
     http-equiv="Content-Security-Policy"
     content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https:; media-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
   />
-  <title>Iker Pérez | Ingeniero Informático — Portfolio</title>
-  <meta name="description" content="Portfolio profesional de Iker Pérez, estudiante de Ingeniería Informática en la Universidade da Coruña. Desarrollador full-stack, IA y Cloud." />
+  <title>Iker PÃ©rez | Ingeniero InformÃ¡tico â€” Portfolio</title>
+  <meta name="description" content="Portfolio profesional de Iker PÃ©rez, estudiante de IngenierÃ­a InformÃ¡tica en la Universidade da CoruÃ±a. Desarrollador full-stack, IA y Cloud." />
+  <link rel="canonical" href="https://portfolio-iker-perez.vercel.app/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://portfolio-iker-perez.vercel.app/" />
+  <meta property="og:title" content="Iker PÃ©rez | Portfolio" />
+  <meta property="og:description" content="Portfolio de Iker PÃ©rez: software, ciberseguridad, cloud e IA." />
+  <meta name="theme-color" content="#0a0a0f" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -42,16 +48,6 @@
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
   </button>
 
-  <!-- Three.js Canvas (background) -->
-  <canvas
-    id="three-canvas"
-    aria-label="Escena 3D interactiva de portátil con accesorios y estrellas en movimiento"
-    aria-describedby="three-scene-desc"
-  ></canvas>
-  <p id="three-scene-desc" class="sr-only">
-    Fondo 3D decorativo e interactivo. El movimiento responde al puntero y al scroll.
-  </p>
-
   <!-- Navigation -->
   <nav id="navbar" class="navbar">
     <div class="nav-container">
@@ -59,10 +55,13 @@
         <span class="logo-bracket">&lt;</span>IP<span class="logo-bracket">/&gt;</span>
       </a>
       <div class="nav-links">
-        <a href="#about" class="nav-link" data-section="about">Sobre mí</a>
+        <a href="#about" class="nav-link" data-section="about">Sobre mÃ­</a>
         <a href="#skills" class="nav-link" data-section="skills">Skills</a>
+        <a href="#services" class="nav-link" data-section="services">Servicios</a>
         <a href="#projects" class="nav-link" data-section="projects">Proyectos</a>
-        <a href="#experience" class="nav-link" data-section="experience">Formación</a>
+        <a href="#process" class="nav-link" data-section="process">MÃ©todo</a>
+        <a href="#experience" class="nav-link" data-section="experience">Trayectoria</a>
+        <a href="#showcase" class="nav-link" data-section="showcase">Media</a>
         <a href="#contact" class="nav-link" data-section="contact">Contacto</a>
       </div>
       <button
@@ -75,7 +74,7 @@
       <button
         class="nav-toggle"
         id="nav-toggle"
-        aria-label="Abrir menú de navegación"
+        aria-label="Abrir menÃº de navegaciÃ³n"
         aria-controls="mobile-menu"
         aria-expanded="false"
       >
@@ -97,57 +96,18 @@
       <span>Motion</span>
       <span id="motion-state">Full</span>
     </button>
-    <button class="ui-option" type="button" data-action="open-project-list">
-      <span>Proyectos</span>
-      <span>Lista</span>
-    </button>
-  </aside>
-
-  <section
-    class="project-modal"
-    id="project-modal"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="project-modal-title"
-    aria-hidden="true"
-  >
-    <div class="project-modal-card">
-      <div class="project-modal-head">
-        <h2 id="project-modal-title">Proyectos interactivos</h2>
-        <button type="button" class="project-modal-close" id="project-modal-close" aria-label="Cerrar lista de proyectos">&times;</button>
-      </div>
-      <p class="project-modal-copy">
-        Modo accesible para lanzar proyectos sin depender del icono 3D.
-      </p>
-      <div class="project-modal-list" id="project-modal-list"></div>
-    </div>
-  </section>
-
-  <aside class="pc-shell" id="pc-shell" aria-label="Panel del PC 3D" aria-hidden="true">
-    <div class="pc-shell-head">
-      <div class="pc-shell-title-wrap">
-        <span class="pc-shell-dot" aria-hidden="true"></span>
-        <span class="pc-shell-title">PC 3D · Simulador</span>
-      </div>
-      <button type="button" class="pc-shell-close" id="pc-shell-close" aria-label="Cerrar panel del PC">Cerrar</button>
-    </div>
-    <p class="pc-shell-copy">
-      Interfaz lista para ejecutar proyectos en el portátil 3D o abrir su repositorio.
-    </p>
-    <div class="pc-shell-actions">
-      <button type="button" class="pc-shell-btn" id="pc-shell-focus-terminal">Activar terminal</button>
-      <button type="button" class="pc-shell-btn ghost" id="pc-shell-open-list">Ver lista completa</button>
-    </div>
-    <div class="pc-shell-projects" id="pc-shell-projects"></div>
   </aside>
   <div id="app-live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
   <!-- Mobile Menu -->
   <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
-    <a href="#about" class="mobile-link">Sobre mí</a>
+    <a href="#about" class="mobile-link">Sobre mÃ­</a>
     <a href="#skills" class="mobile-link">Skills</a>
+    <a href="#services" class="mobile-link">Servicios</a>
     <a href="#projects" class="mobile-link">Proyectos</a>
-    <a href="#experience" class="mobile-link">Formación</a>
+    <a href="#process" class="mobile-link">MÃ©todo</a>
+    <a href="#experience" class="mobile-link">Trayectoria</a>
+    <a href="#showcase" class="mobile-link">Media</a>
     <a href="#contact" class="mobile-link">Contacto</a>
   </div>
 
@@ -160,45 +120,52 @@
     <section id="hero" class="section hero-section">
       <!-- Floating Tech Badges -->
       <div class="floating-badges">
-        <div class="floating-badge">Cloud · IA · Seguridad · Alto rendimiento</div>
+        <div class="floating-badge">Software Engineering - Cybersecurity - AI - Cloud</div>
       </div>
       <div class="hero-content">
         <div class="hero-badge anim-fade-up">
           <span class="badge-dot"></span>
-          Abierto a prácticas y colaboraciones
+          Disponible para prÃ¡cticas y proyectos tech de alto impacto
         </div>
         <h1 class="hero-title">
-          <span class="hero-line anim-fade-up" style="--delay: 0.1s">Iker Pérez</span>
-          <span class="hero-line anim-fade-up gradient-text" style="--delay: 0.2s">Ingeniero</span>
-          <span class="hero-line anim-fade-up" style="--delay: 0.3s">Informático</span>
+          <span class="hero-line anim-fade-up" style="--delay: 0.1s">Iker PÃ©rez</span>
+          <span class="hero-line anim-fade-up gradient-text" style="--delay: 0.2s">Software & Security</span>
+          <span class="hero-line anim-fade-up" style="--delay: 0.3s">Product Engineer</span>
         </h1>
         <p class="hero-description anim-fade-up" style="--delay: 0.4s">
-          Estudiante de Ingeniería Informática en la UDC. <br />
-          Apasionado por <span class="typed-text" id="typed-text"></span><span class="cursor">|</span>
+          Ingeniero de Software especializado en crear sistemas distribuidos, seguros y de alto rendimiento. 
+          Enfoque integral en arquitectura backend, hardening de sistemas y experiencias de usuario inmersivas.
+          Especial interÃ©s en <span class="typed-text" id="typed-text"></span><span class="cursor">|</span>
         </p>
+        <div class="hero-value-grid anim-fade-up" style="--delay: 0.45s">
+          <div class="hero-value-pill">SICUE en UPM - enfoque empresarial</div>
+          <div class="hero-value-pill">ES / GL nativo + InglÃ©s B2</div>
+          <div class="hero-value-pill">Cloud, redes y automatizaciÃ³n</div>
+          <div class="hero-value-pill">IA aplicada y ciberseguridad</div>
+        </div>
         <div class="hero-cta anim-fade-up" style="--delay: 0.5s">
-          <a href="#projects" class="btn btn-primary">
+          <a href="#projects" class="btn btn-primary btn-magnetic">
             <span>Ver proyectos</span>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
-          <a href="#contact" class="btn btn-secondary">
+          <a href="#contact" class="btn btn-secondary btn-magnetic">
             <span>Contactar</span>
           </a>
         </div>
         <div class="hero-stats anim-fade-up" style="--delay: 0.6s">
           <div class="stat">
-            <span class="stat-number" data-target="4" aria-live="polite">0</span><span class="stat-plus" aria-hidden="true">º</span>
-            <span class="stat-label">Año de carrera</span>
+            <span class="stat-number" data-target="4" aria-live="polite">0</span><span class="stat-plus" aria-hidden="true">+</span>
+            <span class="stat-label">AÃ±o de carrera</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat">
-            <span class="stat-number" data-target="15" aria-live="polite">0</span><span class="stat-plus" aria-hidden="true">+</span>
-            <span class="stat-label">Proyectos</span>
+            <span class="stat-number" data-target="20" aria-live="polite">0</span><span class="stat-plus" aria-hidden="true">+</span>
+            <span class="stat-label">Proyectos y prÃ¡cticas</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat">
-            <span class="stat-number" data-target="10" aria-live="polite">0</span><span class="stat-plus" aria-hidden="true">+</span>
-            <span class="stat-label">Tecnologías</span>
+            <span class="stat-number" data-target="8" aria-live="polite">0</span><span class="stat-plus" aria-hidden="true">+</span>
+            <span class="stat-label">Cursos y certificaciones</span>
           </div>
         </div>
       </div>
@@ -210,44 +177,59 @@
       </div>
     </section>
 
+    <section class="section ticker-section" aria-label="Focus areas and work principles">
+      <div class="ticker-viewport">
+        <div class="ticker-track" id="tech-ticker-track">
+          <span class="ticker-item">Secure by design</span>
+          <span class="ticker-item">Backend architecture</span>
+          <span class="ticker-item">Cloud automation</span>
+          <span class="ticker-item">AI product prototyping</span>
+          <span class="ticker-item">Data reliability</span>
+          <span class="ticker-item">UX with performance</span>
+          <span class="ticker-item">Full stack delivery</span>
+          <span class="ticker-item">Continuous improvement</span>
+        </div>
+      </div>
+    </section>
+
     <!-- ABOUT SECTION -->
     <section id="about" class="section about-section">
       <div class="section-container">
         <div class="section-header">
           <span class="section-tag anim-reveal">01</span>
-          <h2 class="section-title anim-reveal">Sobre <span class="gradient-text">mí</span></h2>
+          <h2 class="section-title anim-reveal">Sobre <span class="gradient-text">mÃ­</span></h2>
         </div>
         <div class="about-grid">
           <div class="about-text anim-reveal">
             <p class="about-intro">
-              Soy <strong>Iker Pérez</strong>, estudiante de Ingeniería Informática en la Universidade da Coruña con pasión por la tecnología y la innovación.
+              Soy <strong>Iker Perez</strong>, estudiante de Ingenieria Informatica en la Universidade da Coruna, con interes profesional en software de calidad, seguridad y arquitectura.
             </p>
             <p>
-              Actualmente cursando el último tramo de mi grado, me especializo en desarrollo de software, inteligencia artificial y sistemas distribuidos. Mi formación abarca desde algoritmos y estructuras de datos hasta diseño de software, redes, bases de datos y seguridad informática.
+              Mi formacion combina base fuerte en algoritmos, sistemas operativos, redes, bases de datos y desarrollo full-stack. Durante el programa SICUE en ETSISI-UPM reforze vision de tecnologia aplicada a entornos empresariales.
             </p>
             <p>
-              Me apasiona explorar nuevas tecnologías — desde modelos de IA con Ollama y Kaggle hasta despliegues cloud con Docker, AWS y Azure. Busco constantemente aplicar lo aprendido en proyectos prácticos que resuelvan problemas reales.
+              Tambien tengo experiencia practica en hardware: diseno, reparacion y optimizacion de equipos, lo que me da una perspectiva completa de software + infraestructura.
             </p>
             <div class="about-highlights">
               <div class="highlight">
-                <div class="highlight-icon">🎓</div>
+                <div class="highlight-icon">UDC</div>
                 <div>
-                  <h4>Universidade da Coruña</h4>
-                  <p>Grado en Ingeniería Informática</p>
+                  <h4>Ingenieria Informatica</h4>
+                  <p>Mencion en Tecnologias para la Sociedad de la Informacion</p>
                 </div>
               </div>
               <div class="highlight">
-                <div class="highlight-icon">🤖</div>
+                <div class="highlight-icon">UPM</div>
                 <div>
-                  <h4>IA & Machine Learning</h4>
-                  <p>Kaggle, Ollama, TensorFlow, Streamlit</p>
+                  <h4>Programa SICUE</h4>
+                  <p>Enfoque en sistemas de informacion orientados a negocio</p>
                 </div>
               </div>
               <div class="highlight">
-                <div class="highlight-icon">☁️</div>
+                <div class="highlight-icon">LAB</div>
                 <div>
-                  <h4>Cloud & DevOps</h4>
-                  <p>Docker, AWS, Azure, CI/CD</p>
+                  <h4>Perfil tecnico integral</h4>
+                  <p>Software, cloud, redes, IA y ciberseguridad</p>
                 </div>
               </div>
             </div>
@@ -263,10 +245,10 @@
                 <span class="code-title">iker.config.ts</span>
               </div>
               <pre class="code-content"><code><span class="code-keyword">const</span> <span class="code-var">iker</span> = {
-  <span class="code-prop">name</span>: <span class="code-string">"Iker Pérez"</span>,
-  <span class="code-prop">role</span>: <span class="code-string">"Ing. Informático"</span>,
-  <span class="code-prop">university</span>: <span class="code-string">"UDC 🇪🇸"</span>,
-  <span class="code-prop">location</span>: <span class="code-string">"A Coruña, Galicia"</span>,
+  <span class="code-prop">name</span>: <span class="code-string">"Iker PÃ©rez"</span>,
+  <span class="code-prop">role</span>: <span class="code-string">"Ing. InformÃ¡tico"</span>,
+  <span class="code-prop">university</span>: <span class="code-string">"UDC ðŸ‡ªðŸ‡¸"</span>,
+  <span class="code-prop">location</span>: <span class="code-string">"A CoruÃ±a, Galicia"</span>,
   <span class="code-prop">languages</span>: [<span class="code-string">"ES"</span>, <span class="code-string">"GL"</span>, <span class="code-string">"EN"</span>],
   <span class="code-prop">stack</span>: {
     <span class="code-prop">langs</span>: [<span class="code-string">"Java"</span>, <span class="code-string">"Python"</span>, <span class="code-string">"C"</span>, <span class="code-string">"JS"</span>],
@@ -279,7 +261,7 @@
     <span class="code-string">"Ciberseguridad"</span>,
     <span class="code-string">"Open Source"</span>
   ],
-  <span class="code-prop">status</span>: <span class="code-string">"Building the future 🚀"</span>
+  <span class="code-prop">status</span>: <span class="code-string">"Building the future ðŸš€"</span>
 };</code></pre>
             </div>
           </div>
@@ -293,7 +275,7 @@
         <div class="section-header">
           <span class="section-tag anim-reveal">02</span>
           <h2 class="section-title anim-reveal">Tech <span class="gradient-text">Stack</span></h2>
-          <p class="section-subtitle anim-reveal">Tecnologías y herramientas con las que trabajo</p>
+          <p class="section-subtitle anim-reveal">TecnologÃ­as y herramientas con las que trabajo</p>
         </div>
 
         <div class="skills-grid">
@@ -424,135 +406,232 @@
       </div>
     </section>
 
+    <!-- SERVICES SECTION -->
+    <section id="services" class="section services-section">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-tag anim-reveal">03</span>
+          <h2 class="section-title anim-reveal">Categorias de <span class="gradient-text">valor</span></h2>
+          <p class="section-subtitle anim-reveal">Trabajo por dominios claros para entregar resultados medibles, no solo codigo.</p>
+        </div>
+
+        <div class="service-groups anim-reveal" role="tablist" aria-label="Enfoques de trabajo">
+          <button class="service-chip is-active" type="button" data-service-filter="all" aria-pressed="true">All</button>
+          <button class="service-chip" type="button" data-service-filter="core" aria-pressed="false">Core Skills</button>
+          <button class="service-chip" type="button" data-service-filter="production" aria-pressed="false">Production Ready</button>
+          <button class="service-chip" type="button" data-service-filter="exploratory" aria-pressed="false">Exploratory R&D</button>
+        </div>
+
+        <div class="services-grid">
+          <article class="service-card anim-reveal" data-service-domain="core production">
+            <span class="service-label">Web Platform</span>
+            <h3>Frontend + UX Engineering</h3>
+            <p>Interfaces orientadas a conversion con foco en rendimiento, accesibilidad y arquitectura mantenible.</p>
+          </article>
+          <article class="service-card anim-reveal" data-service-domain="core production">
+            <span class="service-label">Backend Systems</span>
+            <h3>APIs y arquitectura distribuida</h3>
+            <p>DiseÃ±o de servicios robustos con observabilidad, contratos claros y evolucion sin deuda acelerada.</p>
+          </article>
+          <article class="service-card anim-reveal" data-service-domain="core exploratory">
+            <span class="service-label">Security</span>
+            <h3>Secure by design</h3>
+            <p>Buenas practicas de hardening, validacion de inputs y revision de superficies de ataque desde el inicio.</p>
+          </article>
+          <article class="service-card anim-reveal" data-service-domain="production exploratory">
+            <span class="service-label">Cloud & DevOps</span>
+            <h3>Deploy, CI/CD y automatizacion</h3>
+            <p>Entornos reproducibles y pipelines para reducir errores manuales y acelerar entregas con control.</p>
+          </article>
+          <article class="service-card anim-reveal" data-service-domain="exploratory">
+            <span class="service-label">AI / Data</span>
+            <h3>Prototipos de IA aplicada</h3>
+            <p>Pruebas de valor con modelos y datos para validar oportunidades reales antes de escalar producto.</p>
+          </article>
+          <article class="service-card anim-reveal" data-service-domain="core production">
+            <span class="service-label">Full Delivery</span>
+            <h3>De idea a release</h3>
+            <p>Planificacion tecnica, implementacion, QA y mejora continua en ciclos cortos orientados a impacto.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <!-- PROJECTS SECTION -->
     <section id="projects" class="section projects-section">
       <div class="section-container">
         <div class="section-header">
-          <span class="section-tag anim-reveal">03</span>
-          <h2 class="section-title anim-reveal">Proyectos <span class="gradient-text">destacados</span></h2>
-          <p class="section-subtitle anim-reveal">Proyectos académicos y personales que demuestran mis habilidades</p>
+          <span class="section-tag anim-reveal">04</span>
+          <h2 class="section-title anim-reveal">Proyectos <span class="gradient-text">con impacto</span></h2>
+          <p class="section-subtitle anim-reveal">Trabajo tecnico real: rendimiento, seguridad, experiencia de usuario y escalabilidad.</p>
         </div>
 
+        <div class="project-filters anim-reveal" role="toolbar" aria-label="Filtrar proyectos por categoria">
+          <button class="project-filter is-active" type="button" data-filter="all" aria-pressed="true">All</button>
+          <button class="project-filter" type="button" data-filter="core" aria-pressed="false">Core</button>
+          <button class="project-filter" type="button" data-filter="production" aria-pressed="false">Production</button>
+          <button class="project-filter" type="button" data-filter="exploratory" aria-pressed="false">Exploratory</button>
+          <button class="project-filter" type="button" data-filter="frontend" aria-pressed="false">Frontend</button>
+          <button class="project-filter" type="button" data-filter="backend" aria-pressed="false">Backend</button>
+          <button class="project-filter" type="button" data-filter="cloud" aria-pressed="false">Cloud</button>
+          <button class="project-filter" type="button" data-filter="security" aria-pressed="false">Security</button>
+          <button class="project-filter" type="button" data-filter="ai" aria-pressed="false">AI/Data</button>
+          <button class="project-filter" type="button" data-filter="systems" aria-pressed="false">Systems</button>
+        </div>
+        <p class="project-filter-status anim-reveal" id="project-filter-status" aria-live="polite"></p>
+
         <div class="projects-grid">
-          <div class="project-card anim-reveal">
+          <article class="project-card anim-reveal" data-project-id="fullstack-product-engineering" data-domain="web frontend ux core production">
             <div class="project-image">
-              <div class="project-image-placeholder">
+              <div class="project-image-placeholder accent-1">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
               </div>
               <div class="project-overlay">
-                <a href="https://github.com/ikerperez12" target="_blank" rel="noopener noreferrer" class="project-link">
+                <a href="https://github.com/ikerperez12" rel="noopener noreferrer" class="project-link" aria-label="Abrir repositorio en GitHub">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
                 </a>
               </div>
             </div>
             <div class="project-info">
-              <div class="project-tags">
-                <span>Java</span><span>Spring Boot</span><span>REST API</span><span>Docker</span>
-              </div>
-              <h3 class="project-title">Internet & Sistemas Distribuidos</h3>
-              <p class="project-desc">Servicios web con arquitectura REST y despliegue containerizado. APIs escalables con Spring Boot y Docker.</p>
+              <div class="project-tags"><span>React</span><span>Node.js</span><span>UX</span><span>API</span></div>
+              <h3 class="project-title">Full-stack Product Engineering</h3>
+              <p class="project-desc">Aplicaciones web mantenibles con frontend moderno, backend robusto y foco en seguridad desde el diseno.</p>
+              <p class="project-impact"><strong>Impacto:</strong> mejor tiempo de entrega y experiencia de usuario consistente en desktop y mobile.</p>
             </div>
-          </div>
+          </article>
 
-          <div class="project-card anim-reveal">
+          <article class="project-card anim-reveal" data-project-id="ia-ml-nlp-lab" data-domain="ai data exploratory">
             <div class="project-image">
               <div class="project-image-placeholder accent-2">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
               </div>
               <div class="project-overlay">
-                <a href="https://github.com/ikerperez12" target="_blank" rel="noopener noreferrer" class="project-link">
+                <a href="https://github.com/ikerperez12" rel="noopener noreferrer" class="project-link" aria-label="Abrir repositorio en GitHub">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
                 </a>
               </div>
             </div>
             <div class="project-info">
-              <div class="project-tags">
-                <span>Python</span><span>Kaggle</span><span>TensorFlow</span><span>Pandas</span>
-              </div>
-              <h3 class="project-title">Modelos de IA & ML</h3>
-              <p class="project-desc">Machine learning para clasificación y predicción. Competiciones en Kaggle y experimentación con LLMs locales vía Ollama.</p>
+              <div class="project-tags"><span>Python</span><span>NLP</span><span>Streamlit</span><span>Kaggle</span></div>
+              <h3 class="project-title">IA, ML y NLP Lab</h3>
+              <p class="project-desc">Prototipos aplicados de IA y analitica para validar ideas, medir resultados y escalar soluciones utiles.</p>
+              <p class="project-impact"><strong>Impacto:</strong> aceleracion de discovery tecnico y pruebas rapidas de producto.</p>
             </div>
-          </div>
+          </article>
 
-          <div class="project-card anim-reveal">
+          <article class="project-card anim-reveal" data-project-id="cybersecurity-lab" data-domain="security backend core production">
             <div class="project-image">
               <div class="project-image-placeholder accent-3">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               </div>
               <div class="project-overlay">
-                <a href="https://github.com/ikerperez12" target="_blank" rel="noopener noreferrer" class="project-link">
+                <a href="https://github.com/ikerperez12" rel="noopener noreferrer" class="project-link" aria-label="Abrir repositorio en GitHub">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
                 </a>
               </div>
             </div>
             <div class="project-info">
-              <div class="project-tags">
-                <span>Python</span><span>Redes</span><span>Criptografía</span><span>Wireshark</span>
-              </div>
-              <h3 class="project-title">Seguridad en Sistemas</h3>
-              <p class="project-desc">Proyecto tutelado de ciberseguridad: análisis de tráfico, criptografía post-cuántica y detección de vulnerabilidades.</p>
+              <div class="project-tags"><span>PQC</span><span>Wireshark</span><span>Hardening</span><span>Auditing</span></div>
+              <h3 class="project-title">Laboratorio de ciberseguridad</h3>
+              <p class="project-desc">Analisis de trafico, pruebas de seguridad y estudio de criptografia post-cuantica en entorno controlado.</p>
+              <p class="project-impact"><strong>Impacto:</strong> deteccion temprana de riesgos y mejor postura de seguridad en desarrollo.</p>
             </div>
-          </div>
+          </article>
 
-          <div class="project-card anim-reveal">
+          <article class="project-card anim-reveal" data-project-id="cloud-cicd-automation" data-domain="cloud backend production">
             <div class="project-image">
               <div class="project-image-placeholder accent-4">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-              </div>
-              <div class="project-overlay">
-                <a href="https://github.com/ikerperez12" target="_blank" rel="noopener noreferrer" class="project-link">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                </a>
-              </div>
-            </div>
-            <div class="project-info">
-              <div class="project-tags">
-                <span>C / C++</span><span>Algoritmos</span><span>Linux</span><span>SO</span>
-              </div>
-              <h3 class="project-title">Algoritmos & Sistemas Operativos</h3>
-              <p class="project-desc">Algoritmos de ordenación optimizados. Programación de sistemas a bajo nivel, gestión de procesos e hilos en Linux.</p>
-            </div>
-          </div>
-
-          <div class="project-card anim-reveal">
-            <div class="project-image">
-              <div class="project-image-placeholder">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
               </div>
               <div class="project-overlay">
-                <a href="https://github.com/ikerperez12" target="_blank" rel="noopener noreferrer" class="project-link">
+                <a href="https://github.com/ikerperez12" rel="noopener noreferrer" class="project-link" aria-label="Abrir repositorio en GitHub">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
                 </a>
               </div>
             </div>
             <div class="project-info">
-              <div class="project-tags">
-                <span>Three.js</span><span>Anime.js</span><span>Vite</span><span>CSS</span>
-              </div>
-              <h3 class="project-title">Portfolio 3D Interactivo</h3>
-              <p class="project-desc">Este portfolio: partículas 3D que mutan entre geometrías con scroll, animaciones con Anime.js y shaders custom.</p>
+              <div class="project-tags"><span>AWS</span><span>Azure</span><span>CI/CD</span><span>Docker</span></div>
+              <h3 class="project-title">Cloud y automatizacion de despliegues</h3>
+              <p class="project-desc">Entornos reproducibles, pipelines CI/CD y automatizacion de despliegues con foco en trazabilidad.</p>
+              <p class="project-impact"><strong>Impacto:</strong> menos errores manuales y releases mas estables.</p>
             </div>
-          </div>
+          </article>
 
-          <div class="project-card anim-reveal">
+          <article class="project-card anim-reveal" data-project-id="data-architecture-sql" data-domain="backend data core exploratory">
             <div class="project-image">
               <div class="project-image-placeholder accent-2">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
               </div>
               <div class="project-overlay">
-                <a href="https://github.com/ikerperez12" target="_blank" rel="noopener noreferrer" class="project-link">
+                <a href="https://github.com/ikerperez12" rel="noopener noreferrer" class="project-link" aria-label="Abrir repositorio en GitHub">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
                 </a>
               </div>
             </div>
             <div class="project-info">
-              <div class="project-tags">
-                <span>SQL</span><span>PostgreSQL</span><span>DataGrip</span><span>Modelado</span>
-              </div>
-              <h3 class="project-title">Diseño de Bases de Datos</h3>
-              <p class="project-desc">Modelado relacional y diseño de BBDD complejas. Consultas optimizadas, triggers y normalización avanzada.</p>
+              <div class="project-tags"><span>SQL</span><span>PostgreSQL</span><span>Modeling</span><span>Performance</span></div>
+              <h3 class="project-title">Arquitectura de datos y SQL</h3>
+              <p class="project-desc">Modelado relacional y consultas optimizadas para productos orientados a datos y escalabilidad sostenible.</p>
+              <p class="project-impact"><strong>Impacto:</strong> tiempos de respuesta mas bajos y base de datos preparada para crecer.</p>
             </div>
-          </div>
+          </article>
+
+          <article class="project-card anim-reveal" data-project-id="systems-hardware-infra" data-domain="backend systems production core">
+            <div class="project-image">
+              <div class="project-image-placeholder accent-1">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M7 20h10"/><path d="M9 16v4"/><path d="M15 16v4"/></svg>
+              </div>
+              <div class="project-overlay">
+                <a href="https://github.com/ikerperez12" rel="noopener noreferrer" class="project-link" aria-label="Abrir repositorio en GitHub">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                </a>
+              </div>
+            </div>
+            <div class="project-info">
+              <div class="project-tags"><span>Linux</span><span>Networks</span><span>Diagnostics</span><span>Automation</span></div>
+              <h3 class="project-title">Systems Reliability Lab</h3>
+              <p class="project-desc">Integracion de software + infraestructura para diagnostico, estabilizacion de entornos y mejora operativa continua.</p>
+              <p class="project-impact"><strong>Impacto:</strong> menos incidencias de produccion y mayor fiabilidad en sistemas reales.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROCESS SECTION -->
+    <section id="process" class="section process-section">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-tag anim-reveal">05</span>
+          <h2 class="section-title anim-reveal">CÃ³mo <span class="gradient-text">trabajo</span></h2>
+          <p class="section-subtitle anim-reveal">MÃ©todo de trabajo para entregar software Ãºtil, seguro y mantenible</p>
+        </div>
+
+        <div class="process-grid">
+          <article class="process-card anim-reveal">
+            <span class="process-step">01</span>
+            <h3>Discovery tÃ©cnico</h3>
+            <p>Alineo objetivos de negocio con requisitos tÃ©cnicos, riesgos y mÃ©tricas de Ã©xito antes de escribir cÃ³digo.</p>
+          </article>
+          <article class="process-card anim-reveal">
+            <span class="process-step">02</span>
+            <h3>ConstrucciÃ³n segura</h3>
+            <p>Implemento por iteraciones cortas con buenas prÃ¡cticas de seguridad, calidad de cÃ³digo y pruebas de regresiÃ³n.</p>
+          </article>
+          <article class="process-card anim-reveal">
+            <span class="process-step">03</span>
+            <h3>Entrega y mejora continua</h3>
+            <p>Mido rendimiento, usabilidad y estabilidad para priorizar mejoras que aporten valor real al producto.</p>
+          </article>
+        </div>
+
+        <div class="process-proof anim-reveal">
+          <h3>Base acadÃ©mica y certificaciones</h3>
+          <ul class="proof-list">
+            <li>IngenierÃ­a InformÃ¡tica en UDC + programa SICUE en ETSISI-UPM.</li>
+            <li>Building Chatbots (UDC, 2024), Cisco Networking Academy y Microsoft Learn Azure.</li>
+            <li>FormaciÃ³n continua en Android Codelabs, Udemy y Hack The Box.</li>
+          </ul>
         </div>
       </div>
     </section>
@@ -561,8 +640,8 @@
     <section id="experience" class="section experience-section">
       <div class="section-container">
         <div class="section-header">
-          <span class="section-tag anim-reveal">04</span>
-          <h2 class="section-title anim-reveal">Formación <span class="gradient-text">& trayectoria</span></h2>
+          <span class="section-tag anim-reveal">06</span>
+          <h2 class="section-title anim-reveal">FormaciÃ³n <span class="gradient-text">& trayectoria</span></h2>
         </div>
 
         <div class="timeline">
@@ -571,12 +650,12 @@
             <div class="timeline-content">
               <div class="timeline-header">
                 <div>
-                  <h3>Grado en Ingeniería Informática</h3>
-                  <span class="timeline-company">Universidade da Coruña (UDC)</span>
+                  <h3>Grado en IngenierÃ­a InformÃ¡tica</h3>
+                  <span class="timeline-company">Universidade da CoruÃ±a (UDC)</span>
                 </div>
-                <span class="timeline-date">2022 — Presente</span>
+                <span class="timeline-date">2022 â€” Presente</span>
               </div>
-              <p>Formación integral: algoritmos, diseño de software, bases de datos, redes, sistemas operativos, inteligencia artificial, sistemas distribuidos y seguridad informática.</p>
+              <p>FormaciÃ³n integral: algoritmos, diseÃ±o de software, bases de datos, redes, sistemas operativos, inteligencia artificial, sistemas distribuidos y seguridad informÃ¡tica.</p>
               <div class="timeline-tags">
                 <span>Java</span><span>Python</span><span>C</span><span>SQL</span><span>Redes</span><span>IA</span>
               </div>
@@ -588,14 +667,14 @@
             <div class="timeline-content">
               <div class="timeline-header">
                 <div>
-                  <h3>Seguridad en Sistemas — Tutelado</h3>
-                  <span class="timeline-company">UDC — SSI</span>
+                  <h3>Seguridad en Sistemas â€” Tutelado</h3>
+                  <span class="timeline-company">UDC â€” SSI</span>
                 </div>
-                <span class="timeline-date">2024 — 2025</span>
+                <span class="timeline-date">2024 â€” 2025</span>
               </div>
-              <p>Trabajo tutelado en ciberseguridad: análisis de protocolos criptográficos post-cuánticos, captura y análisis de tráfico de red, evaluación de vulnerabilidades.</p>
+              <p>Trabajo tutelado en ciberseguridad: anÃ¡lisis de protocolos criptogrÃ¡ficos post-cuÃ¡nticos, captura y anÃ¡lisis de trÃ¡fico de red, evaluaciÃ³n de vulnerabilidades.</p>
               <div class="timeline-tags">
-                <span>Criptografía</span><span>Wireshark</span><span>Python</span><span>PQC</span>
+                <span>CriptografÃ­a</span><span>Wireshark</span><span>Python</span><span>PQC</span>
               </div>
             </div>
           </div>
@@ -605,10 +684,10 @@
             <div class="timeline-content">
               <div class="timeline-header">
                 <div>
-                  <h3>Proyectos personales & Autoformación</h3>
-                  <span class="timeline-company">Kaggle · Ollama · GitHub</span>
+                  <h3>Proyectos personales & AutoformaciÃ³n</h3>
+                  <span class="timeline-company">Kaggle Â· Ollama Â· GitHub</span>
                 </div>
-                <span class="timeline-date">2023 — Presente</span>
+                <span class="timeline-date">2023 â€” Presente</span>
               </div>
               <p>Aprendizaje continuo en IA/ML con Kaggle, modelos LLM locales con Ollama, dashboards con Streamlit, y despliegues cloud con Docker, AWS y Azure.</p>
               <div class="timeline-tags">
@@ -623,9 +702,9 @@
               <div class="timeline-header">
                 <div>
                   <h3>Internet y Sistemas Distribuidos</h3>
-                  <span class="timeline-company">UDC — ISD</span>
+                  <span class="timeline-company">UDC â€” ISD</span>
                 </div>
-                <span class="timeline-date">2023 — 2024</span>
+                <span class="timeline-date">2023 â€” 2024</span>
               </div>
               <p>Aplicaciones web distribuidas con microservicios. APIs REST con Java/Spring, despliegue containerizado con Docker y PostgreSQL.</p>
               <div class="timeline-tags">
@@ -641,9 +720,9 @@
     <section id="contact" class="section contact-section">
       <div class="section-container">
         <div class="section-header">
-          <span class="section-tag anim-reveal">05</span>
-          <h2 class="section-title anim-reveal">¿Hablamos<span class="gradient-text">?</span></h2>
-          <p class="section-subtitle anim-reveal">Busco prácticas, colaboraciones y proyectos interesantes</p>
+          <span class="section-tag anim-reveal">07</span>
+          <h2 class="section-title anim-reveal">Â¿Hablamos<span class="gradient-text">?</span></h2>
+          <p class="section-subtitle anim-reveal">Busco prÃ¡cticas, colaboraciones y proyectos interesantes</p>
         </div>
 
         <div class="contact-grid">
@@ -663,7 +742,7 @@
               </div>
               <div>
                 <h4>GitHub</h4>
-                <a href="https://github.com/ikerperez12" target="_blank" rel="noopener noreferrer">github.com/ikerperez12</a>
+                <a href="https://github.com/ikerperez12" rel="noopener noreferrer">github.com/ikerperez12</a>
               </div>
             </div>
             <div class="contact-card">
@@ -672,7 +751,7 @@
               </div>
               <div>
                 <h4>LinkedIn</h4>
-                <a href="https://linkedin.com/in/ikerperez" target="_blank" rel="noopener noreferrer">linkedin.com/in/ikerperez</a>
+                <a href="https://linkedin.com/in/ikerperez" rel="noopener noreferrer">linkedin.com/in/ikerperez</a>
               </div>
             </div>
             <div class="contact-card">
@@ -680,13 +759,25 @@
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
               </div>
               <div>
-                <h4>Ubicación</h4>
-                <span style="font-weight:600">A Coruña, Galicia</span>
+                <h4>UbicaciÃ³n</h4>
+                <span style="font-weight:600">A CoruÃ±a, Galicia</span>
               </div>
             </div>
           </div>
 
           <form class="contact-form anim-reveal" id="contact-form">
+            <div class="form-group">
+              <select id="topic" required>
+                <option value="" selected disabled>Selecciona una categoria</option>
+                <option value="frontend-ux">Frontend + UX</option>
+                <option value="backend-apis">Backend + APIs</option>
+                <option value="cloud-devops">Cloud + DevOps</option>
+                <option value="security-review">Security review</option>
+                <option value="ai-data-prototype">AI / Data prototype</option>
+                <option value="other">Otra colaboracion</option>
+              </select>
+              <label for="topic">Categoria</label>
+            </div>
             <div class="form-group">
               <input type="text" id="name" placeholder="Tu nombre" required />
               <label for="name">Nombre</label>
@@ -696,30 +787,99 @@
               <label for="email">Email</label>
             </div>
             <div class="form-group">
-              <textarea id="message" rows="5" placeholder="Cuéntame tu propuesta..." required></textarea>
+              <textarea id="message" rows="5" placeholder="CuÃ©ntame tu propuesta..." required></textarea>
               <label for="message">Mensaje</label>
             </div>
-            <button type="submit" class="btn btn-primary btn-full">
+            <div class="form-group form-honeypot" aria-hidden="true">
+              <input type="text" id="website" tabindex="-1" autocomplete="off" />
+              <label for="website">Website</label>
+            </div>
+            <p class="contact-status" id="contact-status" aria-live="polite"></p>
+            <button type="submit" class="btn btn-primary btn-full btn-magnetic">
               <span>Enviar mensaje</span>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </button>
+            <div id="contact-success" class="contact-feedback is-hidden" aria-live="polite">
+              Gracias. El mensaje se ha enviado correctamente.
+            </div>
+            <div id="contact-error" class="contact-feedback is-error is-hidden" aria-live="polite">
+              No se pudo enviar el mensaje. Revisa los datos e intenta de nuevo.
+            </div>
           </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- SHOWCASE SECTION -->
+    <section id="showcase" class="section showcase-section">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-tag anim-reveal">08</span>
+          <h2 class="section-title anim-reveal">Visual <span class="gradient-text">Showcase</span></h2>
+          <p class="section-subtitle anim-reveal">Capas visuales, storytelling y transiciones multimedia para productos con identidad.</p>
+        </div>
+
+        <div class="showcase-stack">
+          <article class="showcase-item anim-reveal">
+            <div class="showcase-media">
+              <img loading="lazy" src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80" alt="Workspace and coding setup with cinematic lighting" />
+            </div>
+            <div class="showcase-copy">
+              <span class="showcase-kicker">Narrativa visual</span>
+              <h3>Hero y secciones con ritmo cinematografico</h3>
+              <p>Combinacion de contraste, profundidad y movimiento para guiar al usuario por una historia de producto clara.</p>
+            </div>
+          </article>
+
+          <article class="showcase-item anim-reveal">
+            <div class="showcase-media">
+              <video muted playsinline autoplay loop preload="none" poster="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1200&q=80">
+                <source src="https://cdn.coverr.co/videos/coverr-programmer-at-work-1579/1080p.mp4" type="video/mp4" />
+              </video>
+            </div>
+            <div class="showcase-copy">
+              <span class="showcase-kicker">Motion language</span>
+              <h3>Transiciones de scroll con video de apoyo</h3>
+              <p>Animaciones suaves en compositing y multimedia contextual para reforzar el valor de cada bloque.</p>
+            </div>
+          </article>
+
+          <article class="showcase-item anim-reveal">
+            <div class="showcase-media">
+              <img loading="lazy" src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80" alt="Multiple monitors showing software dashboards and development tools" />
+            </div>
+            <div class="showcase-copy">
+              <span class="showcase-kicker">Portfolio profesional</span>
+              <h3>DiseÃ±o orientado a confianza tecnica</h3>
+              <p>Mensajes concretos, estructura escaneable y foco en resultados para convertir visitas en conversaciones reales.</p>
+            </div>
+          </article>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- Footer -->
+    <!-- Footer -->
   <footer class="footer">
     <div class="footer-container">
-      <div class="footer-left">
+      <div class="footer-brand">
         <span class="footer-logo">
           <span class="logo-bracket">&lt;</span>IP<span class="logo-bracket">/&gt;</span>
         </span>
-        <p>Diseñado y desarrollado por Iker Pérez</p>
+        <p>Disenado y desarrollado por Iker Perez.</p>
+        <p class="footer-meta">Software, seguridad, cloud e IA aplicada.</p>
       </div>
-      <div class="footer-right">
-        <p>&copy; 2026 Iker Pérez — UDC</p>
+
+      <nav class="footer-nav" aria-label="Navegacion de cierre">
+        <a href="#about">Sobre mi</a>
+        <a href="#services">Servicios</a>
+        <a href="#projects">Proyectos</a>
+        <a href="#contact">Contacto</a>
+      </nav>
+
+      <div class="footer-status">
+        <p class="footer-availability">Disponible para practicas y colaboraciones tecnicas.</p>
+        <p>&copy; 2026 Iker Perez - UDC</p>
       </div>
     </div>
   </footer>
@@ -727,3 +887,4 @@
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>
+

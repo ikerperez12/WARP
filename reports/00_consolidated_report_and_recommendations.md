@@ -95,13 +95,3 @@ Este informe resume los hallazgos y propone una hoja de ruta clara para elevar l
 
 
 
-Ohara TCG
-Arelia TCG 
-Tequila TCG 
-Nakama TCG (amigo y lore op)
-Kaizoku TCG (pirata en japo)
-Reiki TCG
-Yomi TCG (lectura)
-Kiru TCG (cortar(espada))
-Hihō TCG 
-Meki TCG 

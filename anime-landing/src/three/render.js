@@ -1,4 +1,4 @@
-export function startRenderLoop({ renderer, scene, camera, onTick }) {
+export function startRenderLoop({ renderer, scene, camera, composer, onTick }) {
   let last = performance.now();
 
   function tick(now) {
@@ -7,7 +7,12 @@ export function startRenderLoop({ renderer, scene, camera, onTick }) {
 
     if (onTick) onTick({ now, dt });
 
-    renderer.render(scene, camera);
+    if (composer) {
+      composer.render();
+    } else {
+      renderer.render(scene, camera);
+    }
+    
     requestAnimationFrame(tick);
   }
 

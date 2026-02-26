@@ -1,50 +1,56 @@
 [
   {
-    "id": "hero_motion_engine",
-    "name": "Hero Motion Engine",
-    "description": "Coreografia del hero: intro, loops, parallax y respuesta al puntero.",
+    "id": "fullstack-product-engineering",
+    "name": "Full-stack Product Engineering",
+    "description": "Aplicaciones web mantenibles con frontend moderno, backend robusto y foco en seguridad.",
     "language": "JavaScript",
-    "stack": ["Three.js", "Anime.js", "Vite"],
-    "githubUrl": "https://github.com/ikerperez12",
-    "assets": {
-      "jsUrl": "/wasm/hero-motion/hero_motion.js",
-      "wasmUrl": "/wasm/hero-motion/hero_motion.wasm"
-    }
+    "stack": ["Vite", "Node.js", "REST API"],
+    "domain": "web frontend ux production core",
+    "githubUrl": "https://github.com/ikerperez12"
   },
   {
-    "id": "scene_laptop_render",
-    "name": "Laptop Scene Render",
-    "description": "Pipeline visual del portatil 3D con materiales, luces y detalles premium.",
-    "language": "JavaScript",
-    "stack": ["Three.js", "PBR", "CanvasTexture"],
-    "githubUrl": "https://github.com/ikerperez12",
-    "assets": {
-      "jsUrl": "/wasm/scene-laptop/scene_laptop.js",
-      "wasmUrl": "/wasm/scene-laptop/scene_laptop.wasm"
-    }
+    "id": "ia-ml-nlp-lab",
+    "name": "IA, ML y NLP Lab",
+    "description": "Experimentacion aplicada con modelos, evaluacion de resultados y prototipos utiles.",
+    "language": "Python",
+    "stack": ["Kaggle", "Ollama", "Streamlit"],
+    "domain": "ai data exploratory",
+    "githubUrl": "https://github.com/ikerperez12"
   },
   {
-    "id": "scroll_driven_fx",
-    "name": "Scroll Driven FX",
-    "description": "Sistema de transiciones por scroll con reveal de accesorios y narrativa visual.",
-    "language": "JavaScript",
-    "stack": ["IntersectionObserver", "Animation timeline"],
-    "githubUrl": "https://github.com/ikerperez12",
-    "assets": {
-      "jsUrl": "/wasm/scroll-fx/scroll_fx.js",
-      "wasmUrl": "/wasm/scroll-fx/scroll_fx.wasm"
-    }
+    "id": "cybersecurity-lab",
+    "name": "Cybersecurity Lab",
+    "description": "Analisis de trafico, pruebas de seguridad y buenas practicas de hardening en entornos controlados.",
+    "language": "Python",
+    "stack": ["Wireshark", "PQC", "Security Testing"],
+    "domain": "security backend production",
+    "githubUrl": "https://github.com/ikerperez12"
   },
   {
-    "id": "terminal_runtime",
-    "name": "Terminal Runtime",
-    "description": "Terminal isomorfa simulada con comandos, estado y secuencia de arranque.",
-    "language": "JavaScript",
-    "stack": ["Canvas UI", "Runtime state machine"],
-    "githubUrl": "https://github.com/ikerperez12",
-    "assets": {
-      "jsUrl": "/wasm/terminal-runtime/terminal_runtime.js",
-      "wasmUrl": "/wasm/terminal-runtime/terminal_runtime.wasm"
-    }
+    "id": "cloud-cicd-automation",
+    "name": "Cloud y CI/CD",
+    "description": "Despliegues reproducibles con pipelines para mejorar calidad, velocidad y trazabilidad.",
+    "language": "DevOps",
+    "stack": ["Docker", "AWS", "Azure"],
+    "domain": "cloud devops production",
+    "githubUrl": "https://github.com/ikerperez12"
+  },
+  {
+    "id": "data-architecture-sql",
+    "name": "Data Architecture",
+    "description": "Modelado relacional y optimizacion SQL para productos escalables.",
+    "language": "SQL",
+    "stack": ["PostgreSQL", "Performance", "Data Modeling"],
+    "domain": "backend data production",
+    "githubUrl": "https://github.com/ikerperez12"
+  },
+  {
+    "id": "systems-hardware-infra",
+    "name": "Systems & Hardware",
+    "description": "Integracion software + infraestructura con experiencia practica de hardware y diagnostico.",
+    "language": "Systems",
+    "stack": ["Linux", "Networking", "Diagnostics"],
+    "domain": "backend systems production core",
+    "githubUrl": "https://github.com/ikerperez12"
   }
 ]

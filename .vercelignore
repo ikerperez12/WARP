@@ -3,6 +3,7 @@
 node_modules/
 dist/
 reports/
+agent-diseno-ia/
 anime-landing/
 modelos3D/
 CV.pdf

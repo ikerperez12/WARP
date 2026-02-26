@@ -1,5 +1,12 @@
 import { animate } from "animejs";
 
+/**
+ * Binds mouse/pointer movement to the orb's rotation for a parallax effect.
+ * @param {Object} options
+ * @param {Object} options.orb - The orb object containing the group to rotate.
+ * @param {Object} options.state - The global state object to update pointer coordinates.
+ * @returns {Function} A cleanup function to remove event listeners.
+ */
 export function bindPointerParallax({ orb, state }) {
   const { group } = orb;
 
@@ -29,6 +36,28 @@ export function bindPointerParallax({ orb, state }) {
   return () => window.removeEventListener("pointermove", onMove);
 }
 
+/**
+ * Initializes mouse-tracking for a radial spotlight effect on UI cards.
+ * @param {HTMLElement[]} cards - An array of card elements to bind the effect to.
+ */
+export function bindCardHover(cards) {
+  cards.forEach((card) => {
+    card.addEventListener("pointermove", (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      card.style.setProperty("--mx", `${x}px`);
+      card.style.setProperty("--my", `${y}px`);
+    });
+  });
+}
+
+/**
+ * Triggers a visual 'burst' animation on the orb.
+ * @param {Object} options
+ * @param {Object} options.orb - The orb object.
+ * @param {Object} options.state - The state object.
+ */
 export function burst({ orb, state }) {
   const { ringMat, coreMat, group } = orb;
 
