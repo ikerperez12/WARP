@@ -19,31 +19,31 @@ export function createLaptopModel(textures) {
 
   const bodyMat = useMaterial(
     new THREE.MeshPhysicalMaterial({
-      color: 0x121e33,
-      metalness: 0.8,
-      roughness: 0.14,
-      clearcoat: 0.9,
-      clearcoatRoughness: 0.08,
-      envMapIntensity: 1.4,
+      color: 0x182845,
+      metalness: 0.86,
+      roughness: 0.11,
+      clearcoat: 1,
+      clearcoatRoughness: 0.06,
+      envMapIntensity: 1.58,
     })
   );
 
   const shellMat = useMaterial(
     new THREE.MeshPhysicalMaterial({
-      color: 0x263650,
-      metalness: 0.68,
-      roughness: 0.19,
-      clearcoat: 0.52,
-      clearcoatRoughness: 0.14,
-      envMapIntensity: 1.24,
+      color: 0x324d73,
+      metalness: 0.72,
+      roughness: 0.16,
+      clearcoat: 0.72,
+      clearcoatRoughness: 0.09,
+      envMapIntensity: 1.3,
     })
   );
 
   const darkMat = useMaterial(
     new THREE.MeshStandardMaterial({
-      color: 0x090d16,
-      metalness: 0.24,
-      roughness: 0.48,
+      color: 0x060913,
+      metalness: 0.32,
+      roughness: 0.42,
     })
   );
 
@@ -57,9 +57,9 @@ export function createLaptopModel(textures) {
 
   const detailMat = useMaterial(
     new THREE.MeshStandardMaterial({
-      color: 0x465677,
-      metalness: 0.78,
-      roughness: 0.16,
+      color: 0x5f779f,
+      metalness: 0.8,
+      roughness: 0.14,
     })
   );
 
@@ -73,21 +73,21 @@ export function createLaptopModel(textures) {
 
   const ledMat = useMaterial(
     new THREE.MeshStandardMaterial({
-      color: 0xcce8ff,
-      emissive: new THREE.Color(0x4d9bff),
-      emissiveIntensity: 0.86,
-      metalness: 0.2,
-      roughness: 0.26,
+      color: 0xd8ecff,
+      emissive: new THREE.Color(0x57a7ff),
+      emissiveIntensity: 0.96,
+      metalness: 0.28,
+      roughness: 0.2,
     })
   );
 
   const keyboardMat = useMaterial(
     new THREE.MeshStandardMaterial({
-      color: 0xe8eefc,
-      emissive: new THREE.Color(0x1b3158),
-      emissiveIntensity: 0.5,
-      metalness: 0.2,
-      roughness: 0.24,
+      color: 0xf0f5ff,
+      emissive: new THREE.Color(0x1f3b6f),
+      emissiveIntensity: 0.58,
+      metalness: 0.24,
+      roughness: 0.18,
       vertexColors: true,
     })
   );
@@ -132,22 +132,22 @@ export function createLaptopModel(textures) {
     new THREE.MeshBasicMaterial({
       map: textures.glow,
       transparent: true,
-      opacity: 0.18,
+      opacity: 0.24,
       depthWrite: false,
       depthTest: false,
       blending: THREE.AdditiveBlending,
-      color: 0x8dc8ff,
+      color: 0x79c5ff,
     })
   );
 
   const trackpadMat = useMaterial(
     new THREE.MeshPhysicalMaterial({
-      color: 0x30405d,
-      metalness: 0.56,
-      roughness: 0.2,
-      clearcoat: 0.82,
-      clearcoatRoughness: 0.09,
-      envMapIntensity: 1.28,
+      color: 0x3d5783,
+      metalness: 0.6,
+      roughness: 0.14,
+      clearcoat: 0.9,
+      clearcoatRoughness: 0.07,
+      envMapIntensity: 1.34,
     })
   );
 
@@ -159,6 +159,29 @@ export function createLaptopModel(textures) {
       clearcoat: 0.9,
       clearcoatRoughness: 0.08,
       envMapIntensity: 1.18,
+    })
+  );
+
+  const accentStripMat = useMaterial(
+    new THREE.MeshStandardMaterial({
+      color: 0xb8deff,
+      emissive: new THREE.Color(0x2c8eff),
+      emissiveIntensity: 0.86,
+      metalness: 0.54,
+      roughness: 0.2,
+    })
+  );
+
+  const palmSheenMat = useMaterial(
+    new THREE.MeshPhysicalMaterial({
+      color: 0x9cb7e4,
+      transparent: true,
+      opacity: 0.13,
+      roughness: 0.24,
+      metalness: 0.2,
+      clearcoat: 0.82,
+      clearcoatRoughness: 0.08,
+      envMapIntensity: 1.12,
     })
   );
 
@@ -181,6 +204,23 @@ export function createLaptopModel(textures) {
   const deckBevelRight = deckBevelLeft.clone();
   deckBevelRight.position.x = 1.56;
   root.add(deckBevelRight);
+
+  const accentFront = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(2.62, 0.004, 0.018, 3, 0.004)), accentStripMat);
+  accentFront.position.set(0, 0.0915, 1.02);
+  root.add(accentFront);
+
+  const accentLeft = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(0.018, 0.004, 1.12, 3, 0.004)), accentStripMat);
+  accentLeft.position.set(-1.56, 0.0915, 0.22);
+  root.add(accentLeft);
+
+  const accentRight = accentLeft.clone();
+  accentRight.position.x = 1.56;
+  root.add(accentRight);
+
+  const palmSheen = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(2.9, 1.42)), palmSheenMat);
+  palmSheen.rotation.x = -Math.PI * 0.5;
+  palmSheen.position.set(0, 0.1034, 0.3);
+  root.add(palmSheen);
 
   const keyboardBed = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(2.78, 0.012, 1.16, 5, 0.01)), darkMat);
   keyboardBed.position.set(0, 0.1, -0.03);

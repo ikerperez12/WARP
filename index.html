@@ -944,6 +944,301 @@
         </div>
       </div>
     </section>
+
+    <!-- PHOTO SEQUENCE REEL -->
+    <section id="motion-reel" class="section reel-section">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-tag anim-reveal">09</span>
+          <h2 class="section-title anim-reveal">Photo Sequence <span class="gradient-text">Reel</span></h2>
+          <p class="section-subtitle anim-reveal">Secuencia de muchas imagenes sincronizada al scroll para sentirse como un video en movimiento continuo.</p>
+        </div>
+
+        <div class="reel-experience anim-reveal" id="reel-experience">
+          <div class="reel-sticky">
+            <div
+              class="reel-viewport"
+              id="reel-viewport"
+              role="img"
+              aria-label="Secuencia de fotogramas con desplazamiento continuo que simula una toma de video cinematografica"
+            >
+              <div class="reel-track" id="reel-track" aria-hidden="true">
+                <figure class="reel-frame is-active" data-reel-frame="0"><img src="https://images.unsplash.com/photo-1518773553398-650c184e0bb3?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="1"><img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="2"><img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="3"><img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="4"><img src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="5"><img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="6"><img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="7"><img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="8"><img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="9"><img src="https://images.unsplash.com/photo-1484417894907-623942c8ee29?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="10"><img src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="11"><img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
+              </div>
+
+              <div class="reel-overlay">
+                <span class="showcase-kicker">Scroll driven frames</span>
+                <h3>Del frame estatico al flujo de video: cada tramo de scroll avanza la secuencia de forma fluida.</h3>
+                <p>El desplazamiento mueve la cinta de fotos, activa un frame principal y compone una sensacion de travelling cinematografico.</p>
+                <div class="reel-progress-track" aria-hidden="true">
+                  <span class="reel-progress-bar" id="reel-progress-bar"></span>
+                </div>
+                <p class="reel-caption" id="reel-caption" aria-live="polite">Frame 1 / 12</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEUMORPHISM LAB -->
+    <section id="neo-lab" class="section neo-lab-section">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-tag anim-reveal">10</span>
+          <h2 class="section-title anim-reveal">Neumorphism <span class="gradient-text">Lab</span></h2>
+          <p class="section-subtitle anim-reveal">Controles tactiles y superficies profundas inspiradas en Uiverse, con luz dinamica y respuesta en tiempo real.</p>
+        </div>
+
+        <div class="neo-lab-layout anim-reveal" id="neo-layout">
+          <article class="neo-console" id="neo-console">
+            <div class="neo-console-head">
+              <span class="showcase-kicker">Interactive skin</span>
+              <h3>Controla la atmosfera visual del panel</h3>
+            </div>
+
+            <div class="neo-switches" role="tablist" aria-label="Perfiles de interfaz">
+              <button class="neo-switch is-active" type="button" data-neo-profile="focus">Focus mode</button>
+              <button class="neo-switch" type="button" data-neo-profile="cinematic">Cinematic mode</button>
+              <button class="neo-switch" type="button" data-neo-profile="delivery">Delivery mode</button>
+            </div>
+
+            <div class="neo-slider-row">
+              <label for="neo-intensity">Depth intensity</label>
+              <input id="neo-intensity" type="range" min="28" max="100" value="62" />
+            </div>
+
+            <div class="neo-stats">
+              <div class="neo-stat">
+                <span class="neo-stat-value" id="neo-depth-value">62%</span>
+                <span class="neo-stat-label">Surface depth</span>
+              </div>
+              <div class="neo-stat">
+                <span class="neo-stat-value" id="neo-profile-value">Focus</span>
+                <span class="neo-stat-label">Active profile</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="neo-preview">
+            <div class="neo-preview-card" id="neo-preview-card">
+              <h3>UI Pressure Panel</h3>
+              <p>Sombra dual, relieve interno y micro movimiento para una interaccion con sensacion fisica.</p>
+              <div class="neo-pill-row">
+                <button type="button" class="neo-pill neo-pill-primary">Deploy</button>
+                <button type="button" class="neo-pill">Observe</button>
+                <button type="button" class="neo-pill">Refine</button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ANIME MOTION LAB -->
+    <section id="anime-lab" class="section anime-lab-section">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-tag anim-reveal">11</span>
+          <h2 class="section-title anim-reveal">Anime Motion <span class="gradient-text">Lab</span></h2>
+          <p class="section-subtitle anim-reveal">Ejemplos de timeline y stagger inspirados en anime.js para presentar datos con ritmo y progresion visual.</p>
+        </div>
+
+        <div class="anime-lab-head anim-reveal">
+          <button type="button" class="btn btn-primary" id="anime-replay-btn">Replay sequence</button>
+          <p class="anime-phase" id="anime-phase" aria-live="polite">Sequence idle</p>
+        </div>
+
+        <div class="anime-grid anim-reveal" id="anime-grid">
+          <article class="anime-tile" data-anime-tile>
+            <span class="anime-tile-tag">01</span>
+            <h3>Input sync</h3>
+            <p>Captura eventos del usuario y traduce gestos en estado utilizable.</p>
+          </article>
+          <article class="anime-tile" data-anime-tile>
+            <span class="anime-tile-tag">02</span>
+            <h3>State blending</h3>
+            <p>Interpola valores para transiciones naturales y sin saltos visuales.</p>
+          </article>
+          <article class="anime-tile" data-anime-tile>
+            <span class="anime-tile-tag">03</span>
+            <h3>Scroll timeline</h3>
+            <p>Convierte progreso vertical en beats de narrativa con control fino.</p>
+          </article>
+          <article class="anime-tile" data-anime-tile>
+            <span class="anime-tile-tag">04</span>
+            <h3>Stagger reveal</h3>
+            <p>Entra cada bloque con retardo para construir jerarquia de lectura.</p>
+          </article>
+          <article class="anime-tile" data-anime-tile>
+            <span class="anime-tile-tag">05</span>
+            <h3>Micro feedback</h3>
+            <p>Refuerza accion con respuestas cortas y consistentes en controles.</p>
+          </article>
+          <article class="anime-tile" data-anime-tile>
+            <span class="anime-tile-tag">06</span>
+            <h3>Delivery polish</h3>
+            <p>Ajusta velocidad, easing y contraste para salida profesional.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE PADS + 3D CARDS -->
+    <section id="interaction-deck" class="section interaction-deck-section">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-tag anim-reveal">12</span>
+          <h2 class="section-title anim-reveal">Interactive <span class="gradient-text">Pads</span> & 3D Deck</h2>
+          <p class="section-subtitle anim-reveal">Controles vivos con feedback tactil y tarjetas en perspectiva 3D para experimentar una interfaz mas fisica.</p>
+        </div>
+
+        <div class="interaction-deck-layout anim-reveal">
+          <article class="pad-panel">
+            <div class="pad-panel-head">
+              <span class="showcase-kicker">Control matrix</span>
+              <h3>Pads interactivos para activar escenas y estados</h3>
+            </div>
+            <div class="pad-grid" role="group" aria-label="Interactive control pads">
+              <button type="button" class="pad-btn" data-pad="Orbit">Orbit</button>
+              <button type="button" class="pad-btn" data-pad="Pulse">Pulse</button>
+              <button type="button" class="pad-btn" data-pad="Focus">Focus</button>
+              <button type="button" class="pad-btn" data-pad="Depth">Depth</button>
+              <button type="button" class="pad-btn" data-pad="Flow">Flow</button>
+              <button type="button" class="pad-btn" data-pad="Glitch">Glitch</button>
+              <button type="button" class="pad-btn" data-pad="Sync">Sync</button>
+              <button type="button" class="pad-btn" data-pad="Boost">Boost</button>
+            </div>
+            <p class="pad-status" id="pad-status" aria-live="polite">Pad status: waiting for input</p>
+          </article>
+
+          <article class="tilt-deck" aria-label="3D tilt service deck">
+            <div class="tilt-card" data-tilt-card>
+              <span class="tilt-tag">Pipeline</span>
+              <h3>Realtime delivery lane</h3>
+              <p>Unifica diseño, build y release en una sola cadencia con telemetria continua.</p>
+            </div>
+            <div class="tilt-card" data-tilt-card>
+              <span class="tilt-tag">Security</span>
+              <h3>Surface hardening pass</h3>
+              <p>Valida entradas, minimiza superficie y mantiene trazabilidad de eventos criticos.</p>
+            </div>
+            <div class="tilt-card" data-tilt-card>
+              <span class="tilt-tag">Scale</span>
+              <h3>Elastic runtime profile</h3>
+              <p>Distribuye carga con reglas observables y tiempos de respuesta estables.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- GOOGLE SERVICES TOOLKIT -->
+    <section id="google-services-section" class="section google-services-section">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-tag anim-reveal">13</span>
+          <h2 class="section-title anim-reveal">Google Services <span class="gradient-text">Toolkit</span></h2>
+          <p class="section-subtitle anim-reveal">Servicios utiles para producto: cloud, IA, analitica y operaciones, filtrables en tiempo real.</p>
+        </div>
+
+        <div class="google-toolbar anim-reveal">
+          <div class="google-filter">
+            <label for="google-service-filter">Categoria</label>
+            <select id="google-service-filter">
+              <option value="all">All</option>
+              <option value="cloud">Cloud</option>
+              <option value="ai">AI</option>
+              <option value="analytics">Analytics</option>
+              <option value="ops">Ops</option>
+            </select>
+          </div>
+          <div class="google-search">
+            <label for="google-search-service">Buscar servicio</label>
+            <input id="google-search-service" type="search" placeholder="Ej: vertex, bigquery, cloud run..." />
+          </div>
+          <p class="google-count">Visible: <span id="google-service-count">8</span></p>
+        </div>
+
+        <div class="google-services-grid anim-reveal">
+          <article class="google-service-card" data-type="cloud" data-service="Cloud Run serverless containers deployment api backend">
+            <h3>Cloud Run</h3>
+            <p>Despliegue serverless de contenedores para APIs y microservicios con escalado automatico.</p>
+            <div class="google-card-actions">
+              <a href="https://cloud.google.com/run" target="_blank" rel="noopener noreferrer">Open</a>
+              <button type="button" class="google-service-copy" data-copy="https://cloud.google.com/run">Copy link</button>
+            </div>
+          </article>
+          <article class="google-service-card" data-type="cloud" data-service="Cloud Build ci cd pipelines automation release">
+            <h3>Cloud Build</h3>
+            <p>CI/CD gestionado para builds reproducibles y pipelines de entrega con control total.</p>
+            <div class="google-card-actions">
+              <a href="https://cloud.google.com/build" target="_blank" rel="noopener noreferrer">Open</a>
+              <button type="button" class="google-service-copy" data-copy="https://cloud.google.com/build">Copy link</button>
+            </div>
+          </article>
+          <article class="google-service-card" data-type="ai" data-service="Vertex AI models mlops generative ai agents tuning">
+            <h3>Vertex AI</h3>
+            <p>Entrenamiento, serving y capacidades generativas para crear productos IA de extremo a extremo.</p>
+            <div class="google-card-actions">
+              <a href="https://cloud.google.com/vertex-ai" target="_blank" rel="noopener noreferrer">Open</a>
+              <button type="button" class="google-service-copy" data-copy="https://cloud.google.com/vertex-ai">Copy link</button>
+            </div>
+          </article>
+          <article class="google-service-card" data-type="analytics" data-service="BigQuery warehouse sql analytics datasets dashboards">
+            <h3>BigQuery</h3>
+            <p>Data warehouse para analitica SQL de alto volumen y consulta interactiva en segundos.</p>
+            <div class="google-card-actions">
+              <a href="https://cloud.google.com/bigquery" target="_blank" rel="noopener noreferrer">Open</a>
+              <button type="button" class="google-service-copy" data-copy="https://cloud.google.com/bigquery">Copy link</button>
+            </div>
+          </article>
+          <article class="google-service-card" data-type="analytics" data-service="Looker Studio dashboards reporting metrics business intelligence">
+            <h3>Looker Studio</h3>
+            <p>Dashboards de reporting para convertir datos en decisiones de producto y negocio.</p>
+            <div class="google-card-actions">
+              <a href="https://lookerstudio.google.com" target="_blank" rel="noopener noreferrer">Open</a>
+              <button type="button" class="google-service-copy" data-copy="https://lookerstudio.google.com">Copy link</button>
+            </div>
+          </article>
+          <article class="google-service-card" data-type="ops" data-service="Firebase auth hosting firestore push analytics mobile web apps">
+            <h3>Firebase</h3>
+            <p>Backend rapido para apps web/mobile con auth, base de datos, hosting y telemetria.</p>
+            <div class="google-card-actions">
+              <a href="https://firebase.google.com" target="_blank" rel="noopener noreferrer">Open</a>
+              <button type="button" class="google-service-copy" data-copy="https://firebase.google.com">Copy link</button>
+            </div>
+          </article>
+          <article class="google-service-card" data-type="ops" data-service="Maps Platform location routing places geocoding realtime">
+            <h3>Maps Platform</h3>
+            <p>Geolocalizacion, rutas y datos de lugares para productos con componente espacial.</p>
+            <div class="google-card-actions">
+              <a href="https://mapsplatform.google.com" target="_blank" rel="noopener noreferrer">Open</a>
+              <button type="button" class="google-service-copy" data-copy="https://mapsplatform.google.com">Copy link</button>
+            </div>
+          </article>
+          <article class="google-service-card" data-type="ai" data-service="Gemini API multimodal generation assistants reasoning code">
+            <h3>Gemini API</h3>
+            <p>Modelos multimodales para asistentes, automatizaciones y features generativas en producto.</p>
+            <div class="google-card-actions">
+              <a href="https://ai.google.dev" target="_blank" rel="noopener noreferrer">Open</a>
+              <button type="button" class="google-service-copy" data-copy="https://ai.google.dev">Copy link</button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
   </main>
 
     <!-- Footer -->

@@ -6,6 +6,9 @@ import { initScroll } from './features/scroll.js';
 import { initProjects } from './features/projects.js';
 import { initStats } from './features/stats.js';
 import { initContactForm } from './features/contact.js';
+import { initImmersiveSections } from './features/immersive.js';
+import { initAdvancedMotion } from './features/advanced-motion.js';
+import { initGoogleServicesSection } from './features/google-services.js';
 import { initLiveRegion } from './utils/dom.js';
 
 // Initialize preferences early to apply critical styles (grain, etc.) before paint
@@ -27,4 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initProjects();
   initStats();
   initContactForm();
+  initImmersiveSections();
+  initAdvancedMotion();
+  initGoogleServicesSection();
 });

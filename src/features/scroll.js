@@ -118,7 +118,6 @@ function updateHeroEffects(y) {
   const heroSection = document.getElementById('hero');
   const heroContent = document.querySelector('.hero-content');
   const heroBadges = document.querySelector('.floating-badges');
-  const heroScrollIndicator = document.querySelector('.scroll-indicator');
 
   if (heroSection && heroContent) {
     const start = heroSection.offsetTop;
@@ -135,7 +134,6 @@ function updateHeroEffects(y) {
       heroContent.style.filter = `blur(${4 * fade}px)`;
     }
     if (heroBadges) heroBadges.style.opacity = String(1 - fade * 0.75);
-    if (heroScrollIndicator) heroScrollIndicator.style.opacity = String(1 - fade);
   }
 }
 
