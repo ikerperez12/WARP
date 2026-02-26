@@ -53,6 +53,34 @@ function createSoftCircleTexture(inner, outer, size = 256) {
   return texture;
 }
 
+const keywordTokens = new Set([
+  'const',
+  'let',
+  'function',
+  'return',
+  'import',
+  'from',
+  'export',
+  'default',
+  'new',
+  'window',
+  'document',
+]);
+
+function tokenizeCode(line) {
+  return line.match(/(\".*?\"|\'.*?\'|`.*?`|\/\/.*|[A-Za-z_]\w*|\d+|[^\sA-Za-z_])/g) || [''];
+}
+
+function tokenColor(token) {
+  if (!token) return 'rgba(224, 234, 255, 0.84)';
+  if (token.startsWith('//')) return 'rgba(160, 176, 215, 0.78)';
+  if (token[0] === '"' || token[0] === "'" || token[0] === '`') return 'rgba(237, 198, 255, 0.97)';
+  if (keywordTokens.has(token)) return 'rgba(162, 212, 255, 0.98)';
+  if (/^\d+$/.test(token)) return 'rgba(255, 196, 196, 0.95)';
+  if (/^[{}()[\].,;:+\-*/<>!=]+$/.test(token)) return 'rgba(176, 196, 238, 0.9)';
+  return 'rgba(228, 236, 255, 0.95)';
+}
+
 function createScreenTexture() {
   const width = 1536;
   const height = 960;
@@ -199,19 +227,12 @@ function createScreenTexture() {
     ],
   ];
 
-  const keywordTokens = new Set([
-    'const',
-    'let',
-    'function',
-    'return',
-    'import',
-    'from',
-    'export',
-    'default',
-    'new',
-    'window',
-    'document',
-  ]);
+  const tokenizedCodeBanks = codeBanks.map((bank) =>
+    bank.map((line) => ({
+      text: line,
+      tokens: tokenizeCode(line),
+    }))
+  );
 
   const terminal = {
     focused: false,
@@ -668,20 +689,6 @@ function createScreenTexture() {
     return false;
   }
 
-  function tokenizeCode(line) {
-    return line.match(/(\".*?\"|\'.*?\'|`.*?`|\/\/.*|[A-Za-z_]\w*|\d+|[^\sA-Za-z_])/g) || [''];
-  }
-
-  function tokenColor(token) {
-    if (!token) return 'rgba(224, 234, 255, 0.84)';
-    if (token.startsWith('//')) return 'rgba(160, 176, 215, 0.78)';
-    if (token[0] === '"' || token[0] === "'" || token[0] === '`') return 'rgba(237, 198, 255, 0.97)';
-    if (keywordTokens.has(token)) return 'rgba(162, 212, 255, 0.98)';
-    if (/^\d+$/.test(token)) return 'rgba(255, 196, 196, 0.95)';
-    if (/^[{}()[\].,;:+\-*/<>!=]+$/.test(token)) return 'rgba(176, 196, 238, 0.9)';
-    return 'rgba(228, 236, 255, 0.95)';
-  }
-
   function drawBase() {
     const bg = baseCtx.createLinearGradient(0, 0, width, height);
     bg.addColorStop(0, '#090d1a');
@@ -888,7 +895,7 @@ function createScreenTexture() {
       ctx.fillText(tab.label, x + 12, tabY + 20);
     });
 
-    const activeCode = codeBanks[activeTabIndex] || codeBanks[0];
+    const activeCode = tokenizedCodeBanks[activeTabIndex] || tokenizedCodeBanks[0];
 
     const lineHeight = 31;
     const firstLine = Math.floor(visualScroll / lineHeight);
@@ -905,7 +912,8 @@ function createScreenTexture() {
 
     for (let i = -1; i < visibleLines; i++) {
       const lineIndex = (firstLine + i + activeCode.length * 32) % activeCode.length;
-      const line = activeCode[lineIndex];
+      const lineObj = activeCode[lineIndex];
+      const line = lineObj.text;
       const y = ide.codeY + i * lineHeight - offsetY;
 
       if (lineIndex === 4 || lineIndex === 5 || lineIndex === 6) {
@@ -918,7 +926,7 @@ function createScreenTexture() {
       ctx.fillText(String(((lineIndex % 54) + 1)).padStart(2, ' '), ide.codeX + 8, y);
 
       let cursorX = ide.codeX + 50;
-      const tokens = tokenizeCode(line);
+      const tokens = lineObj.tokens;
       tokens.forEach((token) => {
         ctx.fillStyle = tokenColor(token);
         ctx.globalAlpha = 0.86 + energy * 0.1;
