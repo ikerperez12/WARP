@@ -647,7 +647,7 @@ document.addEventListener('DOMContentLoaded', () => {
         announce('Contact form has missing fields.');
         return;
       }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/.test(email)) {
         setFormStatus('El email no es valido.', 'error');
         announce('Invalid email format.');
         return;
