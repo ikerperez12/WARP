@@ -399,17 +399,6 @@ document.addEventListener('DOMContentLoaded', () => {
       syncProjectCards();
     });
 
-  const showcaseItems = Array.from(document.querySelectorAll('.narrative-demo, .motion-demo'));
-  if (showcaseItems.length) {
-    if (isReduced()) showcaseItems.forEach((item) => item.classList.add('is-in-view'));
-    else {
-      const showcaseObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => entry.target.classList.toggle('is-in-view', entry.isIntersecting));
-      }, { threshold: 0.25 });
-      showcaseItems.forEach((item) => showcaseObserver.observe(item));
-    }
-  }
-
   const navbar = document.getElementById('navbar');
   const navLinks = Array.from(document.querySelectorAll('.nav-link'));
   const sections = Array.from(document.querySelectorAll('.section'));
@@ -419,22 +408,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const heroContent = document.querySelector('.hero-content');
   const heroBadges = document.querySelector('.floating-badges');
   const heroScrollIndicator = document.querySelector('.scroll-indicator');
-  const narrativeStage = document.getElementById('narrative-stage');
-  const narrativeBeats = Array.from(document.querySelectorAll('#narrative-beats .narrative-beat'));
-  const motionDemo = document.getElementById('motion-demo');
-  const motionProgressBar = document.getElementById('motion-progress-bar');
-  const motionVideo = document.getElementById('motion-video');
-  const stockCompositionScroll = document.getElementById('stock-composition-scroll');
-  const stockCompositionStage = document.getElementById('stock-composition-stage');
-  const stockCompositionFrames = Array.from(document.querySelectorAll('.stock-composition-frame'));
-  const stockCompositionSteps = Array.from(document.querySelectorAll('#stock-composition-steps .stock-composition-step'));
-  const stockCompositionProgressBar = document.getElementById('stock-composition-progress-bar');
-  const stockCompositionCaption = document.getElementById('stock-composition-caption');
+  const showcaseScroll = document.getElementById('showcase-scroll');
+  const showcaseStage = document.getElementById('showcase-stage');
+  const showcaseFrames = Array.from(document.querySelectorAll('.showcase-frame'));
+  const showcaseSteps = Array.from(document.querySelectorAll('#showcase-steps .showcase-step'));
+  const showcaseProgressBar = document.getElementById('showcase-progress-bar');
+  const showcaseCaption = document.getElementById('showcase-caption');
 
-  const updateStockComposition = (progress) => {
-    if (!stockCompositionFrames.length) return;
+  const updateShowcaseSequence = (progress) => {
+    if (!showcaseFrames.length) return;
     const reduced = isReduced();
-    const frameCount = stockCompositionFrames.length;
+    const frameCount = showcaseFrames.length;
     const maxIndex = Math.max(frameCount - 1, 1);
     const timelinePosition = progress * maxIndex;
     const lowerIndex = Math.floor(timelinePosition);
@@ -442,7 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const blend = timelinePosition - lowerIndex;
     const activeIndex = Math.round(timelinePosition);
 
-    stockCompositionFrames.forEach((frame, index) => {
+    showcaseFrames.forEach((frame, index) => {
       let opacity = 0;
       if (reduced) {
         opacity = index === activeIndex ? 1 : 0;
@@ -451,18 +435,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (index === lowerIndex) opacity = 1 - blend;
         else if (index === upperIndex) opacity = blend;
         const depth = index - timelinePosition;
-        const translateX = clamp(depth * -10, -26, 26);
-        const translateY = Math.abs(depth) * 18;
-        const scale = 1 - Math.min(0.14, Math.abs(depth) * 0.035);
-        frame.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
+        const translateX = clamp(depth * -18, -56, 56);
+        const translateY = Math.min(86, Math.abs(depth) * 24);
+        const scale = 1 - Math.min(0.22, Math.abs(depth) * 0.04);
+        const rotate = clamp(depth * 1.8, -7, 7);
+        frame.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale}) rotate(${rotate}deg)`;
       }
       frame.style.opacity = opacity.toFixed(3);
       frame.classList.toggle('is-active', index === activeIndex);
     });
 
-    if (stockCompositionSteps.length) {
-      const stepIndex = Math.min(stockCompositionSteps.length - 1, Math.round(progress * (stockCompositionSteps.length - 1)));
-      stockCompositionSteps.forEach((step, index) => {
+    if (showcaseSteps.length) {
+      const stepIndex = Math.min(showcaseSteps.length - 1, Math.round(progress * (showcaseSteps.length - 1)));
+      showcaseSteps.forEach((step, index) => {
         const active = index === stepIndex;
         step.classList.toggle('is-active', active);
         if (active) step.setAttribute('aria-current', 'step');
@@ -470,8 +455,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    if (stockCompositionProgressBar) stockCompositionProgressBar.style.width = `${(progress * 100).toFixed(1)}%`;
-    if (stockCompositionCaption) stockCompositionCaption.textContent = `Plano ${Math.min(frameCount, activeIndex + 1)} de ${frameCount}`;
+    if (showcaseProgressBar) showcaseProgressBar.style.width = `${(progress * 100).toFixed(1)}%`;
+    if (showcaseCaption) showcaseCaption.textContent = `Plano ${Math.min(frameCount, activeIndex + 1)} de ${frameCount}`;
   };
 
   const onScroll = () => {
@@ -514,34 +499,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (heroScrollIndicator) heroScrollIndicator.style.opacity = String(1 - fade);
     }
 
-    if (narrativeStage) {
-      const rect = narrativeStage.getBoundingClientRect();
-      const stageProgress = clamp((window.innerHeight - rect.top) / (window.innerHeight + rect.height), 0, 1);
-      narrativeStage.style.setProperty('--narrative-progress', stageProgress.toFixed(3));
-      if (narrativeBeats.length) {
-        const activeIndex = Math.min(2, Math.floor(stageProgress * 3));
-        narrativeBeats.forEach((beat, idx) => beat.classList.toggle('is-active', idx === activeIndex));
-      }
-    }
-
-    if (motionDemo && motionProgressBar) {
-      const rect = motionDemo.getBoundingClientRect();
-      const motionProgress = clamp((window.innerHeight - rect.top) / (window.innerHeight + rect.height), 0, 1);
-      motionDemo.style.setProperty('--motion-progress', motionProgress.toFixed(3));
-      motionProgressBar.style.width = `${(motionProgress * 100).toFixed(1)}%`;
-
-      if (motionVideo && !isReduced() && Number.isFinite(motionVideo.duration) && motionVideo.duration > 0) {
-        const targetTime = motionProgress * motionVideo.duration;
-        if (Math.abs(motionVideo.currentTime - targetTime) > 0.18) motionVideo.currentTime = targetTime;
-      }
-    }
-
-    if (stockCompositionScroll && stockCompositionStage && stockCompositionFrames.length) {
-      const rect = stockCompositionScroll.getBoundingClientRect();
+    if (showcaseScroll && showcaseStage && showcaseFrames.length) {
+      const rect = showcaseScroll.getBoundingClientRect();
       const range = Math.max(rect.height - window.innerHeight, 1);
-      const stockProgress = clamp(-rect.top / range, 0, 1);
-      stockCompositionStage.style.setProperty('--stock-progress', stockProgress.toFixed(3));
-      updateStockComposition(stockProgress);
+      const showcaseProgress = clamp(-rect.top / range, 0, 1);
+      showcaseStage.style.setProperty('--showcase-progress', showcaseProgress.toFixed(3));
+      updateShowcaseSequence(showcaseProgress);
     }
   };
 

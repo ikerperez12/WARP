@@ -18,11 +18,17 @@ git push origin <tu-rama>
 ## 3) Variables de entorno (obligatorio para formulario)
 En `Project Settings -> Environment Variables` agrega:
 
-`RESEND_API_KEY`: API key de Resend.  
-`CONTACT_FROM_EMAIL`: remitente verificado en Resend (ejemplo pruebas: `Portfolio Contact <onboarding@resend.dev>`).  
-`CONTACT_TO_EMAILS` (opcional): destinatarios separados por comas.  
-Valor por defecto interno si no lo defines:
-`iker.perez@udc.es,ikerjperezgarcia@gmail.com`
+`CONTACT_RECIPIENT_EMAIL` (**obligatoria**): inbox destino principal (`tu-correo@dominio.com`).  
+`RESEND_API_KEY` (opcional): si existe, se usa Resend como proveedor principal.  
+`CONTACT_FROM_EMAIL` (opcional): remitente verificado en Resend (ejemplo pruebas: `Portfolio Contact <onboarding@resend.dev>`).  
+`CONTACT_TO_EMAILS` (opcional): destinatarios extra para Resend, separados por comas.
+
+### Setup rapido recomendado
+1. Configura solo `CONTACT_RECIPIENT_EMAIL` para activar fallback gratuito con FormSubmit.
+2. Envia un mensaje de prueba desde el formulario.
+3. FormSubmit enviara un correo de activacion al inbox destino (solo la primera vez).
+4. Haz click en el enlace de activacion para habilitar los envios.
+5. (Opcional) Agrega `RESEND_API_KEY` para priorizar Resend y mantener FormSubmit como respaldo automatico.
 
 ## 4) Dominio gratis
 Vercel asigna automaticamente:

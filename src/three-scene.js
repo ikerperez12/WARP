@@ -1082,23 +1082,23 @@ function createLaptopModel(textures) {
 
   const bodyMat = useMaterial(
     new THREE.MeshPhysicalMaterial({
-      color: 0x0e1728,
-      metalness: 0.72,
-      roughness: 0.18,
-      clearcoat: 0.74,
-      clearcoatRoughness: 0.12,
-      envMapIntensity: 1.24,
+      color: 0x121e33,
+      metalness: 0.8,
+      roughness: 0.14,
+      clearcoat: 0.9,
+      clearcoatRoughness: 0.08,
+      envMapIntensity: 1.4,
     })
   );
 
   const shellMat = useMaterial(
     new THREE.MeshPhysicalMaterial({
-      color: 0x202d44,
-      metalness: 0.62,
-      roughness: 0.24,
-      clearcoat: 0.4,
-      clearcoatRoughness: 0.18,
-      envMapIntensity: 1.16,
+      color: 0x263650,
+      metalness: 0.68,
+      roughness: 0.19,
+      clearcoat: 0.52,
+      clearcoatRoughness: 0.14,
+      envMapIntensity: 1.24,
     })
   );
 
@@ -1120,9 +1120,9 @@ function createLaptopModel(textures) {
 
   const detailMat = useMaterial(
     new THREE.MeshStandardMaterial({
-      color: 0x394560,
-      metalness: 0.72,
-      roughness: 0.2,
+      color: 0x465677,
+      metalness: 0.78,
+      roughness: 0.16,
     })
   );
 
@@ -1136,9 +1136,9 @@ function createLaptopModel(textures) {
 
   const ledMat = useMaterial(
     new THREE.MeshStandardMaterial({
-      color: 0xd4bcff,
-      emissive: new THREE.Color(0x8a58ff),
-      emissiveIntensity: 0.92,
+      color: 0xcce8ff,
+      emissive: new THREE.Color(0x4d9bff),
+      emissiveIntensity: 0.86,
       metalness: 0.2,
       roughness: 0.26,
     })
@@ -1146,11 +1146,11 @@ function createLaptopModel(textures) {
 
   const keyboardMat = useMaterial(
     new THREE.MeshStandardMaterial({
-      color: 0xf0f4ff,
-      emissive: new THREE.Color(0x1f3556),
-      emissiveIntensity: 0.54,
-      metalness: 0.18,
-      roughness: 0.28,
+      color: 0xe8eefc,
+      emissive: new THREE.Color(0x1b3158),
+      emissiveIntensity: 0.5,
+      metalness: 0.2,
+      roughness: 0.24,
       vertexColors: true,
     })
   );
@@ -1167,11 +1167,11 @@ function createLaptopModel(textures) {
     new THREE.MeshStandardMaterial({
       map: textures.screen.texture,
       emissiveMap: textures.screen.texture,
-      emissive: new THREE.Color(0x6f92ff),
-      emissiveIntensity: 0.58,
-      roughness: 0.08,
-      metalness: 0.12,
-      envMapIntensity: 1.08,
+      emissive: new THREE.Color(0x7ea8ff),
+      emissiveIntensity: 0.64,
+      roughness: 0.06,
+      metalness: 0.14,
+      envMapIntensity: 1.12,
     })
   );
 
@@ -1179,24 +1179,15 @@ function createLaptopModel(textures) {
     new THREE.MeshPhysicalMaterial({
       color: 0xd4e2ff,
       transparent: true,
-      opacity: 0.09,
-      transmission: 0.9,
-      roughness: 0.045,
+      opacity: 0.13,
+      transmission: 0.92,
+      roughness: 0.025,
       metalness: 0,
-      ior: 1.34,
-      thickness: 0.045,
+      ior: 1.4,
+      thickness: 0.06,
       clearcoat: 1,
-      clearcoatRoughness: 0.08,
-    })
-  );
-
-  const shadowMat = useMaterial(
-    new THREE.MeshBasicMaterial({
-      map: textures.shadow,
-      transparent: true,
-      opacity: 0.36,
-      depthWrite: false,
-      color: 0x000000,
+      clearcoatRoughness: 0.03,
+      envMapIntensity: 1.22,
     })
   );
 
@@ -1204,21 +1195,33 @@ function createLaptopModel(textures) {
     new THREE.MeshBasicMaterial({
       map: textures.glow,
       transparent: true,
-      opacity: 0.22,
+      opacity: 0.18,
       depthWrite: false,
+      depthTest: false,
       blending: THREE.AdditiveBlending,
-      color: 0x74b8ff,
+      color: 0x8dc8ff,
     })
   );
 
   const trackpadMat = useMaterial(
     new THREE.MeshPhysicalMaterial({
-      color: 0x2a354d,
-      metalness: 0.48,
-      roughness: 0.28,
-      clearcoat: 0.78,
-      clearcoatRoughness: 0.14,
-      envMapIntensity: 1.2,
+      color: 0x30405d,
+      metalness: 0.56,
+      roughness: 0.2,
+      clearcoat: 0.82,
+      clearcoatRoughness: 0.09,
+      envMapIntensity: 1.28,
+    })
+  );
+
+  const logoMat = useMaterial(
+    new THREE.MeshPhysicalMaterial({
+      color: 0xcad9ff,
+      metalness: 0.55,
+      roughness: 0.18,
+      clearcoat: 0.9,
+      clearcoatRoughness: 0.08,
+      envMapIntensity: 1.18,
     })
   );
 
@@ -1437,6 +1440,14 @@ function createLaptopModel(textures) {
   lidBack.position.set(0, 0.97, -0.01);
   lidPivot.add(lidBack);
 
+  const lidLogoRing = new THREE.Mesh(useGeometry(new THREE.RingGeometry(0.118, 0.164, 52)), logoMat);
+  lidLogoRing.position.set(0, 1.04, 0.023);
+  lidPivot.add(lidLogoRing);
+
+  const lidLogoCore = new THREE.Mesh(useGeometry(new THREE.CircleGeometry(0.099, 48)), detailMat);
+  lidLogoCore.position.set(0, 1.04, 0.0222);
+  lidPivot.add(lidLogoCore);
+
   const bezel = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(3.06, 1.84, 0.028, 5, 0.01)), bezelMat);
   bezel.position.set(0, 0.97, 0.026);
   lidPivot.add(bezel);
@@ -1456,14 +1467,8 @@ function createLaptopModel(textures) {
   camNotch.position.set(0, 1.79, 0.05);
   lidPivot.add(camNotch);
 
-  const shadow = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(4.2, 2.7)), shadowMat);
-  shadow.rotation.x = -Math.PI * 0.5;
-  shadow.position.y = -0.11;
-  root.add(shadow);
-
-  const underGlow = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(2.8, 0.48)), underGlowMat);
-  underGlow.rotation.x = -Math.PI * 0.5;
-  underGlow.position.set(0, -0.07, 1.01);
+  const underGlow = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(2.5, 0.14)), underGlowMat);
+  underGlow.position.set(0, 0.024, 1.105);
   root.add(underGlow);
 
   return {
@@ -1519,7 +1524,7 @@ export function initThreeScene() {
     renderer.setSize(window.innerWidth, window.innerHeight, false);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.02;
+    renderer.toneMappingExposure = 1.07;
 
     pmrem = new THREE.PMREMGenerator(renderer);
     envRT = pmrem.fromScene(new RoomEnvironment(), 0.05);
@@ -1539,36 +1544,38 @@ export function initThreeScene() {
   const camera = new THREE.PerspectiveCamera(33, window.innerWidth / window.innerHeight, 0.1, 90);
   camera.position.set(isMobile ? 0.08 : 0.14, 1.2, 6.9);
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.22));
+  scene.add(new THREE.AmbientLight(0xffffff, 0.2));
 
-  const hemi = new THREE.HemisphereLight(0xbdd5ff, 0x080b14, 0.42);
+  const hemi = new THREE.HemisphereLight(0xc5dcff, 0x070a12, 0.46);
   hemi.position.set(0, 8, 0);
   scene.add(hemi);
 
-  const key = new THREE.DirectionalLight(0xffffff, 1.22);
-  key.position.set(5.6, 4.8, 4.6);
+  const key = new THREE.DirectionalLight(0xfff2e5, 1.26);
+  key.position.set(5.2, 5.4, 4.1);
   scene.add(key);
 
-  const fill = new THREE.DirectionalLight(0x82b6ff, 0.46);
-  fill.position.set(-5.1, 2.3, 3.5);
+  const fill = new THREE.DirectionalLight(0x8ebcff, 0.54);
+  fill.position.set(-5.4, 2.5, 3.7);
   scene.add(fill);
 
-  const rim = new THREE.PointLight(0x77d7ff, 0.95, 22, 2);
-  rim.position.set(-3.6, 2.15, -3.2);
+  const rim = new THREE.PointLight(0x74dcff, 1.04, 24, 2);
+  rim.position.set(-3.4, 2.2, -3.1);
   scene.add(rim);
 
-  const bounce = new THREE.PointLight(0xb3beff, 0.36, 10, 2.2);
-  bounce.position.set(1.4, 0.6, 2.3);
+  const bounce = new THREE.PointLight(0xb9c8ff, 0.42, 12, 2.2);
+  bounce.position.set(1.2, 0.68, 2.2);
   scene.add(bounce);
 
+  const topAccent = new THREE.DirectionalLight(0xc3e2ff, 0.32);
+  topAccent.position.set(0, 6.5, -2.4);
+  scene.add(topAccent);
+
   const starTexture = createStarTexture();
-  const shadowTexture = createSoftCircleTexture('rgba(0,0,0,0.95)', 'rgba(0,0,0,0)', 512);
   const glowTexture = createSoftCircleTexture('rgba(255,255,255,0.95)', 'rgba(255,255,255,0)', 512);
   const screenDisplay = createScreenTexture();
 
   const laptop = createLaptopModel({
     screen: screenDisplay,
-    shadow: shadowTexture,
     glow: glowTexture,
   });
   scene.add(laptop.root);
@@ -1936,7 +1943,6 @@ export function initThreeScene() {
     laptop.materials.forEach((material) => material.dispose());
 
     starTexture.dispose();
-    shadowTexture.dispose();
     glowTexture.dispose();
     screenDisplay.texture.dispose();
 
