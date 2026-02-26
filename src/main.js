@@ -1,5 +1,6 @@
 import anime from 'animejs/lib/anime.es.js';
 import { initThreeScene } from './three-scene.js';
+import { clamp } from './utils/math.js';
 
 const VISUAL_PREFS_KEY = 'warp.visualPrefs';
 const DEFAULT_PREFS = { grain: 'on', cursor: 'on', motion: 'full' };
@@ -14,7 +15,6 @@ const FALLBACK_PROJECTS = [
 
 const toText = (value, fallback = '') => (typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() || fallback : fallback);
 const toId = (value) => toText(value).toLowerCase().replace(/[^a-z0-9_-]/g, '_').slice(0, 80);
-const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
 function toSafeGithubUrl(value) {
   const fallback = 'https://github.com/ikerperez12';
