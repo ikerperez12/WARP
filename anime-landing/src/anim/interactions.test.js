@@ -69,21 +69,24 @@ describe('interactions', () => {
     }
   });
 
-  test('burst triggers four animation targets with injected function', () => {
+  test('burst supports injected animate function in options and second arg', () => {
     const orb = {
       ringMat: { opacity: 0 },
       coreMat: { emissive: { r: 0, g: 0, b: 0 } },
       group: { position: { z: 0 }, rotation: { z: 0 } },
     };
     const state = { shake: 0 };
-    const animateMock = mock.fn();
 
-    burst({ orb, state, animate: animateMock });
+    const animateFromOptions = mock.fn();
+    burst({ orb, state, animate: animateFromOptions });
+    assert.strictEqual(animateFromOptions.mock.calls.length, 4);
 
-    assert.strictEqual(animateMock.mock.calls.length, 4);
-    assert.strictEqual(animateMock.mock.calls[0].arguments[0], orb.ringMat);
-    assert.strictEqual(animateMock.mock.calls[1].arguments[0], orb.group.position);
-    assert.strictEqual(animateMock.mock.calls[2].arguments[0], orb.coreMat.emissive);
-    assert.strictEqual(animateMock.mock.calls[3].arguments[0], state);
+    const animateFromSecondArg = mock.fn();
+    burst({ orb, state }, animateFromSecondArg);
+    assert.strictEqual(animateFromSecondArg.mock.calls.length, 4);
+
+    const config = animateFromSecondArg.mock.calls[3].arguments[1];
+    assert.strictEqual(typeof config.onUpdate, 'function');
+    assert.strictEqual(typeof config.onComplete, 'function');
   });
 });

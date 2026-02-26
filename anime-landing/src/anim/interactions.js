@@ -72,12 +72,17 @@ export function bindCardHover(cards) {
 
 /**
  * Triggers a visual 'burst' animation on the orb.
+ * Supports both signatures:
+ * - burst({ orb, state, animate })
+ * - burst({ orb, state }, animateFn)
  * @param {Object} options
  * @param {Object} options.orb - The orb object.
  * @param {Object} options.state - The state object.
  * @param {Function} [options.animate] - Optional dependency injection for tests.
+ * @param {Function} [animateOverride] - Optional second-argument injector.
  */
-export function burst({ orb, state, animate } = {}) {
+export function burst({ orb, state, animate } = {}, animateOverride) {
+  const injectedAnimate = animateOverride || animate;
   const { ringMat, coreMat, group } = orb;
 
   runAnimate(
@@ -88,7 +93,7 @@ export function burst({ orb, state, animate } = {}) {
       direction: "alternate",
       easing: "easeOutCubic",
     },
-    animate
+    injectedAnimate
   );
 
   runAnimate(
@@ -99,7 +104,7 @@ export function burst({ orb, state, animate } = {}) {
       direction: "alternate",
       easing: "easeOutCubic",
     },
-    animate
+    injectedAnimate
   );
 
   runAnimate(
@@ -112,7 +117,7 @@ export function burst({ orb, state, animate } = {}) {
       direction: "alternate",
       easing: "easeOutCubic",
     },
-    animate
+    injectedAnimate
   );
 
   runAnimate(
@@ -129,6 +134,6 @@ export function burst({ orb, state, animate } = {}) {
         group.rotation.z = 0;
       },
     },
-    animate
+    injectedAnimate
   );
 }
