@@ -385,15 +385,14 @@ export default async function handler(req, res) {
 
     const statusCode = allConfigIssues ? 500 : 502;
     const deliveryErrorMessage = allConfigIssues
-      ? 'Email providers are not configured. Set CONTACT_RECIPIENT_EMAIL (and optionally RESEND_API_KEY + CONTACT_FROM_EMAIL).'
-      : attempts.map((attempt) => `${attempt.provider}: ${attempt.error}`).join(' | ');
+      ? 'Email service is not properly configured.'
+      : 'Email delivery failed. Please try again later.';
 
     console.error('[api/contact] all delivery providers failed', attempts);
     return sendJson(res, statusCode, {
       ok: false,
       code: allConfigIssues ? 'provider_configuration_error' : 'email_delivery_failed',
       error: deliveryErrorMessage,
-      attempts,
     });
   } catch (error) {
     console.error('[api/contact] send failed', error);
