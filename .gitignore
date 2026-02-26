@@ -11,7 +11,8 @@ agent-diseno-ia/
 
 # Reports and audits
 reports/
-modelos3D/
+modelos3D/*
+!modelos3D/original.glb
 CV.pdf
 SI.pdf
 

@@ -9,12 +9,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "export:original-glb": "node scripts/export-original-glb.mjs"
   },
   "devDependencies": {
     "vite": "^7.2.4"
   },
   "dependencies": {
+    "@vercel/kv": "^3.0.0",
     "animejs": "^3.2.2",
     "three": "^0.182.0"
   },

@@ -1,4 +1,4 @@
-import { animate } from "animejs";
+import anime from "animejs";
 
 /**
  * Binds mouse/pointer movement to the orb's rotation for a parallax effect.
@@ -19,11 +19,12 @@ export function bindPointerParallax({ orb, state }) {
 
   window.addEventListener("pointermove", onMove);
 
-  animate(state, {
+  anime({
+    targets: state,
     t: 1,
     duration: 999999,
     loop: true,
-    ease: "linear",
+    easing: "linear",
     onUpdate: () => {
       const tx = -state.pointerY * 0.18;
       const ty = state.pointerX * 0.28;
@@ -61,34 +62,38 @@ export function bindCardHover(cards) {
 export function burst({ orb, state }) {
   const { ringMat, coreMat, group } = orb;
 
-  animate(ringMat, {
+  anime({
+    targets: ringMat,
     opacity: [0.45, 0.95],
     duration: 180,
     direction: "alternate",
-    ease: "out(3)",
+    easing: "easeOutCubic",
   });
 
-  animate(group.position, {
+  anime({
+    targets: group.position,
     z: [0, 0.25],
     duration: 220,
     direction: "alternate",
-    ease: "out(3)",
+    easing: "easeOutCubic",
   });
 
-  animate(coreMat.emissive, {
+  anime({
+    targets: coreMat.emissive,
     r: [0.07, 0.22],
     g: [0.07, 0.22],
     b: [0.07, 0.22],
     duration: 220,
     direction: "alternate",
-    ease: "out(3)",
+    easing: "easeOutCubic",
   });
 
-  animate(state, {
+  anime({
+    targets: state,
     shake: [0, 1],
     duration: 260,
     direction: "alternate",
-    ease: "out(3)",
+    easing: "easeOutCubic",
     onUpdate: () => {
       group.rotation.z = (Math.random() - 0.5) * 0.08 * state.shake;
     },

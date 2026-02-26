@@ -2325,6 +2325,18 @@ body[data-cursor='off'] .custom-cursor-dot {
 }
 
 /* ========================================
+   Utility Classes
+   ======================================== */
+.delay-100 { --delay: 0.1s; }
+.delay-200 { --delay: 0.2s; }
+.delay-300 { --delay: 0.3s; }
+.delay-400 { --delay: 0.4s; }
+.delay-450 { --delay: 0.45s; }
+.delay-500 { --delay: 0.5s; }
+.delay-600 { --delay: 0.6s; }
+.fw-600 { font-weight: 600; }
+
+/* ========================================
    Animations
    ======================================== */
 .anim-fade-up {

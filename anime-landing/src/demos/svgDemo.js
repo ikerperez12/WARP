@@ -1,4 +1,4 @@
-import { animate } from "animejs";
+import anime from "animejs";
 
 export function setupSvgDemo() {
   const path = document.querySelector("#demoPath");
@@ -17,19 +17,21 @@ export function setupSvgDemo() {
   }
 
   function draw() {
-    animate(path.style, {
+    anime({
+      targets: path.style,
       strokeDashoffset: [length, 0],
       duration: 900,
-      ease: "out(3)",
+      easing: "easeOutCubic",
     });
   }
 
   function moveDot() {
     const s = { t: 0 };
-    animate(s, {
+    anime({
+      targets: s,
       t: 1,
       duration: 1200,
-      ease: "inOut(3)",
+      easing: "easeInOutCubic",
       onUpdate: () => {
         const p = path.getPointAtLength(s.t * length);
         dot.setAttribute("cx", String(p.x));

@@ -1,4 +1,7 @@
+import { kv } from '@vercel/kv';
+
 const RATE_WINDOW_MS = 60 * 1000;
+const RATE_WINDOW_SECONDS = Math.ceil(RATE_WINDOW_MS / 1000);
 const CLEANUP_INTERVAL_MS = 60 * 1000;
 const RATE_MAX_REQUESTS = 6;
 const MAX_NAME = 120;
@@ -10,6 +13,7 @@ const EMAIL_PATTERN = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-
 
 const rateStore = globalThis.__warpContactRateStore || new Map();
 globalThis.__warpContactRateStore = rateStore;
+let kvFallbackWarned = false;
 
 function toText(value) {
   if (typeof value !== 'string') return '';
@@ -112,7 +116,7 @@ function cleanupRateStore(now) {
   }
 }
 
-function allowRateLimit(key, now) {
+function allowRateLimitInMemory(key, now) {
   cleanupRateStore(now);
   const current = rateStore.get(key);
   if (!current || current.resetAt <= now) {
@@ -123,6 +127,42 @@ function allowRateLimit(key, now) {
   current.count += 1;
   rateStore.set(key, current);
   return true;
+}
+
+function isKvConfigured() {
+  return Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+}
+
+function normalizeRateKey(key) {
+  return String(key || 'unknown').replace(/[^a-zA-Z0-9:._-]/g, '_');
+}
+
+function getKvRateKey(key, now) {
+  const bucket = Math.floor(now / RATE_WINDOW_MS);
+  return `warp:contact:rate:${bucket}:${normalizeRateKey(key)}`;
+}
+
+async function allowRateLimitWithKv(key, now) {
+  const rateKey = getKvRateKey(key, now);
+  const count = await kv.incr(rateKey);
+  if (count === 1) {
+    await kv.expire(rateKey, RATE_WINDOW_SECONDS);
+  }
+  return count <= RATE_MAX_REQUESTS;
+}
+
+async function allowRateLimit(key, now) {
+  if (!isKvConfigured()) return allowRateLimitInMemory(key, now);
+
+  try {
+    return await allowRateLimitWithKv(key, now);
+  } catch (error) {
+    if (!kvFallbackWarned) {
+      kvFallbackWarned = true;
+      console.warn('[api/contact] KV rate limiter unavailable; using in-memory fallback.', error);
+    }
+    return allowRateLimitInMemory(key, now);
+  }
 }
 
 function getClientKey(req, email) {
@@ -332,6 +372,17 @@ async function deliverEmailWithFallback({ topic, name, email, message }) {
   return { ok: false, attempts };
 }
 
+export const __testing = {
+  RATE_WINDOW_MS,
+  RATE_WINDOW_SECONDS,
+  RATE_MAX_REQUESTS,
+  rateStore,
+  cleanupRateStore,
+  allowRateLimitInMemory,
+  allowRateLimit,
+  getKvRateKey,
+};
+
 export default async function handler(req, res) {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
@@ -367,7 +418,7 @@ export default async function handler(req, res) {
 
   const now = Date.now();
   const rateKey = getClientKey(req, email);
-  if (!allowRateLimit(rateKey, now)) {
+  if (!(await allowRateLimit(rateKey, now))) {
     return sendJson(res, 429, {
       ok: false,
       code: 'rate_limited',
