@@ -1,4 +1,4 @@
-import anime from "animejs";
+import { animate, createTimeline } from "animejs";
 
 export function makeIntro({ orb, ui }) {
   const { group, innerMat, shell } = orb;
@@ -8,7 +8,7 @@ export function makeIntro({ orb, ui }) {
   group.scale.set(0, 0, 0);
   if (shell) shell.material.opacity = 0;
   
-  const tl = anime.timeline({ autoplay: false });
+  const tl = createTimeline({ autoplay: false });
 
   // 1. Core Burst
   tl.add(
@@ -54,8 +54,7 @@ export function makeIntro({ orb, ui }) {
       duration: 800,
       easing: "easeOutExpo",
       begin: () => {
-        anime({
-          targets: headline,
+        animate(headline, {
           skewX: [20, -20, 0],
           opacity: [0.5, 1, 0.8, 1],
           duration: 400,

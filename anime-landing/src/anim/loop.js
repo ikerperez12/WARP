@@ -1,10 +1,9 @@
-import anime from "animejs";
+import { animate } from "animejs";
 
 export function startLoops({ orb, state }) {
   const { group, shards, points, ptsMat } = orb;
 
-  anime({
-    targets: group.rotation,
+  animate(group.rotation, {
     y: "+=6.283185",
     duration: 30000,
     loop: true,
@@ -12,8 +11,7 @@ export function startLoops({ orb, state }) {
   });
 
   if (shards) {
-    anime({
-      targets: shards.rotation,
+    animate(shards.rotation, {
       y: "-=6.283185",
       x: "+=3.14",
       duration: 20000,
@@ -22,8 +20,7 @@ export function startLoops({ orb, state }) {
     });
   }
 
-  anime({
-    targets: state,
+  animate(state, {
     breath: [0, 1],
     duration: 3000,
     direction: "alternate",
@@ -35,8 +32,7 @@ export function startLoops({ orb, state }) {
     },
   });
 
-  anime({
-    targets: ptsMat,
+  animate(ptsMat, {
     opacity: [0.2, 0.6],
     duration: 2000,
     direction: "alternate",

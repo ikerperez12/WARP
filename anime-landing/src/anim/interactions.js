@@ -1,16 +1,16 @@
-import anime from "animejs";
+import { animate as animeAnimate } from "animejs";
 
 function runAnimate(target, config, animateFn) {
   if (typeof animateFn === "function") {
     return animateFn(target, config);
   }
 
-  const payload = { targets: target, ...config };
-  if (payload.ease && !payload.easing) {
-    payload.easing = payload.ease;
-    delete payload.ease;
+  const normalizedConfig = { ...config };
+  if (normalizedConfig.ease && !normalizedConfig.easing) {
+    normalizedConfig.easing = normalizedConfig.ease;
+    delete normalizedConfig.ease;
   }
-  return anime(payload);
+  return animeAnimate(target, normalizedConfig);
 }
 
 /**
