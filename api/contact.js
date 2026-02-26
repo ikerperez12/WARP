@@ -238,35 +238,45 @@ async function sendEmailViaFormSubmit({ recipient, topic, name, email, message }
 
   try {
     const signal = getRequestSignal();
+    const body = new URLSearchParams({
+      _subject: content.subject,
+      _replyto: email,
+      _captcha: 'false',
+      _template: 'table',
+      topic,
+      name,
+      email,
+      message,
+    });
+
     const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(recipient)}`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
       },
-      body: JSON.stringify({
-        _subject: content.subject,
-        _replyto: email,
-        _captcha: 'false',
-        _template: 'table',
-        topic,
-        name,
-        email,
-        message,
-      }),
+      body: body.toString(),
       ...(signal ? { signal } : {}),
     });
 
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
+      const detail = normalizeProviderErrorText(
+        payload?.message || payload?.error,
+        'Check recipient activation and endpoint configuration.'
+      );
+      const normalized = detail.toLowerCase();
+      const requiresActivation =
+        response.status === 403 &&
+        (normalized.includes('activate') || normalized.includes('activation') || normalized.includes('confirm'));
+
       return {
         ok: false,
         provider: 'formsubmit',
-        code: 'formsubmit_rejected',
-        error: `FormSubmit rejected the message (${response.status}): ${normalizeProviderErrorText(
-          payload?.message || payload?.error,
-          'Check recipient activation and endpoint configuration.'
-        )}`,
+        code: requiresActivation ? 'formsubmit_activation_required' : 'formsubmit_rejected',
+        error: requiresActivation
+          ? `FormSubmit requires inbox activation (${response.status}). Open the activation email sent to ${recipient} and confirm the form.`
+          : `FormSubmit rejected the message (${response.status}): ${detail}`,
       };
     }
 
