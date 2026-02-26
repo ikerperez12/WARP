@@ -330,6 +330,11 @@ async function deliverEmailWithFallback({ topic, name, email, message }) {
 
 export default async function handler(req, res) {
   res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'; sandbox");
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=(), payment=()');
 
   if (req.method !== 'POST') {
     return sendJson(res, 405, { ok: false, error: 'Method not allowed.' });
