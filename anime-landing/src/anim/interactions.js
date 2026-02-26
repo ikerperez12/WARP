@@ -1,13 +1,14 @@
-import { animate } from "animejs";
+import { animate as defaultAnimate } from "animejs";
 
 /**
  * Binds mouse/pointer movement to the orb's rotation for a parallax effect.
  * @param {Object} options
  * @param {Object} options.orb - The orb object containing the group to rotate.
  * @param {Object} options.state - The global state object to update pointer coordinates.
+ * @param {Function} [options.animate] - Optional dependency injection for animation function.
  * @returns {Function} A cleanup function to remove event listeners.
  */
-export function bindPointerParallax({ orb, state }) {
+export function bindPointerParallax({ orb, state, animate = defaultAnimate }) {
   const { group } = orb;
 
   function onMove(e) {
@@ -57,8 +58,9 @@ export function bindCardHover(cards) {
  * @param {Object} options
  * @param {Object} options.orb - The orb object.
  * @param {Object} options.state - The state object.
+ * @param {Function} [options.animate] - Optional dependency injection for animation function.
  */
-export function burst({ orb, state }) {
+export function burst({ orb, state, animate = defaultAnimate }) {
   const { ringMat, coreMat, group } = orb;
 
   animate(ringMat, {
