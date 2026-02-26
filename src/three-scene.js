@@ -81,12 +81,19 @@ export function initThreeScene() {
   const isReduced = () => reducedMotionQuery.matches || manualReduced;
   let destroyed = false;
 
-  const renderer = new THREE.WebGLRenderer({
-    canvas,
-    antialias: true,
-    alpha: true,
-    powerPreference: 'high-performance',
-  });
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: true,
+      powerPreference: 'high-performance',
+    });
+  } catch (error) {
+    canvas.style.display = 'none';
+    console.warn('[three-scene] WebGL is not available in this environment.', error);
+    return () => {};
+  }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(window.innerWidth, window.innerHeight, false);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
