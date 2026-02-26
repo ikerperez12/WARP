@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -8,13 +8,13 @@
     http-equiv="Content-Security-Policy"
     content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https:; media-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
   />
-  <title>Iker PÃ©rez | Ingeniero InformÃ¡tico â€” Portfolio</title>
-  <meta name="description" content="Portfolio profesional de Iker PÃ©rez, estudiante de IngenierÃ­a InformÃ¡tica en la Universidade da CoruÃ±a. Desarrollador full-stack, IA y Cloud." />
+  <title>Iker Pérez | Ingeniero Informático — Portfolio</title>
+  <meta name="description" content="Portfolio profesional de Iker Pérez, estudiante de Ingeniería Informática en la Universidade da Coruña. Desarrollador full-stack, IA y Cloud." />
   <link rel="canonical" href="https://portfolio-iker-perez.vercel.app/" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://portfolio-iker-perez.vercel.app/" />
-  <meta property="og:title" content="Iker PÃ©rez | Portfolio" />
-  <meta property="og:description" content="Portfolio de Iker PÃ©rez: software, ciberseguridad, cloud e IA." />
+  <meta property="og:title" content="Iker Pérez | Portfolio" />
+  <meta property="og:description" content="Portfolio de Iker Pérez: software, ciberseguridad, cloud e IA." />
   <meta name="theme-color" content="#0a0a0f" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -48,6 +48,16 @@
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
   </button>
 
+  <!-- Three.js Canvas (background) -->
+  <canvas
+    id="three-canvas"
+    aria-label="Escena 3D interactiva de portátil en movimiento"
+    aria-describedby="three-scene-desc"
+  ></canvas>
+  <p id="three-scene-desc" class="sr-only">
+    Fondo 3D decorativo de un portátil que responde al puntero y al scroll.
+  </p>
+
   <!-- Navigation -->
   <nav id="navbar" class="navbar">
     <div class="nav-container">
@@ -55,11 +65,11 @@
         <span class="logo-bracket">&lt;</span>IP<span class="logo-bracket">/&gt;</span>
       </a>
       <div class="nav-links">
-        <a href="#about" class="nav-link" data-section="about">Sobre mÃ­</a>
+        <a href="#about" class="nav-link" data-section="about">Sobre mí</a>
         <a href="#skills" class="nav-link" data-section="skills">Skills</a>
         <a href="#services" class="nav-link" data-section="services">Servicios</a>
         <a href="#projects" class="nav-link" data-section="projects">Proyectos</a>
-        <a href="#process" class="nav-link" data-section="process">MÃ©todo</a>
+        <a href="#process" class="nav-link" data-section="process">Método</a>
         <a href="#experience" class="nav-link" data-section="experience">Trayectoria</a>
         <a href="#showcase" class="nav-link" data-section="showcase">Media</a>
         <a href="#contact" class="nav-link" data-section="contact">Contacto</a>
@@ -74,7 +84,7 @@
       <button
         class="nav-toggle"
         id="nav-toggle"
-        aria-label="Abrir menÃº de navegaciÃ³n"
+        aria-label="Abrir menú de navegación"
         aria-controls="mobile-menu"
         aria-expanded="false"
       >
@@ -101,11 +111,11 @@
 
   <!-- Mobile Menu -->
   <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
-    <a href="#about" class="mobile-link">Sobre mÃ­</a>
+    <a href="#about" class="mobile-link">Sobre mí</a>
     <a href="#skills" class="mobile-link">Skills</a>
     <a href="#services" class="mobile-link">Servicios</a>
     <a href="#projects" class="mobile-link">Proyectos</a>
-    <a href="#process" class="mobile-link">MÃ©todo</a>
+    <a href="#process" class="mobile-link">Método</a>
     <a href="#experience" class="mobile-link">Trayectoria</a>
     <a href="#showcase" class="mobile-link">Media</a>
     <a href="#contact" class="mobile-link">Contacto</a>
@@ -125,22 +135,22 @@
       <div class="hero-content">
         <div class="hero-badge anim-fade-up">
           <span class="badge-dot"></span>
-          Disponible para prÃ¡cticas y proyectos tech de alto impacto
+          Disponible para prácticas y proyectos tech de alto impacto
         </div>
         <h1 class="hero-title">
-          <span class="hero-line anim-fade-up" style="--delay: 0.1s">Iker PÃ©rez</span>
+          <span class="hero-line anim-fade-up" style="--delay: 0.1s">Iker Pérez</span>
           <span class="hero-line anim-fade-up gradient-text" style="--delay: 0.2s">Software & Security</span>
           <span class="hero-line anim-fade-up" style="--delay: 0.3s">Product Engineer</span>
         </h1>
         <p class="hero-description anim-fade-up" style="--delay: 0.4s">
           Ingeniero de Software especializado en crear sistemas distribuidos, seguros y de alto rendimiento. 
           Enfoque integral en arquitectura backend, hardening de sistemas y experiencias de usuario inmersivas.
-          Especial interÃ©s en <span class="typed-text" id="typed-text"></span><span class="cursor">|</span>
+          Especial interés en <span class="typed-text" id="typed-text"></span><span class="cursor">|</span>
         </p>
         <div class="hero-value-grid anim-fade-up" style="--delay: 0.45s">
           <div class="hero-value-pill">SICUE en UPM - enfoque empresarial</div>
-          <div class="hero-value-pill">ES / GL nativo + InglÃ©s B2</div>
-          <div class="hero-value-pill">Cloud, redes y automatizaciÃ³n</div>
+          <div class="hero-value-pill">ES / GL nativo + Inglés B2</div>
+          <div class="hero-value-pill">Cloud, redes y automatización</div>
           <div class="hero-value-pill">IA aplicada y ciberseguridad</div>
         </div>
         <div class="hero-cta anim-fade-up" style="--delay: 0.5s">
@@ -155,12 +165,12 @@
         <div class="hero-stats anim-fade-up" style="--delay: 0.6s">
           <div class="stat">
             <span class="stat-number" data-target="4" aria-live="polite">0</span><span class="stat-plus" aria-hidden="true">+</span>
-            <span class="stat-label">AÃ±o de carrera</span>
+            <span class="stat-label">Año de carrera</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat">
             <span class="stat-number" data-target="20" aria-live="polite">0</span><span class="stat-plus" aria-hidden="true">+</span>
-            <span class="stat-label">Proyectos y prÃ¡cticas</span>
+            <span class="stat-label">Proyectos y prácticas</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat">
@@ -197,7 +207,7 @@
       <div class="section-container">
         <div class="section-header">
           <span class="section-tag anim-reveal">01</span>
-          <h2 class="section-title anim-reveal">Sobre <span class="gradient-text">mÃ­</span></h2>
+          <h2 class="section-title anim-reveal">Sobre <span class="gradient-text">mí</span></h2>
         </div>
         <div class="about-grid">
           <div class="about-text anim-reveal">
@@ -245,10 +255,10 @@
                 <span class="code-title">iker.config.ts</span>
               </div>
               <pre class="code-content"><code><span class="code-keyword">const</span> <span class="code-var">iker</span> = {
-  <span class="code-prop">name</span>: <span class="code-string">"Iker PÃ©rez"</span>,
-  <span class="code-prop">role</span>: <span class="code-string">"Ing. InformÃ¡tico"</span>,
-  <span class="code-prop">university</span>: <span class="code-string">"UDC ðŸ‡ªðŸ‡¸"</span>,
-  <span class="code-prop">location</span>: <span class="code-string">"A CoruÃ±a, Galicia"</span>,
+  <span class="code-prop">name</span>: <span class="code-string">"Iker Pérez"</span>,
+  <span class="code-prop">role</span>: <span class="code-string">"Ing. Informático"</span>,
+  <span class="code-prop">university</span>: <span class="code-string">"UDC 🇪🇸"</span>,
+  <span class="code-prop">location</span>: <span class="code-string">"A Coruña, Galicia"</span>,
   <span class="code-prop">languages</span>: [<span class="code-string">"ES"</span>, <span class="code-string">"GL"</span>, <span class="code-string">"EN"</span>],
   <span class="code-prop">stack</span>: {
     <span class="code-prop">langs</span>: [<span class="code-string">"Java"</span>, <span class="code-string">"Python"</span>, <span class="code-string">"C"</span>, <span class="code-string">"JS"</span>],
@@ -261,7 +271,7 @@
     <span class="code-string">"Ciberseguridad"</span>,
     <span class="code-string">"Open Source"</span>
   ],
-  <span class="code-prop">status</span>: <span class="code-string">"Building the future ðŸš€"</span>
+  <span class="code-prop">status</span>: <span class="code-string">"Building the future 🚀"</span>
 };</code></pre>
             </div>
           </div>
@@ -275,7 +285,7 @@
         <div class="section-header">
           <span class="section-tag anim-reveal">02</span>
           <h2 class="section-title anim-reveal">Tech <span class="gradient-text">Stack</span></h2>
-          <p class="section-subtitle anim-reveal">TecnologÃ­as y herramientas con las que trabajo</p>
+          <p class="section-subtitle anim-reveal">Tecnologías y herramientas con las que trabajo</p>
         </div>
 
         <div class="skills-grid">
@@ -431,7 +441,7 @@
           <article class="service-card anim-reveal" data-service-domain="core production">
             <span class="service-label">Backend Systems</span>
             <h3>APIs y arquitectura distribuida</h3>
-            <p>DiseÃ±o de servicios robustos con observabilidad, contratos claros y evolucion sin deuda acelerada.</p>
+            <p>Diseño de servicios robustos con observabilidad, contratos claros y evolucion sin deuda acelerada.</p>
           </article>
           <article class="service-card anim-reveal" data-service-domain="core exploratory">
             <span class="service-label">Security</span>
@@ -603,20 +613,20 @@
       <div class="section-container">
         <div class="section-header">
           <span class="section-tag anim-reveal">05</span>
-          <h2 class="section-title anim-reveal">CÃ³mo <span class="gradient-text">trabajo</span></h2>
-          <p class="section-subtitle anim-reveal">MÃ©todo de trabajo para entregar software Ãºtil, seguro y mantenible</p>
+          <h2 class="section-title anim-reveal">Cómo <span class="gradient-text">trabajo</span></h2>
+          <p class="section-subtitle anim-reveal">Método de trabajo para entregar software útil, seguro y mantenible</p>
         </div>
 
         <div class="process-grid">
           <article class="process-card anim-reveal">
             <span class="process-step">01</span>
-            <h3>Discovery tÃ©cnico</h3>
-            <p>Alineo objetivos de negocio con requisitos tÃ©cnicos, riesgos y mÃ©tricas de Ã©xito antes de escribir cÃ³digo.</p>
+            <h3>Discovery técnico</h3>
+            <p>Alineo objetivos de negocio con requisitos técnicos, riesgos y métricas de éxito antes de escribir código.</p>
           </article>
           <article class="process-card anim-reveal">
             <span class="process-step">02</span>
-            <h3>ConstrucciÃ³n segura</h3>
-            <p>Implemento por iteraciones cortas con buenas prÃ¡cticas de seguridad, calidad de cÃ³digo y pruebas de regresiÃ³n.</p>
+            <h3>Construcción segura</h3>
+            <p>Implemento por iteraciones cortas con buenas prácticas de seguridad, calidad de código y pruebas de regresión.</p>
           </article>
           <article class="process-card anim-reveal">
             <span class="process-step">03</span>
@@ -626,11 +636,11 @@
         </div>
 
         <div class="process-proof anim-reveal">
-          <h3>Base acadÃ©mica y certificaciones</h3>
+          <h3>Base académica y certificaciones</h3>
           <ul class="proof-list">
-            <li>IngenierÃ­a InformÃ¡tica en UDC + programa SICUE en ETSISI-UPM.</li>
+            <li>Ingeniería Informática en UDC + programa SICUE en ETSISI-UPM.</li>
             <li>Building Chatbots (UDC, 2024), Cisco Networking Academy y Microsoft Learn Azure.</li>
-            <li>FormaciÃ³n continua en Android Codelabs, Udemy y Hack The Box.</li>
+            <li>Formación continua en Android Codelabs, Udemy y Hack The Box.</li>
           </ul>
         </div>
       </div>
@@ -641,7 +651,7 @@
       <div class="section-container">
         <div class="section-header">
           <span class="section-tag anim-reveal">06</span>
-          <h2 class="section-title anim-reveal">FormaciÃ³n <span class="gradient-text">& trayectoria</span></h2>
+          <h2 class="section-title anim-reveal">Formación <span class="gradient-text">& trayectoria</span></h2>
         </div>
 
         <div class="timeline">
@@ -650,12 +660,12 @@
             <div class="timeline-content">
               <div class="timeline-header">
                 <div>
-                  <h3>Grado en IngenierÃ­a InformÃ¡tica</h3>
-                  <span class="timeline-company">Universidade da CoruÃ±a (UDC)</span>
+                  <h3>Grado en Ingeniería Informática</h3>
+                  <span class="timeline-company">Universidade da Coruña (UDC)</span>
                 </div>
-                <span class="timeline-date">2022 â€” Presente</span>
+                <span class="timeline-date">2022 — Presente</span>
               </div>
-              <p>FormaciÃ³n integral: algoritmos, diseÃ±o de software, bases de datos, redes, sistemas operativos, inteligencia artificial, sistemas distribuidos y seguridad informÃ¡tica.</p>
+              <p>Formación integral: algoritmos, diseño de software, bases de datos, redes, sistemas operativos, inteligencia artificial, sistemas distribuidos y seguridad informática.</p>
               <div class="timeline-tags">
                 <span>Java</span><span>Python</span><span>C</span><span>SQL</span><span>Redes</span><span>IA</span>
               </div>
@@ -667,14 +677,14 @@
             <div class="timeline-content">
               <div class="timeline-header">
                 <div>
-                  <h3>Seguridad en Sistemas â€” Tutelado</h3>
-                  <span class="timeline-company">UDC â€” SSI</span>
+                  <h3>Seguridad en Sistemas — Tutelado</h3>
+                  <span class="timeline-company">UDC — SSI</span>
                 </div>
-                <span class="timeline-date">2024 â€” 2025</span>
+                <span class="timeline-date">2024 — 2025</span>
               </div>
-              <p>Trabajo tutelado en ciberseguridad: anÃ¡lisis de protocolos criptogrÃ¡ficos post-cuÃ¡nticos, captura y anÃ¡lisis de trÃ¡fico de red, evaluaciÃ³n de vulnerabilidades.</p>
+              <p>Trabajo tutelado en ciberseguridad: análisis de protocolos criptográficos post-cuánticos, captura y análisis de tráfico de red, evaluación de vulnerabilidades.</p>
               <div class="timeline-tags">
-                <span>CriptografÃ­a</span><span>Wireshark</span><span>Python</span><span>PQC</span>
+                <span>Criptografía</span><span>Wireshark</span><span>Python</span><span>PQC</span>
               </div>
             </div>
           </div>
@@ -684,10 +694,10 @@
             <div class="timeline-content">
               <div class="timeline-header">
                 <div>
-                  <h3>Proyectos personales & AutoformaciÃ³n</h3>
-                  <span class="timeline-company">Kaggle Â· Ollama Â· GitHub</span>
+                  <h3>Proyectos personales & Autoformación</h3>
+                  <span class="timeline-company">Kaggle · Ollama · GitHub</span>
                 </div>
-                <span class="timeline-date">2023 â€” Presente</span>
+                <span class="timeline-date">2023 — Presente</span>
               </div>
               <p>Aprendizaje continuo en IA/ML con Kaggle, modelos LLM locales con Ollama, dashboards con Streamlit, y despliegues cloud con Docker, AWS y Azure.</p>
               <div class="timeline-tags">
@@ -702,9 +712,9 @@
               <div class="timeline-header">
                 <div>
                   <h3>Internet y Sistemas Distribuidos</h3>
-                  <span class="timeline-company">UDC â€” ISD</span>
+                  <span class="timeline-company">UDC — ISD</span>
                 </div>
-                <span class="timeline-date">2023 â€” 2024</span>
+                <span class="timeline-date">2023 — 2024</span>
               </div>
               <p>Aplicaciones web distribuidas con microservicios. APIs REST con Java/Spring, despliegue containerizado con Docker y PostgreSQL.</p>
               <div class="timeline-tags">
@@ -721,8 +731,8 @@
       <div class="section-container">
         <div class="section-header">
           <span class="section-tag anim-reveal">07</span>
-          <h2 class="section-title anim-reveal">Â¿Hablamos<span class="gradient-text">?</span></h2>
-          <p class="section-subtitle anim-reveal">Busco prÃ¡cticas, colaboraciones y proyectos interesantes</p>
+          <h2 class="section-title anim-reveal">¿Hablamos<span class="gradient-text">?</span></h2>
+          <p class="section-subtitle anim-reveal">Busco prácticas, colaboraciones y proyectos interesantes</p>
         </div>
 
         <div class="contact-grid">
@@ -759,8 +769,8 @@
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
               </div>
               <div>
-                <h4>UbicaciÃ³n</h4>
-                <span style="font-weight:600">A CoruÃ±a, Galicia</span>
+                <h4>Ubicación</h4>
+                <span style="font-weight:600">A Coruña, Galicia</span>
               </div>
             </div>
           </div>
@@ -787,7 +797,7 @@
               <label for="email">Email</label>
             </div>
             <div class="form-group">
-              <textarea id="message" rows="5" placeholder="CuÃ©ntame tu propuesta..." required></textarea>
+              <textarea id="message" rows="5" placeholder="Cuéntame tu propuesta..." required></textarea>
               <label for="message">Mensaje</label>
             </div>
             <div class="form-group form-honeypot" aria-hidden="true">
@@ -850,7 +860,7 @@
             </div>
             <div class="showcase-copy">
               <span class="showcase-kicker">Portfolio profesional</span>
-              <h3>DiseÃ±o orientado a confianza tecnica</h3>
+              <h3>Diseño orientado a confianza tecnica</h3>
               <p>Mensajes concretos, estructura escaneable y foco en resultados para convertir visitas en conversaciones reales.</p>
             </div>
           </article>

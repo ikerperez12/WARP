@@ -1,4 +1,5 @@
 import anime from 'animejs/lib/anime.es.js';
+import { initThreeScene } from './three-scene.js';
 
 const VISUAL_PREFS_KEY = 'warp.visualPrefs';
 const DEFAULT_PREFS = { grain: 'on', cursor: 'on', motion: 'full' };
@@ -58,6 +59,12 @@ function applyVisualPrefs(prefs) {
 
 const visualPrefs = readVisualPrefs();
 applyVisualPrefs(visualPrefs);
+const disposeThreeScene = initThreeScene();
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    if (typeof disposeThreeScene === 'function') disposeThreeScene();
+  });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -132,6 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
     syncVisualLabels();
     setCursorEnabled();
     bindMagneticButtons();
+    window.dispatchEvent(new CustomEvent('warp:motion-mode', { detail: { mode: visualPrefs.motion } }));
   };
 
   const uiToggle = document.getElementById('ui-toggle');
