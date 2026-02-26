@@ -1,4 +1,5 @@
 const RATE_WINDOW_MS = 60 * 1000;
+const CLEANUP_INTERVAL_MS = 60 * 1000;
 const RATE_MAX_REQUESTS = 6;
 const MAX_NAME = 120;
 const MAX_EMAIL = 180;
@@ -103,6 +104,9 @@ function resolveRecipients() {
 }
 
 function cleanupRateStore(now) {
+  if (now - (rateStore.lastCleanup || 0) < CLEANUP_INTERVAL_MS) return;
+  rateStore.lastCleanup = now;
+
   for (const [key, entry] of rateStore.entries()) {
     if (entry.resetAt <= now) rateStore.delete(key);
   }
