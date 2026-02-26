@@ -10,7 +10,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test src/ui/cards.test.js"
+    "test": "node --test src/**/*.test.js"
   },
   "devDependencies": {
     "vite": "^7.2.4"

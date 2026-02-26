@@ -57,25 +57,26 @@ export function bindCardHover(cards) {
  * @param {Object} options
  * @param {Object} options.orb - The orb object.
  * @param {Object} options.state - The state object.
+ * @param {Function} [animateFn] - Optional dependency injection for testing.
  */
-export function burst({ orb, state }) {
+export function burst({ orb, state }, animateFn = animate) {
   const { ringMat, coreMat, group } = orb;
 
-  animate(ringMat, {
+  animateFn(ringMat, {
     opacity: [0.45, 0.95],
     duration: 180,
     direction: "alternate",
     ease: "out(3)",
   });
 
-  animate(group.position, {
+  animateFn(group.position, {
     z: [0, 0.25],
     duration: 220,
     direction: "alternate",
     ease: "out(3)",
   });
 
-  animate(coreMat.emissive, {
+  animateFn(coreMat.emissive, {
     r: [0.07, 0.22],
     g: [0.07, 0.22],
     b: [0.07, 0.22],
@@ -84,7 +85,7 @@ export function burst({ orb, state }) {
     ease: "out(3)",
   });
 
-  animate(state, {
+  animateFn(state, {
     shake: [0, 1],
     duration: 260,
     direction: "alternate",
