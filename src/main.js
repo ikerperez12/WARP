@@ -9,6 +9,8 @@ import { initContactForm } from './features/contact.js';
 import { initImmersiveSections } from './features/immersive.js';
 import { initAdvancedMotion } from './features/advanced-motion.js';
 import { initGoogleServicesSection } from './features/google-services.js';
+import { initExperienceLab } from './features/experience-lab.js';
+import { initPortfolioPlus } from './features/portfolio-plus.js';
 import { initLiveRegion } from './utils/dom.js';
 
 // Initialize preferences early to apply critical styles (grain, etc.) before paint
@@ -33,4 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initImmersiveSections();
   initAdvancedMotion();
   initGoogleServicesSection();
+  initExperienceLab();
+  initPortfolioPlus();
 });

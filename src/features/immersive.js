@@ -76,9 +76,9 @@ function initNeumorphismLab() {
   if (!neoLayout || !neoConsole || !switches.length || !slider || !depthValue || !profileValue) return;
 
   const profileNames = {
-    focus: 'Focus',
-    cinematic: 'Cinematic',
-    delivery: 'Delivery',
+    focus: 'Calidad',
+    cinematic: 'Presentación',
+    delivery: 'Entrega',
   };
 
   const updateDepth = () => {
@@ -93,7 +93,7 @@ function initNeumorphismLab() {
   const setProfile = (button) => {
     switches.forEach((entry) => entry.classList.toggle('is-active', entry === button));
     const key = button.dataset.neoProfile || 'focus';
-    profileValue.textContent = profileNames[key] || 'Focus';
+    profileValue.textContent = profileNames[key] || 'Calidad';
     neoLayout.setAttribute('data-neo-profile', key);
 
     if (!neoPreviewCard || isReduced()) return;
@@ -137,9 +137,9 @@ function initAnimeMotionLab() {
   if (!grid || !tiles.length || !replayButton || !phaseLabel) return;
 
   const playSequence = () => {
-    phaseLabel.textContent = 'Sequence running';
+    phaseLabel.textContent = 'Flujo en ejecución';
     if (isReduced()) {
-      phaseLabel.textContent = 'Reduced motion active';
+      phaseLabel.textContent = 'Motion reducido activo';
       tiles.forEach((tile) => {
         tile.style.opacity = '1';
         tile.style.transform = 'none';
@@ -158,7 +158,7 @@ function initAnimeMotionLab() {
       duration: 720,
       easing: 'easeOutExpo',
       complete: () => {
-        phaseLabel.textContent = 'Sequence complete';
+        phaseLabel.textContent = 'Flujo completado';
       },
     });
   };

@@ -12,7 +12,7 @@ function initPadGrid() {
   if (!padButtons.length || !padStatus) return;
 
   const updateStatus = (label) => {
-    padStatus.textContent = `Pad status: ${label} activated`;
+    padStatus.textContent = `Prioridad activa: ${label}`;
   };
 
   padButtons.forEach((button) => {
