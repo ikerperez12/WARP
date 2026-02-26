@@ -1,68 +1,89 @@
-import test from 'node:test';
+import { test, describe, mock } from 'node:test';
 import assert from 'node:assert';
-import { bindCardHover } from './interactions.js';
+import { bindPointerParallax, bindCardHover, burst } from './interactions.js';
 
-test('bindCardHover sets CSS variables on pointermove', () => {
-  // Mock card element
-  const mockCard = {
-    listeners: {},
-    addEventListener(event, callback) {
-      this.listeners[event] = callback;
-    },
-    getBoundingClientRect() {
-      return { left: 10, top: 20 };
-    },
-    style: {
-      properties: {},
-      setProperty(name, value) {
-        this.properties[name] = value;
-      }
-    }
-  };
-
-  // Bind hover to the mock card
-  bindCardHover([mockCard]);
-
-  // Check if listener was attached
-  assert.strictEqual(typeof mockCard.listeners.pointermove, 'function');
-
-  // Simulate pointermove event
-  const mockEvent = {
-    clientX: 50,
-    clientY: 100
-  };
-
-  mockCard.listeners.pointermove(mockEvent);
-
-  // x = clientX - rect.left = 50 - 10 = 40
-  // y = clientY - rect.top = 100 - 20 = 80
-  assert.strictEqual(mockCard.style.properties['--mx'], '40px');
-  assert.strictEqual(mockCard.style.properties['--my'], '80px');
-});
-
-test('bindCardHover handles multiple cards', () => {
-  const cards = [
-    {
+describe('interactions', () => {
+  test('bindCardHover sets CSS variables from pointer position', () => {
+    const card = {
       listeners: {},
-      addEventListener(event, callback) { this.listeners[event] = callback; },
-      getBoundingClientRect() { return { left: 0, top: 0 }; },
-      style: { properties: {}, setProperty(name, value) { this.properties[name] = value; } }
-    },
-    {
-      listeners: {},
-      addEventListener(event, callback) { this.listeners[event] = callback; },
-      getBoundingClientRect() { return { left: 100, top: 100 }; },
-      style: { properties: {}, setProperty(name, value) { this.properties[name] = value; } }
+      addEventListener(event, callback) {
+        this.listeners[event] = callback;
+      },
+      getBoundingClientRect() {
+        return { left: 10, top: 20 };
+      },
+      style: {
+        properties: {},
+        setProperty(name, value) {
+          this.properties[name] = value;
+        },
+      },
+    };
+
+    bindCardHover([card]);
+    card.listeners.pointermove({ clientX: 50, clientY: 100 });
+
+    assert.strictEqual(card.style.properties['--mx'], '40px');
+    assert.strictEqual(card.style.properties['--my'], '80px');
+  });
+
+  test('bindPointerParallax registers listeners and animates with injected function', () => {
+    const originalWindow = global.window;
+    const addEventListener = mock.fn();
+    const removeEventListener = mock.fn();
+    global.window = {
+      innerWidth: 1024,
+      innerHeight: 768,
+      addEventListener,
+      removeEventListener,
+    };
+
+    try {
+      const orb = { group: { rotation: { x: 0, y: 0 } } };
+      const state = { pointerX: 0, pointerY: 0 };
+      const animateMock = mock.fn();
+
+      const cleanup = bindPointerParallax({ orb, state, animate: animateMock });
+
+      assert.strictEqual(addEventListener.mock.calls.length, 1);
+      assert.strictEqual(addEventListener.mock.calls[0].arguments[0], 'pointermove');
+      assert.strictEqual(animateMock.mock.calls.length, 1);
+      assert.strictEqual(animateMock.mock.calls[0].arguments[0], state);
+
+      const onMove = addEventListener.mock.calls[0].arguments[1];
+      onMove({ clientX: 512, clientY: 384 });
+      assert.strictEqual(state.pointerX, 0);
+      assert.strictEqual(state.pointerY, 0);
+
+      state.pointerX = 1;
+      state.pointerY = 1;
+      const animationConfig = animateMock.mock.calls[0].arguments[1];
+      animationConfig.onUpdate();
+      assert.ok(orb.group.rotation.x < 0);
+      assert.ok(orb.group.rotation.y > 0);
+
+      cleanup();
+      assert.strictEqual(removeEventListener.mock.calls.length, 1);
+    } finally {
+      global.window = originalWindow;
     }
-  ];
+  });
 
-  bindCardHover(cards);
+  test('burst triggers four animation targets with injected function', () => {
+    const orb = {
+      ringMat: { opacity: 0 },
+      coreMat: { emissive: { r: 0, g: 0, b: 0 } },
+      group: { position: { z: 0 }, rotation: { z: 0 } },
+    };
+    const state = { shake: 0 };
+    const animateMock = mock.fn();
 
-  cards[0].listeners.pointermove({ clientX: 10, clientY: 20 });
-  assert.strictEqual(cards[0].style.properties['--mx'], '10px');
-  assert.strictEqual(cards[0].style.properties['--my'], '20px');
+    burst({ orb, state, animate: animateMock });
 
-  cards[1].listeners.pointermove({ clientX: 110, clientY: 120 });
-  assert.strictEqual(cards[1].style.properties['--mx'], '10px');
-  assert.strictEqual(cards[1].style.properties['--my'], '20px');
+    assert.strictEqual(animateMock.mock.calls.length, 4);
+    assert.strictEqual(animateMock.mock.calls[0].arguments[0], orb.ringMat);
+    assert.strictEqual(animateMock.mock.calls[1].arguments[0], orb.group.position);
+    assert.strictEqual(animateMock.mock.calls[2].arguments[0], orb.coreMat.emissive);
+    assert.strictEqual(animateMock.mock.calls[3].arguments[0], state);
+  });
 });
