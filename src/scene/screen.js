@@ -630,6 +630,16 @@ export function createScreenTexture() {
     return 'rgba(228, 236, 255, 0.95)';
   }
 
+  // Pre-tokenize all code lines once to avoid repeating regex tokenization on every frame.
+  const tokenizedCodeBanks = codeBanks.map((bank) =>
+    bank.map((line) =>
+      tokenizeCode(line).map((token) => ({
+        token,
+        color: tokenColor(token),
+      }))
+    )
+  );
+
   function drawBase() {
     const bg = baseCtx.createLinearGradient(0, 0, width, height);
     bg.addColorStop(0, '#090d1a');
@@ -837,6 +847,7 @@ export function createScreenTexture() {
     });
 
     const activeCode = codeBanks[activeTabIndex] || codeBanks[0];
+    const activeCodeTokens = tokenizedCodeBanks[activeTabIndex] || tokenizedCodeBanks[0];
 
     const lineHeight = 31;
     const firstLine = Math.floor(visualScroll / lineHeight);
@@ -866,9 +877,9 @@ export function createScreenTexture() {
       ctx.fillText(String(((lineIndex % 54) + 1)).padStart(2, ' '), ide.codeX + 8, y);
 
       let cursorX = ide.codeX + 50;
-      const tokens = tokenizeCode(line);
-      tokens.forEach((token) => {
-        ctx.fillStyle = tokenColor(token);
+      const tokens = activeCodeTokens[lineIndex] || [];
+      tokens.forEach(({ token, color }) => {
+        ctx.fillStyle = color;
         ctx.globalAlpha = 0.86 + energy * 0.1;
         ctx.fillText(token, cursorX, y);
         cursorX += ctx.measureText(token).width + 8;
