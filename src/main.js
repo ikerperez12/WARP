@@ -94,6 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
       githubUrl: 'https://github.com/ikerperez12',
     },
   ];
+  const DEFAULT_GITHUB_URL = 'https://github.com/ikerperez12';
 
   let projectRegistry = FALLBACK_PROJECTS.slice();
   const liveRegion = document.getElementById('app-live-region');
@@ -108,21 +109,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 30);
   }
 
+  function sanitizeText(value, fallback = '') {
+    if (typeof value !== 'string') return fallback;
+    const cleaned = value.replace(/\s+/g, ' ').trim();
+    return cleaned || fallback;
+  }
+
+  function sanitizeProjectId(value) {
+    const normalized = sanitizeText(value).toLowerCase();
+    if (!normalized) return '';
+    return normalized.replace(/[^a-z0-9_-]/g, '_').slice(0, 80);
+  }
+
+  function sanitizeStack(items) {
+    if (!Array.isArray(items)) return [];
+    return items.map((item) => sanitizeText(item)).filter(Boolean).slice(0, 8);
+  }
+
+  function toSafeGithubUrl(value) {
+    if (typeof value !== 'string') return DEFAULT_GITHUB_URL;
+    try {
+      const parsed = new URL(value, window.location.origin);
+      if (parsed.protocol !== 'https:') return DEFAULT_GITHUB_URL;
+      if (parsed.username || parsed.password) return DEFAULT_GITHUB_URL;
+      return parsed.toString();
+    } catch {
+      return DEFAULT_GITHUB_URL;
+    }
+  }
+
   function normalizeProjects(raw) {
     if (!Array.isArray(raw)) return FALLBACK_PROJECTS.slice();
     const cleaned = raw
       .map((item) => {
         if (!item || typeof item !== 'object') return null;
-        const id = typeof item.id === 'string' ? item.id.trim() : '';
-        const name = typeof item.name === 'string' ? item.name.trim() : '';
+        const id = sanitizeProjectId(item.id);
+        const name = sanitizeText(item.name);
         if (!id || !name) return null;
         return {
           id,
           name,
-          description: typeof item.description === 'string' ? item.description : '',
-          language: typeof item.language === 'string' ? item.language : 'N/A',
-          stack: Array.isArray(item.stack) ? item.stack.filter((v) => typeof v === 'string') : [],
-          githubUrl: typeof item.githubUrl === 'string' ? item.githubUrl : 'https://github.com/ikerperez12',
+          description: sanitizeText(item.description, 'Proyecto interactivo disponible en terminal.'),
+          language: sanitizeText(item.language, 'N/A'),
+          stack: sanitizeStack(item.stack),
+          githubUrl: toSafeGithubUrl(item.githubUrl),
         };
       })
       .filter(Boolean);
@@ -169,19 +199,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderProjectList() {
     if (!projectModalList) return;
-    projectModalList.innerHTML = projectRegistry
-      .map((project) => {
-        const stack = project.stack.length > 0 ? project.stack.join(' · ') : 'Stack no definido';
-        const safeDesc = project.description || 'Proyecto interactivo disponible en terminal.';
-        return `
-          <button class="project-launch" type="button" data-project-id="${project.id}">
-            <span class="project-launch-title">${project.name}</span>
-            <span class="project-launch-meta">${project.language} · ${stack}</span>
-            <span class="project-launch-meta">${safeDesc}</span>
-          </button>
-        `;
-      })
-      .join('');
+    projectModalList.replaceChildren();
+    const fragment = document.createDocumentFragment();
+
+    projectRegistry.forEach((project) => {
+      const stack = project.stack.length > 0 ? project.stack.join(' - ') : 'Stack no definido';
+      const safeDesc = project.description || 'Proyecto interactivo disponible en terminal.';
+
+      const button = document.createElement('button');
+      button.className = 'project-launch';
+      button.type = 'button';
+      button.dataset.projectId = project.id;
+
+      const titleEl = document.createElement('span');
+      titleEl.className = 'project-launch-title';
+      titleEl.textContent = project.name;
+
+      const metaEl = document.createElement('span');
+      metaEl.className = 'project-launch-meta';
+      metaEl.textContent = `${project.language} - ${stack}`;
+
+      const descEl = document.createElement('span');
+      descEl.className = 'project-launch-meta';
+      descEl.textContent = safeDesc;
+
+      button.append(titleEl, metaEl, descEl);
+      fragment.appendChild(button);
+    });
+
+    projectModalList.appendChild(fragment);
 
     projectModalList.querySelectorAll('.project-launch').forEach((button) => {
       button.addEventListener('click', () => {
@@ -193,6 +239,8 @@ document.addEventListener('DOMContentLoaded', () => {
         closeProjectModal();
       });
     });
+
+    return;
   }
 
   function openProjectModal() {
@@ -225,21 +273,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderPcShellProjects() {
     if (!pcShellProjects) return;
-    pcShellProjects.innerHTML = projectRegistry
-      .map((project) => {
-        const stack = project.stack.length ? project.stack.join(' · ') : 'Stack';
-        return `
-          <article class="pc-shell-project">
-            <span class="pc-shell-project-name">${project.name}</span>
-            <span class="pc-shell-project-meta">${project.language} · ${stack}</span>
-            <div class="pc-shell-project-actions">
-              <button type="button" class="pc-shell-project-btn" data-run-project="${project.id}">Abrir en PC 3D</button>
-              <a href="${project.githubUrl}" target="_blank" rel="noopener noreferrer" class="pc-shell-project-link">Ver GitHub</a>
-            </div>
-          </article>
-        `;
-      })
-      .join('');
+    pcShellProjects.replaceChildren();
+    const fragment = document.createDocumentFragment();
+
+    projectRegistry.forEach((project) => {
+      const stack = project.stack.length ? project.stack.join(' - ') : 'Stack';
+
+      const article = document.createElement('article');
+      article.className = 'pc-shell-project';
+
+      const nameEl = document.createElement('span');
+      nameEl.className = 'pc-shell-project-name';
+      nameEl.textContent = project.name;
+
+      const metaEl = document.createElement('span');
+      metaEl.className = 'pc-shell-project-meta';
+      metaEl.textContent = `${project.language} - ${stack}`;
+
+      const actions = document.createElement('div');
+      actions.className = 'pc-shell-project-actions';
+
+      const runBtn = document.createElement('button');
+      runBtn.type = 'button';
+      runBtn.className = 'pc-shell-project-btn';
+      runBtn.dataset.runProject = project.id;
+      runBtn.textContent = 'Abrir en PC 3D';
+
+      const githubLink = document.createElement('a');
+      githubLink.className = 'pc-shell-project-link';
+      githubLink.href = toSafeGithubUrl(project.githubUrl);
+      githubLink.target = '_blank';
+      githubLink.rel = 'noopener noreferrer';
+      githubLink.textContent = 'Ver GitHub';
+
+      actions.append(runBtn, githubLink);
+      article.append(nameEl, metaEl, actions);
+      fragment.appendChild(article);
+    });
+
+    pcShellProjects.appendChild(fragment);
 
     pcShellProjects.querySelectorAll('[data-run-project]').forEach((button) => {
       button.addEventListener('click', () => {
@@ -250,6 +322,8 @@ document.addEventListener('DOMContentLoaded', () => {
         announceLive(`Proyecto ${projectId} abierto en PC 3D`);
       });
     });
+
+    return;
   }
 
   function bindProjectCards() {
@@ -871,7 +945,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const btn = contactForm.querySelector('.btn');
       const originalText = btn.querySelector('span').textContent;
-      btn.querySelector('span').textContent = '¡Mensaje enviado! ✓';
+      btn.querySelector('span').textContent = 'Mensaje enviado! OK';
 
       if (!isMotionReduced()) {
         anime({

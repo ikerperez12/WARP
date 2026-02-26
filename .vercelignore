@@ -1,0 +1,9 @@
+.git/
+.history/
+node_modules/
+dist/
+reports/
+anime-landing/
+modelos3D/
+CV.pdf
+SI.pdf

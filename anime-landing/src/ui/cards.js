@@ -6,15 +6,28 @@ export function mountCards(container) {
     { title: "Scroll-driven", body: "Scroll controla intensidad y animaciones.", chip: "SCR" },
   ];
 
-  container.innerHTML = cards
-    .map(
-      (c) => `
-      <div class="card">
-        <div class="card-chip">${c.chip}</div>
-        <div class="card-title">${c.title}</div>
-        <div class="card-body">${c.body}</div>
-      </div>
-    `
-    )
-    .join("");
+  container.replaceChildren();
+  const fragment = document.createDocumentFragment();
+
+  cards.forEach((card) => {
+    const item = document.createElement("div");
+    item.className = "card";
+
+    const chip = document.createElement("div");
+    chip.className = "card-chip";
+    chip.textContent = card.chip;
+
+    const title = document.createElement("div");
+    title.className = "card-title";
+    title.textContent = card.title;
+
+    const body = document.createElement("div");
+    body.className = "card-body";
+    body.textContent = card.body;
+
+    item.append(chip, title, body);
+    fragment.appendChild(item);
+  });
+
+  container.appendChild(fragment);
 }
