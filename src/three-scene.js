@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import laptopModelUrl from '../modelos3D/laptop.glb?url';
+const laptopModelUrl = `${import.meta.env.BASE_URL}laptop.glb`;
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
