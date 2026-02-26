@@ -829,39 +829,81 @@
           <p class="section-subtitle anim-reveal">Capas visuales, storytelling y transiciones multimedia para productos con identidad.</p>
         </div>
 
-        <div class="showcase-stack">
-          <article class="showcase-item anim-reveal">
-            <div class="showcase-media">
-              <img loading="lazy" src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80" alt="Workspace and coding setup with cinematic lighting" />
+        <div class="showcase-experiments">
+          <article class="narrative-demo anim-reveal" id="narrative-demo">
+            <div class="narrative-stage" id="narrative-stage">
+              <div class="narrative-video-shell">
+                <video class="narrative-video" muted playsinline autoplay loop preload="none" poster="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1400&q=80">
+                  <source src="https://cdn.coverr.co/videos/coverr-programmer-at-work-1579/1080p.mp4" type="video/mp4" />
+                </video>
+              </div>
+              <div class="narrative-overlay"></div>
+              <div class="narrative-copy">
+                <span class="showcase-kicker">Narrativa visual</span>
+                <h3>Hero y secciones con ritmo cinematografico</h3>
+                <p>Combinacion de contraste, profundidad y movimiento para guiar al usuario por una historia de producto clara.</p>
+              </div>
+              <div class="narrative-beats" id="narrative-beats">
+                <span class="narrative-beat is-active" data-beat-index="0">Apertura de impacto</span>
+                <span class="narrative-beat" data-beat-index="1">Zoom a capacidades</span>
+                <span class="narrative-beat" data-beat-index="2">Cierre con conversion</span>
+              </div>
             </div>
-            <div class="showcase-copy">
-              <span class="showcase-kicker">Narrativa visual</span>
-              <h3>Hero y secciones con ritmo cinematografico</h3>
-              <p>Combinacion de contraste, profundidad y movimiento para guiar al usuario por una historia de producto clara.</p>
+            <div class="narrative-grid">
+              <div class="narrative-panel">
+                <h4>Contraste y direccion</h4>
+                <p>La jerarquia visual empieza en hero y acompana la lectura con capas de profundidad y foco tipografico.</p>
+              </div>
+              <div class="narrative-panel">
+                <h4>Profundidad guiada</h4>
+                <p>Parallax suave, brillo y sombras para separar contenido clave sin perder legibilidad.</p>
+              </div>
+              <div class="narrative-panel">
+                <h4>Storytelling continuo</h4>
+                <p>Cada bloque responde al anterior: problema, capacidad tecnica y prueba visual en una misma secuencia.</p>
+              </div>
             </div>
           </article>
 
-          <article class="showcase-item anim-reveal">
-            <div class="showcase-media">
-              <video muted playsinline autoplay loop preload="none" poster="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1200&q=80">
-                <source src="https://cdn.coverr.co/videos/coverr-programmer-at-work-1579/1080p.mp4" type="video/mp4" />
-              </video>
-            </div>
-            <div class="showcase-copy">
-              <span class="showcase-kicker">Motion language</span>
-              <h3>Transiciones de scroll con video de apoyo</h3>
-              <p>Animaciones suaves en compositing y multimedia contextual para reforzar el valor de cada bloque.</p>
-            </div>
-          </article>
+          <article class="motion-demo anim-reveal" id="motion-demo">
+            <div class="motion-layout">
+              <div class="motion-visual">
+                <div class="motion-video-shell">
+                  <video id="motion-video" muted playsinline autoplay loop preload="none" poster="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1400&q=80">
+                    <source src="https://cdn.coverr.co/videos/coverr-programmer-at-work-1579/1080p.mp4" type="video/mp4" />
+                  </video>
+                </div>
+              </div>
+              <div class="motion-ui">
+                <span class="showcase-kicker">Motion language</span>
+                <h3>Transiciones de scroll con video de apoyo</h3>
+                <p>Animaciones suaves en compositing y multimedia contextual para reforzar el valor de cada bloque.</p>
 
-          <article class="showcase-item anim-reveal">
-            <div class="showcase-media">
-              <img loading="lazy" src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80" alt="Multiple monitors showing software dashboards and development tools" />
-            </div>
-            <div class="showcase-copy">
-              <span class="showcase-kicker">Portfolio profesional</span>
-              <h3>Diseño orientado a confianza tecnica</h3>
-              <p>Mensajes concretos, estructura escaneable y foco en resultados para convertir visitas en conversaciones reales.</p>
+                <div class="motion-kpis">
+                  <div class="motion-kpi">
+                    <span class="motion-kpi-label">Scroll sync</span>
+                    <strong>Parallax + scrub</strong>
+                  </div>
+                  <div class="motion-kpi">
+                    <span class="motion-kpi-label">Compositing</span>
+                    <strong>Overlay cinematografico</strong>
+                  </div>
+                  <div class="motion-kpi">
+                    <span class="motion-kpi-label">Contexto</span>
+                    <strong>Video orientado a mensaje</strong>
+                  </div>
+                </div>
+
+                <div class="motion-progress-track" aria-hidden="true">
+                  <span class="motion-progress-bar" id="motion-progress-bar"></span>
+                </div>
+
+                <div class="motion-steps">
+                  <span class="motion-step">Entrada</span>
+                  <span class="motion-step">Enfoque</span>
+                  <span class="motion-step">Salida</span>
+                </div>
+              </div>
             </div>
           </article>
         </div>

@@ -399,7 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
       syncProjectCards();
     });
 
-  const showcaseItems = Array.from(document.querySelectorAll('.showcase-item'));
+  const showcaseItems = Array.from(document.querySelectorAll('.narrative-demo, .motion-demo'));
   if (showcaseItems.length) {
     if (isReduced()) showcaseItems.forEach((item) => item.classList.add('is-in-view'));
     else {
@@ -419,6 +419,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const heroContent = document.querySelector('.hero-content');
   const heroBadges = document.querySelector('.floating-badges');
   const heroScrollIndicator = document.querySelector('.scroll-indicator');
+  const narrativeStage = document.getElementById('narrative-stage');
+  const narrativeBeats = Array.from(document.querySelectorAll('#narrative-beats .narrative-beat'));
+  const motionDemo = document.getElementById('motion-demo');
+  const motionProgressBar = document.getElementById('motion-progress-bar');
+  const motionVideo = document.getElementById('motion-video');
 
   const onScroll = () => {
     const y = window.scrollY;
@@ -458,6 +463,28 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (heroBadges) heroBadges.style.opacity = String(1 - fade * 0.75);
       if (heroScrollIndicator) heroScrollIndicator.style.opacity = String(1 - fade);
+    }
+
+    if (narrativeStage) {
+      const rect = narrativeStage.getBoundingClientRect();
+      const stageProgress = clamp((window.innerHeight - rect.top) / (window.innerHeight + rect.height), 0, 1);
+      narrativeStage.style.setProperty('--narrative-progress', stageProgress.toFixed(3));
+      if (narrativeBeats.length) {
+        const activeIndex = Math.min(2, Math.floor(stageProgress * 3));
+        narrativeBeats.forEach((beat, idx) => beat.classList.toggle('is-active', idx === activeIndex));
+      }
+    }
+
+    if (motionDemo && motionProgressBar) {
+      const rect = motionDemo.getBoundingClientRect();
+      const motionProgress = clamp((window.innerHeight - rect.top) / (window.innerHeight + rect.height), 0, 1);
+      motionDemo.style.setProperty('--motion-progress', motionProgress.toFixed(3));
+      motionProgressBar.style.width = `${(motionProgress * 100).toFixed(1)}%`;
+
+      if (motionVideo && !isReduced() && Number.isFinite(motionVideo.duration) && motionVideo.duration > 0) {
+        const targetTime = motionProgress * motionVideo.duration;
+        if (Math.abs(motionVideo.currentTime - targetTime) > 0.18) motionVideo.currentTime = targetTime;
+      }
     }
   };
 

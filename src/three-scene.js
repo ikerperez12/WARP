@@ -1,75 +1,2012 @@
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-const laptopModelUrl = `${import.meta.env.BASE_URL}laptop.glb`;
+﻿import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
-const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+function clamp01(value) {
+  if (value < 0) return 0;
+  if (value > 1) return 1;
+  return value;
+}
 
 function damp(current, target, lambda, delta) {
   return current + (target - current) * (1 - Math.exp(-lambda * delta));
 }
 
-function fitObjectToSize(root, maxSize = 3.6) {
+function createStarTexture() {
+  const size = 96;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createRadialGradient(size * 0.5, size * 0.5, 0, size * 0.5, size * 0.5, size * 0.5);
+  grad.addColorStop(0, 'rgba(255,255,255,1)');
+  grad.addColorStop(0.22, 'rgba(230,240,255,0.92)');
+  grad.addColorStop(0.56, 'rgba(167,196,255,0.25)');
+  grad.addColorStop(1, 'rgba(167,196,255,0)');
+
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+function createSoftCircleTexture(inner, outer, size = 256) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+
+  const ctx = canvas.getContext('2d');
+  const gradient = ctx.createRadialGradient(size * 0.5, size * 0.5, 0, size * 0.5, size * 0.5, size * 0.5);
+  gradient.addColorStop(0, inner);
+  gradient.addColorStop(1, outer);
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+function collectMeshResources(root) {
+  const geometrySet = new Set();
+  const materialSet = new Set();
+
+  root.traverse((node) => {
+    if (!node || !node.isMesh) return;
+    if (node.geometry) geometrySet.add(node.geometry);
+
+    const materials = Array.isArray(node.material) ? node.material : [node.material];
+    materials.forEach((material) => {
+      if (material) materialSet.add(material);
+    });
+  });
+
+  return {
+    geometries: Array.from(geometrySet),
+    materials: Array.from(materialSet),
+  };
+}
+
+function disposeMaterialDeep(material) {
+  if (!material || typeof material.dispose !== 'function') return;
+
+  const mapKeys = [
+    'map',
+    'alphaMap',
+    'aoMap',
+    'bumpMap',
+    'displacementMap',
+    'emissiveMap',
+    'envMap',
+    'lightMap',
+    'metalnessMap',
+    'normalMap',
+    'roughnessMap',
+    'specularMap',
+    'clearcoatMap',
+    'clearcoatNormalMap',
+    'clearcoatRoughnessMap',
+    'sheenColorMap',
+    'sheenRoughnessMap',
+    'thicknessMap',
+    'transmissionMap',
+  ];
+
+  mapKeys.forEach((key) => {
+    const texture = material[key];
+    if (texture && texture.isTexture) texture.dispose();
+  });
+
+  material.dispose();
+}
+
+function disposeAccessoryResources(accessory) {
+  if (!accessory) return;
+
+  const seenGeometries = new Set();
+  accessory.geometries?.forEach((geometry) => {
+    if (!geometry || seenGeometries.has(geometry)) return;
+    seenGeometries.add(geometry);
+    if (typeof geometry.dispose === 'function') geometry.dispose();
+  });
+
+  const seenMaterials = new Set();
+  accessory.materials?.forEach((material) => {
+    if (!material || seenMaterials.has(material)) return;
+    seenMaterials.add(material);
+    disposeMaterialDeep(material);
+  });
+
+  if (accessory.glowTexture && typeof accessory.glowTexture.dispose === 'function') {
+    accessory.glowTexture.dispose();
+  }
+}
+
+function centerAndScaleObject(root, targetMaxSize, yOffset = 0) {
   const box = new THREE.Box3().setFromObject(root);
   if (box.isEmpty()) return;
 
   const size = box.getSize(new THREE.Vector3());
-  const maxDimension = Math.max(size.x, size.y, size.z, 0.001);
-  const scale = maxSize / maxDimension;
+  const maxDim = Math.max(size.x, size.y, size.z, 0.0001);
+  const scale = targetMaxSize / maxDim;
   root.scale.multiplyScalar(scale);
 
-  const recentered = new THREE.Box3().setFromObject(root);
-  const center = recentered.getCenter(new THREE.Vector3());
+  const centeredBox = new THREE.Box3().setFromObject(root);
+  const center = centeredBox.getCenter(new THREE.Vector3());
   root.position.sub(center);
 
-  const grounded = new THREE.Box3().setFromObject(root);
-  root.position.y -= grounded.min.y;
+  const groundedBox = new THREE.Box3().setFromObject(root);
+  root.position.y -= groundedBox.min.y;
+  root.position.y += yOffset;
 }
 
-function disposeMaterial(material) {
-  if (!material) return;
-  if (material.map) material.map.dispose();
-  if (material.normalMap) material.normalMap.dispose();
-  if (material.roughnessMap) material.roughnessMap.dispose();
-  if (material.metalnessMap) material.metalnessMap.dispose();
-  if (material.emissiveMap) material.emissiveMap.dispose();
-  material.dispose();
+function orientModelFlat(root, options = {}) {
+  const longAxis = options.longAxis || 'z';
+  const box = new THREE.Box3();
+  const size = new THREE.Vector3();
+
+  const angles = [0, Math.PI * 0.5, -Math.PI * 0.5, Math.PI];
+  let best = null;
+
+  for (let ix = 0; ix < angles.length; ix++) {
+    for (let iy = 0; iy < angles.length; iy++) {
+      for (let iz = 0; iz < angles.length; iz++) {
+        root.rotation.set(angles[ix], angles[iy], angles[iz]);
+        root.updateMatrixWorld(true);
+        box.setFromObject(root);
+        box.getSize(size);
+
+        const score = size.y * 4 + Math.abs(size.x - size.z) * 0.06;
+        if (!best || score < best.score) {
+          best = {
+            score,
+            rx: angles[ix],
+            ry: angles[iy],
+            rz: angles[iz],
+            sx: size.x,
+            sy: size.y,
+            sz: size.z,
+          };
+        }
+      }
+    }
+  }
+
+  if (!best) return;
+
+  root.rotation.set(best.rx, best.ry, best.rz);
+  root.updateMatrixWorld(true);
+  box.setFromObject(root);
+  box.getSize(size);
+
+  if (longAxis === 'z' && size.x > size.z * 1.04) {
+    root.rotation.y += Math.PI * 0.5;
+  } else if (longAxis === 'x' && size.z > size.x * 1.04) {
+    root.rotation.y += Math.PI * 0.5;
+  }
 }
 
-function disposeObject(root) {
+function findWheelMesh(root) {
+  let wheel = null;
   root.traverse((node) => {
-    if (!node?.isMesh) return;
-    if (node.geometry) node.geometry.dispose();
-    if (Array.isArray(node.material)) node.material.forEach(disposeMaterial);
-    else disposeMaterial(node.material);
+    if (wheel || !node || !node.isMesh) return;
+    const name = (node.name || '').toLowerCase();
+    if (name.includes('wheel') || name.includes('scroll')) wheel = node;
+  });
+  return wheel;
+}
+
+function findAccentMaterial(root) {
+  let namedMatch = null;
+  let emissiveMatch = null;
+
+  root.traverse((node) => {
+    if (!node || !node.isMesh) return;
+    const materials = Array.isArray(node.material) ? node.material : [node.material];
+
+    materials.forEach((material) => {
+      if (!material) return;
+      const name = (material.name || '').toLowerCase();
+
+      if (!namedMatch && (name.includes('led') || name.includes('logo') || name.includes('light'))) {
+        namedMatch = material;
+      }
+
+      if (!emissiveMatch && material.emissive && material.emissiveIntensity > 0.01) {
+        emissiveMatch = material;
+      }
+    });
+  });
+
+  return namedMatch || emissiveMatch || null;
+}
+
+function tunePbrMaterials(root, options = {}) {
+  const roughnessMul = options.roughnessMul ?? 0.88;
+  const metalnessBoost = options.metalnessBoost ?? 0.06;
+  const envBoost = options.envMapIntensity ?? 1.2;
+
+  root.traverse((node) => {
+    if (!node || !node.isMesh) return;
+    const materials = Array.isArray(node.material) ? node.material : [node.material];
+
+    materials.forEach((material) => {
+      if (!material) return;
+
+      if (typeof material.roughness === 'number') {
+        material.roughness = THREE.MathUtils.clamp(material.roughness * roughnessMul, 0.04, 0.95);
+      }
+
+      if (typeof material.metalness === 'number') {
+        material.metalness = THREE.MathUtils.clamp(material.metalness + metalnessBoost, 0, 1);
+      }
+
+      if ('envMapIntensity' in material && typeof material.envMapIntensity === 'number') {
+        material.envMapIntensity = Math.max(material.envMapIntensity, envBoost);
+      }
+
+      material.needsUpdate = true;
+    });
   });
 }
 
-function createStarField(scene) {
-  const count = 420;
-  const geometry = new THREE.BufferGeometry();
-  const positions = new Float32Array(count * 3);
+function loadAccessoryModel(loader, url, options) {
+  const opts = {
+    targetMaxSize: 1,
+    yOffset: 0,
+    roughnessMul: 0.9,
+    metalnessBoost: 0.05,
+    envMapIntensity: 1.15,
+    glowColor: 0x2ec8ff,
+    glowOpacity: 0.2,
+    glowPlane: [0.9, 0.65],
+    ...options,
+  };
 
-  for (let i = 0; i < count; i += 1) {
-    const i3 = i * 3;
-    positions[i3] = (Math.random() - 0.5) * 42;
-    positions[i3 + 1] = (Math.random() - 0.5) * 24;
-    positions[i3 + 2] = -Math.random() * 26 - 1;
+  return new Promise((resolve, reject) => {
+    loader.load(
+      url,
+      (gltf) => {
+        const modelRoot = gltf.scene || (gltf.scenes && gltf.scenes[0]);
+        if (!modelRoot) {
+          reject(new Error(`No scene found in GLB: ${url}`));
+          return;
+        }
+
+        if (opts.autoFlat) {
+          orientModelFlat(modelRoot, { longAxis: opts.longAxis || 'z' });
+        }
+        if (Array.isArray(opts.modelRotation) && opts.modelRotation.length === 3) {
+          modelRoot.rotation.set(opts.modelRotation[0], opts.modelRotation[1], opts.modelRotation[2]);
+        }
+        if (Array.isArray(opts.modelScale) && opts.modelScale.length === 3) {
+          modelRoot.scale.set(opts.modelScale[0], opts.modelScale[1], opts.modelScale[2]);
+        }
+
+        tunePbrMaterials(modelRoot, opts);
+        centerAndScaleObject(modelRoot, opts.targetMaxSize, opts.yOffset);
+
+        if (Array.isArray(opts.modelOffset) && opts.modelOffset.length === 3) {
+          modelRoot.position.add(new THREE.Vector3(opts.modelOffset[0], opts.modelOffset[1], opts.modelOffset[2]));
+        }
+
+        const group = new THREE.Group();
+        group.add(modelRoot);
+
+        const glowTexture = createSoftCircleTexture('rgba(255,255,255,0.95)', 'rgba(255,255,255,0)', 256);
+        const glowMat = new THREE.MeshBasicMaterial({
+          map: glowTexture,
+          transparent: true,
+          opacity: opts.glowOpacity,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          color: opts.glowColor,
+        });
+        const glow = new THREE.Mesh(new THREE.PlaneGeometry(opts.glowPlane[0], opts.glowPlane[1]), glowMat);
+        glow.rotation.x = -Math.PI * 0.5;
+        glow.position.y = -0.012;
+        group.add(glow);
+
+        const wheel = findWheelMesh(modelRoot);
+        const sideLedMat = findAccentMaterial(modelRoot);
+        const resources = collectMeshResources(group);
+        resources.materials.push(glowMat);
+        resources.geometries.push(glow.geometry);
+
+        group.scale.setScalar(0.001);
+
+        resolve({
+          group,
+          wheel,
+          sideLedMat,
+          glowMat,
+          glowTexture,
+          materials: resources.materials,
+          geometries: resources.geometries,
+        });
+      },
+      undefined,
+      (error) => reject(error)
+    );
+  });
+}
+
+function createScreenTexture() {
+  const width = 1536;
+  const height = 960;
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext('2d');
+  const baseCanvas = document.createElement('canvas');
+  baseCanvas.width = width;
+  baseCanvas.height = height;
+  const baseCtx = baseCanvas.getContext('2d');
+
+  function roundedRect(drawCtx, x, y, w, h, r) {
+    drawCtx.beginPath();
+    drawCtx.moveTo(x + r, y);
+    drawCtx.lineTo(x + w - r, y);
+    drawCtx.quadraticCurveTo(x + w, y, x + w, y + r);
+    drawCtx.lineTo(x + w, y + h - r);
+    drawCtx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    drawCtx.lineTo(x + r, y + h);
+    drawCtx.quadraticCurveTo(x, y + h, x, y + h - r);
+    drawCtx.lineTo(x, y + r);
+    drawCtx.quadraticCurveTo(x, y, x + r, y);
+    drawCtx.closePath();
   }
 
+  const ide = {
+    x: 22,
+    y: 16,
+    w: 1492,
+    h: 928,
+    sidebarX: 44,
+    codeX: 168,
+    codeY: 104,
+    codeW: 1312,
+    codeH: 590,
+    termX: 168,
+    termY: 716,
+    termW: 1312,
+    termH: 184,
+  };
+
+  const tabDefinitions = [
+    { label: 'hero.config.ts', accent: 'rgba(194, 164, 255, 0.88)' },
+    { label: 'scene/laptop.ts', accent: 'rgba(150, 205, 255, 0.88)' },
+    { label: 'fx/scroll-driven.ts', accent: 'rgba(148, 236, 197, 0.86)' },
+    { label: 'terminal/live.log', accent: 'rgba(247, 189, 146, 0.88)' },
+  ];
+
+  const defaultProjectRegistry = [
+    {
+      id: 'hero_motion_engine',
+      name: 'Hero Motion Engine',
+      description: 'Coreografia del hero: intro, loops y parallax.',
+      language: 'JavaScript',
+      stack: ['Three.js', 'Anime.js'],
+    },
+    {
+      id: 'scene_laptop_render',
+      name: 'Laptop Scene Render',
+      description: 'Pipeline visual del portatil 3D con materiales y luces.',
+      language: 'JavaScript',
+      stack: ['Three.js', 'PBR'],
+    },
+    {
+      id: 'scroll_driven_fx',
+      name: 'Scroll Driven FX',
+      description: 'Transiciones por scroll y narrativa visual.',
+      language: 'JavaScript',
+      stack: ['Timeline', 'IntersectionObserver'],
+    },
+    {
+      id: 'terminal_runtime',
+      name: 'Terminal Runtime',
+      description: 'Terminal simulada con comandos y estado.',
+      language: 'JavaScript',
+      stack: ['Canvas UI'],
+    },
+  ];
+
+  const codeBanks = [
+    [
+      'import { animate } from "animejs";',
+      'const heroTitle = document.querySelector(".hero-title");',
+      'const ctas = document.querySelectorAll(".hero-cta .btn");',
+      '',
+      'animate(heroTitle, {',
+      '  opacity: [0, 1],',
+      '  translateY: [28, 0],',
+      '  duration: 950,',
+      '  easing: "out(3)",',
+      '});',
+      '',
+      'animate(ctas, {',
+      '  opacity: [0, 1],',
+      '  scale: [0.94, 1],',
+      '  delay: (_, i) => 120 * i,',
+      '});',
+    ],
+    [
+      'import * as THREE from "three";',
+      'const scene = new THREE.Scene();',
+      'const laptop = createLaptopModel({ quality: "ultra" });',
+      '',
+      'laptop.setMaterials({',
+      '  chassis: { metalness: 0.62, roughness: 0.28 },',
+      '  glass: { transmission: 0.9, roughness: 0.05 },',
+      '  leds: { intensity: 1.2, accent: "#c084fc" },',
+      '});',
+      '',
+      'renderer.setPixelRatio(Math.min(devicePixelRatio, 1.8));',
+      'renderer.toneMappingExposure = 0.98;',
+      'renderer.render(scene, camera);',
+    ],
+    [
+      'const state = { pointer: 0, scroll: 0, velocity: 0 };',
+      '',
+      'function onScroll(progress, velocity) {',
+      '  state.scroll = progress;',
+      '  state.velocity = velocity;',
+      '  laptop.setDepth(0.2 + progress * 0.9);',
+      '  laptop.setParallax(progress * 0.8);',
+      '  stars.parallax(progress, velocity);',
+      '}',
+      '',
+      'window.addEventListener("scroll", () => {',
+      '  const p = readScrollProgress();',
+      '  onScroll(p, p - state.scroll);',
+      '}, { passive: true });',
+    ],
+    [
+      'visitor@warp:~$ help',
+      'commands: help, status, runtime, projects, run <id>, about <id>, demo, launcher, stop',
+      '',
+      'visitor@warp:~$ status',
+      'scene: online | stars: synced | hero: active',
+      '',
+      'visitor@warp:~$ stack',
+      'three.js + anime.js + vite + canvas texture',
+      '',
+      'visitor@warp:~$ ping',
+      'pong :: render loop stable',
+    ],
+  ];
+
+  const keywordTokens = new Set([
+    'const',
+    'let',
+    'function',
+    'return',
+    'import',
+    'from',
+    'export',
+    'default',
+    'new',
+    'window',
+    'document',
+  ]);
+
+  const terminal = {
+    focused: false,
+    input: '',
+    lines: [],
+    history: [],
+    historyIndex: -1,
+    metrics: {
+      scroll: 0,
+      velocity: 0,
+      time: 0,
+      energy: 0,
+    },
+    milestones: {
+      m1: false,
+      m2: false,
+      m3: false,
+    },
+  };
+
+  let projectRegistry = defaultProjectRegistry.slice();
+  const runtime = {
+    phase: 'idle',
+    activeProject: null,
+    profile: null,
+    queue: [],
+    queueIndex: 0,
+    queueClock: 0,
+    traceClock: 0,
+    traceIndex: 0,
+    startedAtMs: 0,
+    completedRuns: 0,
+    autoHintClock: 0,
+  };
+
+  function getProjectProfile(projectId) {
+    switch (projectId) {
+      case 'hero_motion_engine':
+        return {
+          boot: [
+            'Loading hero timeline assets...',
+            'Binding parallax and pointer easing...',
+          ],
+          traces: [
+            'timeline intro ready',
+            'hero text stagger synced',
+            'cta micro-interactions online',
+            'pointer smoothing stable',
+          ],
+        };
+      case 'scene_laptop_render':
+        return {
+          boot: [
+            'Compiling material graph...',
+            'Calibrating rim/key/fill lights...',
+          ],
+          traces: [
+            'pbr roughness tuned',
+            'panel reflection pass stable',
+            'keyboard emissive wave running',
+            'accessory anchors locked',
+          ],
+        };
+      case 'scroll_driven_fx':
+        return {
+          boot: [
+            'Building scroll timeline...',
+            'Registering section progress markers...',
+          ],
+          traces: [
+            'hero fade transition active',
+            'mouse pad reveal threshold reached',
+            'terminal tab synced to scroll',
+            'velocity damping healthy',
+          ],
+        };
+      case 'terminal_runtime':
+        return {
+          boot: [
+            'Bootstrapping command parser...',
+            'Attaching runtime telemetry bridge...',
+          ],
+          traces: [
+            'command queue idling',
+            'history buffer stable',
+            'live status bridge active',
+            'interactive mode responsive',
+          ],
+        };
+      default:
+        return {
+          boot: ['Initializing generic project runtime...'],
+          traces: ['runtime stable', 'render loop nominal'],
+        };
+    }
+  }
+
+  function buildProjectTraceLine(project, traceIndex, metrics) {
+    const profile = runtime.profile || getProjectProfile(project.id);
+    const samples = profile.traces || [];
+    const sample = samples.length > 0 ? samples[traceIndex % samples.length] : 'runtime stable';
+    const scrollPct = (metrics.scroll * 100).toFixed(1);
+    const velocity = metrics.velocity.toFixed(2);
+    const glow = metrics.energy.toFixed(2);
+    return `[${project.id}] ${sample} | scroll ${scrollPct}% | vel ${velocity} | glow ${glow}`;
+  }
+
+  function getRuntimeUptimeSec() {
+    if (!runtime.startedAtMs) return 0;
+    return Math.max(0, (performance.now() - runtime.startedAtMs) / 1000);
+  }
+
+  function runNextProjectDemo() {
+    if (!projectRegistry.length) return null;
+    const next = projectRegistry[runtime.completedRuns % projectRegistry.length];
+    queueProjectBoot(next);
+    return next;
+  }
+
+  function pushLine(text, type = 'info') {
+    terminal.lines.push({ text, type, at: performance.now() });
+    if (terminal.lines.length > 72) terminal.lines.shift();
+  }
+
+  function emitTerminalStatus(status, extra = {}) {
+    if (typeof window === 'undefined') return;
+    window.dispatchEvent(
+      new CustomEvent('warp:terminal-status', {
+        detail: { status, ...extra },
+      })
+    );
+  }
+
+  function normalizeProjects(raw) {
+    if (!Array.isArray(raw)) return defaultProjectRegistry.slice();
+    const cleaned = raw
+      .map((item) => {
+        if (!item || typeof item !== 'object') return null;
+        const id = typeof item.id === 'string' ? item.id.trim() : '';
+        const name = typeof item.name === 'string' ? item.name.trim() : '';
+        if (!id || !name) return null;
+        return {
+          id,
+          name,
+          description: typeof item.description === 'string' ? item.description : '',
+          language: typeof item.language === 'string' ? item.language : 'N/A',
+          stack: Array.isArray(item.stack) ? item.stack.filter((v) => typeof v === 'string') : [],
+        };
+      })
+      .filter(Boolean);
+
+    return cleaned.length > 0 ? cleaned : defaultProjectRegistry.slice();
+  }
+
+  function setProjects(raw) {
+    projectRegistry = normalizeProjects(raw);
+    pushLine(`[registry] ${projectRegistry.length} project(s) loaded`, 'ok');
+    if (runtime.activeProject) {
+      const stillAvailable = projectRegistry.some((project) => project.id === runtime.activeProject.id);
+      if (!stillAvailable) stopProject('removed from registry');
+    }
+    emitTerminalStatus('registry-loaded', { count: projectRegistry.length });
+  }
+
+  function getProjects() {
+    return projectRegistry.slice();
+  }
+
+  function findProject(identifier) {
+    if (!identifier) return null;
+    const query = String(identifier).trim().toLowerCase();
+    return (
+      projectRegistry.find((project) => project.id.toLowerCase() === query) ||
+      projectRegistry.find((project) => project.name.toLowerCase() === query) ||
+      null
+    );
+  }
+
+  function printProjects() {
+    pushLine(`projects (${projectRegistry.length}):`, 'ok');
+    projectRegistry.forEach((project) => {
+      pushLine(`- ${project.id} :: ${project.name} [${project.language}]`, 'hint');
+    });
+    pushLine('tip: run <id>  |  about <id>  |  demo', 'hint');
+  }
+
+  function stopProject(reason = 'stopped by user') {
+    if (!runtime.activeProject) return;
+    const current = runtime.activeProject;
+    pushLine(`[runtime] ${current.name} ${reason}`, 'warn');
+    emitTerminalStatus('idle', { projectId: current.id, projectName: current.name });
+    runtime.completedRuns += 1;
+    runtime.phase = 'idle';
+    runtime.activeProject = null;
+    runtime.profile = null;
+    runtime.queue = [];
+    runtime.queueIndex = 0;
+    runtime.queueClock = 0;
+    runtime.traceClock = 0;
+    runtime.traceIndex = 0;
+    runtime.startedAtMs = 0;
+    runtime.autoHintClock = 0;
+  }
+
+  function queueProjectBoot(project) {
+    if (!project) return;
+    if (runtime.activeProject && runtime.activeProject.id !== project.id) {
+      stopProject('preempted');
+    }
+
+    const profile = getProjectProfile(project.id);
+    runtime.phase = 'booting';
+    runtime.activeProject = project;
+    runtime.profile = profile;
+    runtime.queue = [
+      { t: 0.1, text: 'WARP OS v1.0 Inicializando...', type: 'ok' },
+      { t: 0.35, text: 'Estableciendo entorno virtual...', type: 'ok' },
+      { t: 0.6, text: `Descargando binario [${project.id}.wasm] (simulado)... [##########] 100%`, type: 'ok' },
+      { t: 0.86, text: 'Verificando integridad del paquete... OK', type: 'ok' },
+      { t: 1.12, text: 'Compilando modulo WebAssembly...', type: 'ok' },
+      { t: 1.42, text: 'Montando sistema de archivos virtual (MEMFS)...', type: 'ok' },
+      { t: 1.74, text: 'Enlazando I/O y runtime bridge...', type: 'ok' },
+      { t: 2.0, text: `Entorno listo. Ejecutando proyecto '${project.name}'`, type: 'ok' },
+      { t: 2.2, text: `stack: ${(project.stack || []).join(' + ') || 'n/a'}`, type: 'hint' },
+      { t: 2.4, text: project.description || 'Proyecto en ejecucion.', type: 'hint' },
+      ...profile.boot.map((line, index) => ({
+        t: 2.65 + index * 0.22,
+        text: line,
+        type: 'hint',
+      })),
+    ];
+    runtime.queueIndex = 0;
+    runtime.queueClock = 0;
+    runtime.traceClock = 0;
+    runtime.traceIndex = 0;
+    runtime.startedAtMs = performance.now();
+    runtime.autoHintClock = 0;
+    terminal.metrics.energy = Math.min(2.8, terminal.metrics.energy + 0.34);
+
+    pushLine(`[launch] ${project.name}`, 'cmd');
+    emitTerminalStatus('loading', { projectId: project.id, projectName: project.name });
+  }
+
+  function runProjectById(projectId) {
+    const project = findProject(projectId);
+    if (!project) {
+      pushLine(`project not found: ${projectId}`, 'warn');
+      pushLine('tip: use "projects" to list available ids', 'hint');
+      return false;
+    }
+    queueProjectBoot(project);
+    return true;
+  }
+
+  setProjects(defaultProjectRegistry);
+  pushLine('[boot] portfolio scene initialized', 'ok');
+  pushLine('[hint] click screen and type "help"', 'hint');
+
+  function executeCommand(raw) {
+    const input = raw.trim();
+    if (!input) return;
+
+    pushLine(`visitor@warp:~$ ${input}`, 'cmd');
+    terminal.history.push(input);
+    terminal.historyIndex = terminal.history.length;
+
+    const [command, ...rest] = input.split(/\s+/);
+    const arg = rest.join(' ').toLowerCase();
+
+    switch (command.toLowerCase()) {
+      case 'help':
+        pushLine(
+          'commands: help, status, runtime, stack, sections, projects, run <id>, about <id>, demo, launcher, stop, focus, clear, glow, ping',
+          'ok'
+        );
+        break;
+      case 'status':
+        pushLine(
+          `scene: online | scroll ${(terminal.metrics.scroll * 100).toFixed(1)}% | velocity ${terminal.metrics.velocity.toFixed(2)} | glow ${terminal.metrics.energy.toFixed(2)} | runtime ${runtime.phase}`,
+          'ok'
+        );
+        if (runtime.activeProject) {
+          pushLine(`active project: ${runtime.activeProject.name} (${runtime.activeProject.id})`, 'hint');
+        }
+        break;
+      case 'stack':
+        pushLine('stack: Three.js + Anime.js + Vite + CanvasTexture', 'ok');
+        break;
+      case 'sections':
+        pushLine('sections: hero, about, skills, projects, experience, contact', 'ok');
+        break;
+      case 'projects':
+        printProjects();
+        break;
+      case 'registry':
+        pushLine(`registry entries: ${projectRegistry.length}`, 'ok');
+        break;
+      case 'run': {
+        if (!arg) {
+          pushLine('usage: run <project-id>', 'hint');
+          break;
+        }
+        runProjectById(arg);
+        break;
+      }
+      case 'open': {
+        if (!arg) {
+          pushLine('usage: open <project-id>', 'hint');
+          break;
+        }
+        runProjectById(arg);
+        break;
+      }
+      case 'demo': {
+        const next = runNextProjectDemo();
+        if (!next) {
+          pushLine('no projects available', 'warn');
+        } else {
+          pushLine(`demo launch -> ${next.id}`, 'hint');
+        }
+        break;
+      }
+      case 'about': {
+        if (!arg) {
+          pushLine('usage: about <project-id>', 'hint');
+          break;
+        }
+        const project = findProject(arg);
+        if (!project) {
+          pushLine(`project not found: ${arg}`, 'warn');
+          break;
+        }
+        pushLine(`${project.name} [${project.id}]`, 'ok');
+        pushLine(project.description || 'No description available.', 'hint');
+        pushLine(`lang: ${project.language} | stack: ${(project.stack || []).join(' · ') || 'n/a'}`, 'hint');
+        break;
+      }
+      case 'launcher':
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('warp:open-project-list'));
+          pushLine('opening accessible launcher...', 'ok');
+        }
+        break;
+      case 'runtime': {
+        const uptime = getRuntimeUptimeSec();
+        const active = runtime.activeProject ? runtime.activeProject.id : 'none';
+        pushLine(
+          `runtime: ${runtime.phase} | active: ${active} | uptime: ${uptime.toFixed(1)}s | runs: ${runtime.completedRuns}`,
+          'ok'
+        );
+        break;
+      }
+      case 'stop':
+        if (!runtime.activeProject) {
+          pushLine('runtime idle', 'hint');
+        } else {
+          stopProject('stopped');
+        }
+        break;
+      case 'focus':
+        pushLine('focus target: hero laptop + live IDE overlay', 'ok');
+        break;
+      case 'ping':
+        pushLine('pong :: render loop stable', 'ok');
+        break;
+      case 'glow':
+        if (arg === 'up') {
+          terminal.metrics.energy = Math.min(2.8, terminal.metrics.energy + 0.22);
+          pushLine('glow intensity boosted', 'ok');
+        } else if (arg === 'down') {
+          terminal.metrics.energy = Math.max(0.1, terminal.metrics.energy - 0.2);
+          pushLine('glow intensity reduced', 'ok');
+        } else {
+          pushLine('usage: glow up | glow down', 'hint');
+        }
+        break;
+      case 'clear':
+        terminal.lines = [];
+        pushLine('[terminal] cleared', 'ok');
+        break;
+      default:
+        pushLine(`unknown command: ${command}`, 'warn');
+        pushLine('tip: type "help"', 'hint');
+    }
+  }
+
+  function setFocus(focused) {
+    if (terminal.focused === focused) return;
+    terminal.focused = focused;
+    if (focused) {
+      pushLine('[interactive] terminal focus enabled', 'ok');
+      emitTerminalStatus('focus-on');
+    } else {
+      pushLine('[interactive] terminal focus released', 'hint');
+      emitTerminalStatus('focus-off');
+    }
+  }
+
+  function handleKeyDown(event) {
+    const target = event.target;
+    const isTypingTarget =
+      target &&
+      (target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.isContentEditable);
+
+    if (!terminal.focused) {
+      if (isTypingTarget) return false;
+      if ((event.ctrlKey && event.key.toLowerCase() === 'i') || event.key === '`') {
+        setFocus(true);
+        return true;
+      }
+      return false;
+    }
+
+    if (event.key === 'Escape') {
+      setFocus(false);
+      return true;
+    }
+
+    if (event.key === 'Enter') {
+      executeCommand(terminal.input);
+      terminal.input = '';
+      return true;
+    }
+
+    if (event.key === 'Backspace') {
+      terminal.input = terminal.input.slice(0, -1);
+      return true;
+    }
+
+    if (event.key === 'ArrowUp') {
+      if (terminal.history.length > 0) {
+        terminal.historyIndex = Math.max(0, terminal.historyIndex - 1);
+        terminal.input = terminal.history[terminal.historyIndex] || '';
+      }
+      return true;
+    }
+
+    if (event.key === 'ArrowDown') {
+      if (terminal.history.length > 0) {
+        terminal.historyIndex = Math.min(terminal.history.length, terminal.historyIndex + 1);
+        terminal.input = terminal.history[terminal.historyIndex] || '';
+      }
+      return true;
+    }
+
+    if (event.key.length === 1 && !event.metaKey && !event.ctrlKey && !event.altKey) {
+      terminal.input += event.key;
+      return true;
+    }
+
+    return false;
+  }
+
+  function tokenizeCode(line) {
+    return line.match(/(\".*?\"|\'.*?\'|`.*?`|\/\/.*|[A-Za-z_]\w*|\d+|[^\sA-Za-z_])/g) || [''];
+  }
+
+  function tokenColor(token) {
+    if (!token) return 'rgba(224, 234, 255, 0.84)';
+    if (token.startsWith('//')) return 'rgba(160, 176, 215, 0.78)';
+    if (token[0] === '"' || token[0] === "'" || token[0] === '`') return 'rgba(237, 198, 255, 0.97)';
+    if (keywordTokens.has(token)) return 'rgba(162, 212, 255, 0.98)';
+    if (/^\d+$/.test(token)) return 'rgba(255, 196, 196, 0.95)';
+    if (/^[{}()[\].,;:+\-*/<>!=]+$/.test(token)) return 'rgba(176, 196, 238, 0.9)';
+    return 'rgba(228, 236, 255, 0.95)';
+  }
+
+  function drawBase() {
+    const bg = baseCtx.createLinearGradient(0, 0, width, height);
+    bg.addColorStop(0, '#090d1a');
+    bg.addColorStop(0.45, '#0f1632');
+    bg.addColorStop(1, '#0b1023');
+    baseCtx.fillStyle = bg;
+    baseCtx.fillRect(0, 0, width, height);
+
+    const nebulaA = baseCtx.createRadialGradient(width * 0.2, height * 0.26, 0, width * 0.2, height * 0.26, width * 0.58);
+    nebulaA.addColorStop(0, 'rgba(155,100,255,0.34)');
+    nebulaA.addColorStop(1, 'rgba(155,100,255,0)');
+    baseCtx.fillStyle = nebulaA;
+    baseCtx.fillRect(0, 0, width, height);
+
+    const nebulaB = baseCtx.createRadialGradient(width * 0.82, height * 0.74, 0, width * 0.82, height * 0.74, width * 0.54);
+    nebulaB.addColorStop(0, 'rgba(96,165,250,0.32)');
+    nebulaB.addColorStop(1, 'rgba(96,165,250,0)');
+    baseCtx.fillStyle = nebulaB;
+    baseCtx.fillRect(0, 0, width, height);
+
+    roundedRect(baseCtx, ide.x, ide.y, ide.w, ide.h, 12);
+    baseCtx.fillStyle = 'rgba(7, 10, 20, 0.86)';
+    baseCtx.fill();
+    baseCtx.strokeStyle = 'rgba(170, 190, 248, 0.1)';
+    baseCtx.lineWidth = 1;
+    baseCtx.stroke();
+
+    roundedRect(baseCtx, ide.x + 1, ide.y + 1, ide.w - 2, 46, 10);
+    baseCtx.fillStyle = 'rgba(22, 34, 68, 0.72)';
+    baseCtx.fill();
+
+    const dots = ['#fb7185', '#f59e0b', '#34d399'];
+    dots.forEach((color, i) => {
+      baseCtx.beginPath();
+      baseCtx.fillStyle = color;
+      baseCtx.globalAlpha = 0.8;
+      baseCtx.arc(ide.x + 24 + i * 18, ide.y + 26, 5, 0, Math.PI * 2);
+      baseCtx.fill();
+    });
+    baseCtx.globalAlpha = 1;
+
+    // Window controls (minimize / maximize / close) for terminal UX cues
+    const controlY = ide.y + 19;
+    const controlX = ide.x + ide.w - 118;
+    roundedRect(baseCtx, controlX, controlY, 90, 16, 8);
+    baseCtx.fillStyle = 'rgba(28, 38, 73, 0.62)';
+    baseCtx.fill();
+    baseCtx.strokeStyle = 'rgba(148, 170, 230, 0.24)';
+    baseCtx.stroke();
+
+    baseCtx.fillStyle = 'rgba(192, 205, 238, 0.74)';
+    baseCtx.fillRect(controlX + 14, controlY + 8, 12, 1.4);
+    baseCtx.strokeStyle = 'rgba(192, 205, 238, 0.78)';
+    baseCtx.strokeRect(controlX + 39, controlY + 5, 9, 7);
+    baseCtx.beginPath();
+    baseCtx.strokeStyle = 'rgba(255, 164, 180, 0.9)';
+    baseCtx.moveTo(controlX + 63, controlY + 5);
+    baseCtx.lineTo(controlX + 76, controlY + 12);
+    baseCtx.moveTo(controlX + 76, controlY + 5);
+    baseCtx.lineTo(controlX + 63, controlY + 12);
+    baseCtx.stroke();
+
+    roundedRect(baseCtx, ide.sidebarX, ide.y + 58, 92, ide.h - 126, 8);
+    baseCtx.fillStyle = 'rgba(14, 21, 42, 0.72)';
+    baseCtx.fill();
+
+    for (let i = 0; i < 14; i++) {
+      roundedRect(baseCtx, ide.sidebarX + 17, ide.y + 82 + i * 42, 58, 8, 4);
+      baseCtx.fillStyle = i === 2 ? 'rgba(194, 164, 255, 0.88)' : 'rgba(130, 150, 206, 0.42)';
+      baseCtx.fill();
+    }
+
+    roundedRect(baseCtx, ide.codeX - 18, ide.codeY - 16, ide.codeW, ide.codeH + 12, 8);
+    baseCtx.fillStyle = 'rgba(7, 11, 24, 0.88)';
+    baseCtx.fill();
+
+    roundedRect(baseCtx, ide.termX - 18, ide.termY - 12, ide.termW, ide.termH, 8);
+    baseCtx.fillStyle = 'rgba(7, 12, 24, 0.9)';
+    baseCtx.fill();
+
+    roundedRect(baseCtx, ide.x + ide.w - 34, ide.codeY - 10, 10, ide.codeH - 20, 3);
+    baseCtx.fillStyle = 'rgba(98, 118, 175, 0.25)';
+    baseCtx.fill();
+  }
+
+  drawBase();
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+
+  let visualScroll = 0;
+  let visualVelocity = 0;
+  let energy = 0;
+  let cursorBlink = 0;
+  let lastTick = -1;
+  let lastScroll = 0;
+  let autoLogTime = 0;
+  let activeTabIndex = 0;
+
+  function update(time, scrollProgress, scrollVelocity = 0, dt = 1 / 60) {
+    const delta = Math.min(Math.max(dt, 1 / 180), 1 / 20);
+    if (time - lastTick < 0.032 && Math.abs(scrollProgress - lastScroll) < 0.002 && Math.abs(scrollVelocity) < 0.01 && !terminal.focused) return;
+    lastTick = time;
+    lastScroll = scrollProgress;
+
+    visualVelocity = damp(visualVelocity, Math.abs(scrollVelocity), 7.5, delta);
+    energy = damp(energy, 0.22 + scrollProgress * 0.92 + visualVelocity * 0.42 + terminal.metrics.energy * 0.06, 4.8, delta);
+    const scrollKick = Math.sign(scrollVelocity) * Math.min(Math.abs(scrollVelocity) * 90, 200);
+    visualScroll = damp(visualScroll, scrollProgress * 860 + time * 8 + scrollKick, 5.3, delta);
+    cursorBlink += delta;
+    autoLogTime += delta;
+
+    let nextTabIndex = 0;
+    if (scrollProgress >= 0.3) nextTabIndex = 1;
+    if (scrollProgress >= 0.58) nextTabIndex = 2;
+    if (scrollProgress >= 0.82) nextTabIndex = 3;
+    if (runtime.phase !== 'idle' && terminal.focused) nextTabIndex = 3;
+    if (nextTabIndex !== activeTabIndex) {
+      activeTabIndex = nextTabIndex;
+      pushLine(`[tab] switched to ${tabDefinitions[activeTabIndex].label}`, 'ok');
+    }
+
+    terminal.metrics.scroll = scrollProgress;
+    terminal.metrics.velocity = scrollVelocity;
+    terminal.metrics.time = time;
+    terminal.metrics.energy = energy;
+
+    if (scrollProgress > 0.12 && !terminal.milestones.m1) {
+      terminal.milestones.m1 = true;
+      pushLine('[event] accessory::mouse ready', 'ok');
+    }
+    if (scrollProgress > 0.35 && !terminal.milestones.m2) {
+      terminal.milestones.m2 = true;
+      pushLine('[event] scene::deep parallax enabled', 'ok');
+    }
+    if (scrollProgress > 0.62 && !terminal.milestones.m3) {
+      terminal.milestones.m3 = true;
+      pushLine('[event] viewport::docs mode active', 'ok');
+    }
+
+    if (runtime.phase === 'booting' && runtime.activeProject) {
+      runtime.queueClock += delta;
+      while (
+        runtime.queueIndex < runtime.queue.length &&
+        runtime.queueClock >= runtime.queue[runtime.queueIndex].t
+      ) {
+        const step = runtime.queue[runtime.queueIndex];
+        pushLine(step.text, step.type || 'info');
+        runtime.queueIndex += 1;
+      }
+
+      if (runtime.queueIndex >= runtime.queue.length) {
+        runtime.phase = 'running';
+        runtime.traceClock = 0;
+        emitTerminalStatus('running', {
+          projectId: runtime.activeProject.id,
+          projectName: runtime.activeProject.name,
+        });
+      }
+    }
+
+    if (runtime.phase === 'running' && runtime.activeProject) {
+      runtime.traceClock += delta;
+      if (runtime.traceClock > 4.8) {
+        runtime.traceClock = 0;
+        const trace = buildProjectTraceLine(runtime.activeProject, runtime.traceIndex, terminal.metrics);
+        runtime.traceIndex += 1;
+        pushLine(trace, 'hint');
+      }
+    }
+
+    if (runtime.phase === 'idle') {
+      runtime.autoHintClock += delta;
+      if (runtime.autoHintClock > 12) {
+        runtime.autoHintClock = 0;
+        pushLine('[hint] use "projects" or "launcher" to explore demos', 'hint');
+      }
+    }
+
+    if (!terminal.focused && autoLogTime > 3.2) {
+      autoLogTime = 0;
+      pushLine(`[trace] orbit ${(0.44 + scrollProgress * 0.7).toFixed(2)} | render stable`, 'hint');
+    }
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(baseCanvas, 0, 0);
+
+    const tabX = ide.codeX - 18;
+    const tabY = ide.codeY - 52;
+    const tabW = 270;
+    const tabH = 30;
+    tabDefinitions.forEach((tab, index) => {
+      const x = tabX + index * (tabW - 8);
+      roundedRect(ctx, x, tabY, tabW, tabH, 8);
+      const selected = index === activeTabIndex;
+      ctx.fillStyle = selected ? `rgba(25, 37, 74, ${0.84 + energy * 0.06})` : 'rgba(11, 16, 31, 0.72)';
+      ctx.fill();
+      ctx.strokeStyle = selected ? tab.accent : 'rgba(142, 164, 220, 0.2)';
+      ctx.lineWidth = selected ? 1.4 : 1;
+      ctx.stroke();
+      ctx.fillStyle = selected ? 'rgba(234, 241, 255, 0.95)' : 'rgba(162, 178, 222, 0.76)';
+      ctx.font = '16px "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+      ctx.fillText(tab.label, x + 12, tabY + 20);
+    });
+
+    const activeCode = codeBanks[activeTabIndex] || codeBanks[0];
+
+    const lineHeight = 31;
+    const firstLine = Math.floor(visualScroll / lineHeight);
+    const offsetY = visualScroll % lineHeight;
+    const visibleLines = 17;
+
+    ctx.save();
+    ctx.beginPath();
+    roundedRect(ctx, ide.codeX - 18, ide.codeY - 16, ide.codeW, ide.codeH + 12, 11);
+    ctx.clip();
+
+    ctx.font = '19px "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+    ctx.textBaseline = 'middle';
+
+    for (let i = -1; i < visibleLines; i++) {
+      const lineIndex = (firstLine + i + activeCode.length * 32) % activeCode.length;
+      const line = activeCode[lineIndex];
+      const y = ide.codeY + i * lineHeight - offsetY;
+
+      if (lineIndex === 4 || lineIndex === 5 || lineIndex === 6) {
+        roundedRect(ctx, ide.codeX + 8, y - 11, ide.codeW - 68, 22, 7);
+        ctx.fillStyle = `rgba(120, 92, 255, ${0.11 + energy * 0.04})`;
+        ctx.fill();
+      }
+
+      ctx.fillStyle = 'rgba(152, 168, 206, 0.72)';
+      ctx.fillText(String(((lineIndex % 54) + 1)).padStart(2, ' '), ide.codeX + 8, y);
+
+      let cursorX = ide.codeX + 50;
+      const tokens = tokenizeCode(line);
+      tokens.forEach((token) => {
+        ctx.fillStyle = tokenColor(token);
+        ctx.globalAlpha = 0.86 + energy * 0.1;
+        ctx.fillText(token, cursorX, y);
+        cursorX += ctx.measureText(token).width + 8;
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    ctx.restore();
+
+    const terminalRows = terminal.lines.slice(-6);
+    ctx.font = '16px "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+    terminalRows.forEach((entry, i) => {
+      let color = 'rgba(146, 170, 226, 0.72)';
+      if (entry.type === 'ok') color = 'rgba(172, 244, 196, 0.82)';
+      if (entry.type === 'warn') color = 'rgba(255, 191, 168, 0.85)';
+      if (entry.type === 'cmd') color = 'rgba(208, 219, 255, 0.9)';
+      if (entry.type === 'hint') color = 'rgba(156, 178, 230, 0.72)';
+      ctx.fillStyle = color;
+      ctx.fillText(entry.text, ide.termX, ide.termY + 18 + i * 22);
+    });
+
+    const promptY = ide.termY + ide.termH - 24;
+    ctx.fillStyle = terminal.focused ? 'rgba(224, 236, 255, 0.94)' : 'rgba(153, 172, 221, 0.74)';
+    ctx.fillText('visitor@warp:~$ ', ide.termX, promptY);
+
+    const promptOffset = ctx.measureText('visitor@warp:~$ ').width;
+    const visibleInput = terminal.input.slice(-76);
+    ctx.fillStyle = 'rgba(236, 240, 255, 0.92)';
+    ctx.fillText(visibleInput, ide.termX + promptOffset, promptY);
+
+    if (terminal.focused && Math.sin(cursorBlink * 5.2) > 0) {
+      const caretX = ide.termX + promptOffset + ctx.measureText(visibleInput).width + 2;
+      ctx.fillStyle = `rgba(247, 212, 255, ${0.55 + energy * 0.35})`;
+      ctx.fillRect(caretX, promptY - 9, 2, 17);
+    }
+
+    if (!terminal.focused) {
+      ctx.fillStyle = 'rgba(172, 188, 229, 0.58)';
+      ctx.font = '15px "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+      ctx.fillText('click screen or press Ctrl+I · type "projects" or "launcher"', ide.termX + 344, promptY);
+    }
+
+    const activityWidth = 60 + scrollProgress * 420 + (Math.sin(time * 3.2) * 20 + 20);
+    roundedRect(ctx, ide.termX, ide.termY + ide.termH - 7, activityWidth, 4, 2);
+    ctx.fillStyle = `rgba(172, 224, 255, ${0.24 + energy * 0.22})`;
+    ctx.fill();
+
+    const screenGlow = ctx.createRadialGradient(width * 0.5, height * 0.56, 0, width * 0.5, height * 0.56, width * 0.68);
+    screenGlow.addColorStop(0, `rgba(125, 106, 255, ${0.13 + energy * 0.07})`);
+    screenGlow.addColorStop(1, 'rgba(125, 106, 255, 0)');
+    ctx.fillStyle = screenGlow;
+    ctx.fillRect(0, 0, width, height);
+
+    const reflect = ctx.createLinearGradient(width * 0.08, height * 0.14, width * 0.86, height * 0.86);
+    reflect.addColorStop(0, 'rgba(255,255,255,0)');
+    reflect.addColorStop(0.45, `rgba(255,255,255,${0.04 + energy * 0.02})`);
+    reflect.addColorStop(0.58, 'rgba(255,255,255,0.01)');
+    reflect.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = reflect;
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.globalAlpha = 0.05 + energy * 0.04;
+    for (let i = 0; i < 36; i++) {
+      const y = (i / 35) * height;
+      ctx.fillStyle = i % 2 === 0 ? '#cbc4ff' : '#8eb6ff';
+      ctx.fillRect(0, y, width, 1);
+    }
+    ctx.globalAlpha = 1;
+
+    texture.needsUpdate = true;
+  }
+
+  update(0, 0, 0, 1 / 60);
+
+  return {
+    texture,
+    update,
+    setFocus,
+    handleKeyDown,
+    setProjects,
+    runProjectById,
+    getProjects,
+    isFocused: () => terminal.focused,
+  };
+}
+
+function createStarLayer(config, texture) {
+  const { count, spreadX, spreadY, depth, size, opacity, parallax, speed } = config;
+
+  const positions = new Float32Array(count * 3);
+  const colors = new Float32Array(count * 3);
+
+  for (let i = 0; i < count; i++) {
+    positions[i * 3 + 0] = (Math.random() - 0.5) * spreadX;
+    positions[i * 3 + 1] = (Math.random() - 0.5) * spreadY;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * depth;
+
+    let color;
+    const roll = Math.random();
+    if (roll < 0.86) {
+      color = new THREE.Color(0xe5f0ff);
+    } else if (roll < 0.96) {
+      color = new THREE.Color(0xc7d8ff);
+    } else {
+      color = new THREE.Color(0xc084fc);
+    }
+
+    color.multiplyScalar(0.64 + Math.random() * 0.36);
+    colors[i * 3 + 0] = color.r;
+    colors[i * 3 + 1] = color.g;
+    colors[i * 3 + 2] = color.b;
+  }
+
+  const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
   const material = new THREE.PointsMaterial({
-    color: 0xdbe6ff,
-    size: 0.06,
+    map: texture,
+    size,
     transparent: true,
-    opacity: 0.22,
+    opacity,
+    vertexColors: true,
     depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    sizeAttenuation: true,
   });
 
   const points = new THREE.Points(geometry, material);
-  scene.add(points);
 
-  return { points, geometry, material };
+  return {
+    points,
+    geometry,
+    material,
+    baseOpacity: opacity,
+    parallax,
+    speed,
+    phase: Math.random() * Math.PI * 2,
+    twinkleSpeed: 0.34 + Math.random() * 0.28,
+    twinkleAmount: 0.07 + Math.random() * 0.05,
+  };
+}
+
+function createLaptopModel(textures) {
+  const root = new THREE.Group();
+
+  const materials = [];
+  const geometries = [];
+
+  const useMaterial = (material) => {
+    materials.push(material);
+    return material;
+  };
+
+  const useGeometry = (geometry) => {
+    geometries.push(geometry);
+    return geometry;
+  };
+
+  const bodyMat = useMaterial(
+    new THREE.MeshPhysicalMaterial({
+      color: 0x111727,
+      metalness: 0.66,
+      roughness: 0.24,
+      clearcoat: 0.56,
+      clearcoatRoughness: 0.18,
+    })
+  );
+
+  const shellMat = useMaterial(
+    new THREE.MeshPhysicalMaterial({
+      color: 0x1f283b,
+      metalness: 0.58,
+      roughness: 0.29,
+      clearcoat: 0.28,
+      clearcoatRoughness: 0.24,
+    })
+  );
+
+  const darkMat = useMaterial(
+    new THREE.MeshStandardMaterial({
+      color: 0x070a12,
+      metalness: 0.25,
+      roughness: 0.6,
+    })
+  );
+
+  const portMat = useMaterial(
+    new THREE.MeshStandardMaterial({
+      color: 0x090d17,
+      metalness: 0.24,
+      roughness: 0.78,
+    })
+  );
+
+  const detailMat = useMaterial(
+    new THREE.MeshStandardMaterial({
+      color: 0x2f374a,
+      metalness: 0.64,
+      roughness: 0.24,
+    })
+  );
+
+  const rubberMat = useMaterial(
+    new THREE.MeshStandardMaterial({
+      color: 0x080b12,
+      metalness: 0.02,
+      roughness: 0.88,
+    })
+  );
+
+  const ledMat = useMaterial(
+    new THREE.MeshStandardMaterial({
+      color: 0xcda7ff,
+      emissive: new THREE.Color(0x7a3cff),
+      emissiveIntensity: 0.86,
+      metalness: 0.18,
+      roughness: 0.3,
+    })
+  );
+
+  const keyboardMat = useMaterial(
+    new THREE.MeshStandardMaterial({
+      color: 0xf6f8ff,
+      emissive: new THREE.Color(0x31204f),
+      emissiveIntensity: 0.46,
+      metalness: 0.12,
+      roughness: 0.33,
+      vertexColors: true,
+    })
+  );
+
+  const bezelMat = useMaterial(
+    new THREE.MeshStandardMaterial({
+      color: 0x05070d,
+      metalness: 0.1,
+      roughness: 0.82,
+    })
+  );
+
+  const panelMat = useMaterial(
+    new THREE.MeshStandardMaterial({
+      map: textures.screen.texture,
+      emissiveMap: textures.screen.texture,
+      emissive: new THREE.Color(0x5677ff),
+      emissiveIntensity: 0.5,
+      roughness: 0.15,
+      metalness: 0.08,
+    })
+  );
+
+  const glassMat = useMaterial(
+    new THREE.MeshPhysicalMaterial({
+      color: 0xb8ccff,
+      transparent: true,
+      opacity: 0.022,
+      transmission: 0.82,
+      roughness: 0.02,
+      metalness: 0,
+      ior: 1.28,
+      thickness: 0.03,
+    })
+  );
+
+  const shadowMat = useMaterial(
+    new THREE.MeshBasicMaterial({
+      map: textures.shadow,
+      transparent: true,
+      opacity: 0.36,
+      depthWrite: false,
+      color: 0x000000,
+    })
+  );
+
+  const underGlowMat = useMaterial(
+    new THREE.MeshBasicMaterial({
+      map: textures.glow,
+      transparent: true,
+      opacity: 0.3,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      color: 0x8f57ff,
+    })
+  );
+
+  const baseBottom = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(3.44, 0.086, 2.22, 7, 0.03)), bodyMat);
+  baseBottom.position.y = 0.005;
+  root.add(baseBottom);
+
+  const deck = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(3.34, 0.036, 2.14, 7, 0.024)), shellMat);
+  deck.position.y = 0.068;
+  root.add(deck);
+
+  const deckBevelFront = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(3.14, 0.007, 0.018, 3, 0.004)), detailMat);
+  deckBevelFront.position.set(0, 0.088, 1.06);
+  root.add(deckBevelFront);
+
+  const deckBevelLeft = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(0.018, 0.007, 1.62, 3, 0.004)), detailMat);
+  deckBevelLeft.position.set(-1.66, 0.088, 0.13);
+  root.add(deckBevelLeft);
+
+  const deckBevelRight = deckBevelLeft.clone();
+  deckBevelRight.position.x = 1.56;
+  root.add(deckBevelRight);
+
+  const keyboardBed = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(2.78, 0.012, 1.16, 5, 0.01)), darkMat);
+  keyboardBed.position.set(0, 0.1, -0.03);
+  root.add(keyboardBed);
+
+  const keyRows = 6;
+  const keyCols = 16;
+  const keyCount = keyRows * keyCols;
+
+  const keyGeometry = useGeometry(new RoundedBoxGeometry(0.11, 0.024, 0.108, 2, 0.01));
+  const keys = new THREE.InstancedMesh(keyGeometry, keyboardMat, keyCount);
+  const tmp = new THREE.Object3D();
+  const baseColor = new THREE.Color(0x8790a8);
+  const rgbColor = new THREE.Color();
+  const finalColor = new THREE.Color();
+
+  let idx = 0;
+  for (let row = 0; row < keyRows; row++) {
+    for (let col = 0; col < keyCols; col++) {
+      const x = (col - (keyCols - 1) * 0.5) * 0.152;
+      const z = (row - (keyRows - 1) * 0.5) * 0.146 - 0.14;
+
+      tmp.position.set(x, 0.112, z);
+      tmp.rotation.set(0, 0, 0);
+      tmp.updateMatrix();
+      keys.setMatrixAt(idx, tmp.matrix);
+
+      const hue = 0.72 + (col / (keyCols - 1)) * 0.22 + Math.sin(row * 1.2 + col * 0.45) * 0.01;
+      rgbColor.setHSL(hue, 0.62, 0.55);
+      finalColor.copy(baseColor).lerp(rgbColor, 0.5);
+      keys.setColorAt(idx, finalColor);
+      idx += 1;
+    }
+  }
+
+  keys.instanceMatrix.needsUpdate = true;
+  if (keys.instanceColor) keys.instanceColor.needsUpdate = true;
+  root.add(keys);
+
+  const touchpad = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(0.86, 0.008, 0.62, 4, 0.02)), shellMat);
+  touchpad.position.set(0, 0.095, 0.68);
+  root.add(touchpad);
+
+  const frontLed = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(2.55, 0.014, 0.022, 4, 0.01)), ledMat);
+  frontLed.position.set(0, 0.018, 1.12);
+  root.add(frontLed);
+
+  const leftPortA = new THREE.Mesh(useGeometry(new THREE.BoxGeometry(0.016, 0.028, 0.24)), portMat);
+  leftPortA.position.set(-1.712, 0.032, 0.32);
+  root.add(leftPortA);
+  const leftUsbC = new THREE.Mesh(useGeometry(new THREE.BoxGeometry(0.012, 0.008, 0.08)), portMat);
+  leftUsbC.position.set(-1.71, 0.026, 0.06);
+  root.add(leftUsbC);
+  const leftPortB = new THREE.Mesh(useGeometry(new THREE.BoxGeometry(0.012, 0.018, 0.12)), portMat);
+  leftPortB.position.set(-1.712, 0.032, -0.02);
+  root.add(leftPortB);
+  const leftAudio = new THREE.Mesh(useGeometry(new THREE.CylinderGeometry(0.015, 0.015, 0.05, 14)), portMat);
+  leftAudio.rotation.z = Math.PI * 0.5;
+  leftAudio.position.set(-1.708, 0.032, -0.36);
+  root.add(leftAudio);
+
+  const leftHdmi = new THREE.Mesh(useGeometry(new THREE.BoxGeometry(0.018, 0.022, 0.34)), portMat);
+  leftHdmi.position.set(-1.712, 0.031, -0.26);
+  root.add(leftHdmi);
+
+  const leftRjTop = new THREE.Mesh(useGeometry(new THREE.BoxGeometry(0.014, 0.012, 0.2)), portMat);
+  leftRjTop.position.set(-1.713, 0.041, 0.58);
+  root.add(leftRjTop);
+  const leftRjBase = new THREE.Mesh(useGeometry(new THREE.BoxGeometry(0.018, 0.018, 0.2)), portMat);
+  leftRjBase.position.set(-1.712, 0.026, 0.58);
+  root.add(leftRjBase);
+
+  const rightPortA = leftPortB.clone();
+  rightPortA.position.set(1.712, 0.032, 0.3);
+  root.add(rightPortA);
+  const rightUsbC = leftUsbC.clone();
+  rightUsbC.position.set(1.71, 0.026, 0.02);
+  root.add(rightUsbC);
+  const rightPortB = new THREE.Mesh(useGeometry(new THREE.BoxGeometry(0.016, 0.028, 0.24)), portMat);
+  rightPortB.position.set(1.712, 0.031, -0.06);
+  root.add(rightPortB);
+
+  const rightSd = new THREE.Mesh(useGeometry(new THREE.BoxGeometry(0.01, 0.006, 0.2)), portMat);
+  rightSd.position.set(1.711, 0.02, -0.42);
+  root.add(rightSd);
+
+  const rightHdmi = new THREE.Mesh(useGeometry(new THREE.BoxGeometry(0.018, 0.022, 0.34)), portMat);
+  rightHdmi.position.set(1.712, 0.031, 0.1);
+  root.add(rightHdmi);
+
+  const rearVentFrame = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(2.98, 0.02, 0.24, 4, 0.01)), darkMat);
+  rearVentFrame.position.set(0, 0.094, -0.98);
+  root.add(rearVentFrame);
+
+  const rearSlots = new THREE.InstancedMesh(useGeometry(new THREE.BoxGeometry(0.05, 0.009, 0.154)), portMat, 46);
+  for (let i = 0; i < 46; i++) {
+    const x = (i - 22.5) * 0.061;
+    tmp.position.set(x, 0.101, -0.985);
+    tmp.rotation.set(0, 0, 0);
+    tmp.updateMatrix();
+    rearSlots.setMatrixAt(i, tmp.matrix);
+  }
+  rearSlots.instanceMatrix.needsUpdate = true;
+  root.add(rearSlots);
+
+  // Top rear ventilation areas with slot pattern (more realistic than visible fan props)
+  const topVentPanelGeo = useGeometry(new RoundedBoxGeometry(0.78, 0.01, 0.34, 4, 0.01));
+  const topVentLeft = new THREE.Mesh(topVentPanelGeo, darkMat);
+  topVentLeft.position.set(-0.69, 0.106, -0.66);
+  root.add(topVentLeft);
+  const topVentRight = topVentLeft.clone();
+  topVentRight.position.x = 0.69;
+  root.add(topVentRight);
+
+  const topVentSlotGeo = useGeometry(new THREE.BoxGeometry(0.58, 0.0025, 0.012));
+  const topVentSlots = new THREE.InstancedMesh(topVentSlotGeo, portMat, 28);
+  for (let i = 0; i < 28; i++) {
+    const side = i < 14 ? -1 : 1;
+    const row = i % 14;
+    tmp.position.set(side * 0.69, 0.109, -0.79 + row * 0.02);
+    tmp.rotation.set(0, 0, 0);
+    tmp.updateMatrix();
+    topVentSlots.setMatrixAt(i, tmp.matrix);
+  }
+  topVentSlots.instanceMatrix.needsUpdate = true;
+  root.add(topVentSlots);
+
+  const speakerDotGeo = useGeometry(new THREE.CylinderGeometry(0.006, 0.006, 0.003, 10));
+  const speakerDots = new THREE.InstancedMesh(speakerDotGeo, portMat, 120);
+  let s = 0;
+  for (let side = -1; side <= 1; side += 2) {
+    for (let row = 0; row < 5; row++) {
+      for (let col = 0; col < 12; col++) {
+        tmp.position.set(side * 1.335, 0.102, -0.57 + col * 0.104 + row * 0.004);
+        tmp.rotation.set(Math.PI * 0.5, 0, 0);
+        tmp.updateMatrix();
+        speakerDots.setMatrixAt(s, tmp.matrix);
+        s += 1;
+      }
+    }
+  }
+  speakerDots.instanceMatrix.needsUpdate = true;
+  root.add(speakerDots);
+
+  const sideVentGeo = useGeometry(new THREE.BoxGeometry(0.01, 0.007, 0.06));
+  const sideVents = new THREE.InstancedMesh(sideVentGeo, portMat, 56);
+  for (let i = 0; i < 28; i++) {
+    const z = -0.78 + i * 0.055;
+    tmp.position.set(-1.706, 0.054, z);
+    tmp.rotation.set(0, 0, 0);
+    tmp.updateMatrix();
+    sideVents.setMatrixAt(i, tmp.matrix);
+
+    tmp.position.set(1.706, 0.054, z);
+    tmp.rotation.set(0, 0, 0);
+    tmp.updateMatrix();
+    sideVents.setMatrixAt(i + 28, tmp.matrix);
+  }
+  sideVents.instanceMatrix.needsUpdate = true;
+  root.add(sideVents);
+
+  const footGeo = useGeometry(new RoundedBoxGeometry(0.42, 0.012, 0.18, 2, 0.006));
+  const feet = new THREE.InstancedMesh(footGeo, rubberMat, 4);
+  const footPositions = [
+    [-1.1, -0.03, -0.7],
+    [1.1, -0.03, -0.7],
+    [-1.1, -0.03, 0.82],
+    [1.1, -0.03, 0.82],
+  ];
+  for (let i = 0; i < footPositions.length; i++) {
+    tmp.position.set(footPositions[i][0], footPositions[i][1], footPositions[i][2]);
+    tmp.rotation.set(0, 0, 0);
+    tmp.updateMatrix();
+    feet.setMatrixAt(i, tmp.matrix);
+  }
+  feet.instanceMatrix.needsUpdate = true;
+  root.add(feet);
+
+  const hinge = new THREE.Mesh(useGeometry(new THREE.CylinderGeometry(0.028, 0.028, 2.36, 28)), darkMat);
+  hinge.rotation.z = Math.PI * 0.5;
+  hinge.position.set(0, 0.086, -1.04);
+  root.add(hinge);
+
+  const lidPivot = new THREE.Group();
+  lidPivot.position.set(0, 0.086, -1.04);
+  lidPivot.rotation.x = -0.37;
+  root.add(lidPivot);
+
+  const lidBack = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(3.2, 2.0, 0.062, 6, 0.028)), shellMat);
+  lidBack.position.set(0, 0.97, -0.01);
+  lidPivot.add(lidBack);
+
+  const bezel = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(3.06, 1.84, 0.028, 5, 0.01)), bezelMat);
+  bezel.position.set(0, 0.97, 0.026);
+  lidPivot.add(bezel);
+
+  const panel = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(3.0, 1.79)), panelMat);
+  panel.position.set(0, 0.97, 0.045);
+  lidPivot.add(panel);
+
+  const panelGlass = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(3.0, 1.79)), glassMat);
+  panelGlass.position.set(0, 0.97, 0.052);
+  lidPivot.add(panelGlass);
+
+  const camDot = new THREE.Mesh(useGeometry(new THREE.CircleGeometry(0.013, 16)), darkMat);
+  camDot.position.set(0, 1.79, 0.054);
+  lidPivot.add(camDot);
+  const camNotch = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(0.1, 0.01, 0.006, 3, 0.002)), detailMat);
+  camNotch.position.set(0, 1.79, 0.05);
+  lidPivot.add(camNotch);
+
+  const shadow = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(4.2, 2.7)), shadowMat);
+  shadow.rotation.x = -Math.PI * 0.5;
+  shadow.position.y = -0.11;
+  root.add(shadow);
+
+  const underGlow = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(2.8, 0.48)), underGlowMat);
+  underGlow.rotation.x = -Math.PI * 0.5;
+  underGlow.position.set(0, -0.07, 1.01);
+  root.add(underGlow);
+
+  return {
+    root,
+    lidPivot,
+    panel,
+    panelGlass,
+    keys,
+    keyRows,
+    keyCols,
+    keyboardMat,
+    panelMat,
+    ledMat,
+    underGlowMat,
+    materials,
+    geometries,
+  };
+}
+
+function createMousePadAccessory() {
+  const group = new THREE.Group();
+  const materials = [];
+  const geometries = [];
+
+  const useMaterial = (material) => {
+    materials.push(material);
+    return material;
+  };
+
+  const useGeometry = (geometry) => {
+    geometries.push(geometry);
+    return geometry;
+  };
+
+  const padMat = useMaterial(
+    new THREE.MeshStandardMaterial({
+      color: 0x0a101a,
+      metalness: 0.04,
+      roughness: 0.95,
+    })
+  );
+
+  const topMat = useMaterial(
+    new THREE.MeshStandardMaterial({
+      color: 0x0f1726,
+      metalness: 0.06,
+      roughness: 0.82,
+    })
+  );
+
+  const edgeMat = useMaterial(
+    new THREE.MeshStandardMaterial({
+      color: 0x8cd8ff,
+      emissive: new THREE.Color(0x2ec8ff),
+      emissiveIntensity: 0.5,
+      metalness: 0.02,
+      roughness: 0.28,
+      transparent: true,
+      opacity: 0.56,
+    })
+  );
+
+  const glowTexture = createSoftCircleTexture('rgba(255,255,255,0.95)', 'rgba(255,255,255,0)', 256);
+  const glowMat = useMaterial(
+    new THREE.MeshBasicMaterial({
+      map: glowTexture,
+      transparent: true,
+      opacity: 0.2,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      color: 0x2ec8ff,
+    })
+  );
+
+  const base = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(1.16, 0.03, 0.92, 5, 0.05)), padMat);
+  group.add(base);
+
+  const top = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(1.08, 0.006, 0.84, 5, 0.045)), topMat);
+  top.position.y = 0.016;
+  group.add(top);
+
+  const edgeFront = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(1.02, 0.008, 0.012, 4, 0.004)), edgeMat);
+  edgeFront.position.set(0, 0.012, 0.416);
+  group.add(edgeFront);
+
+  const edgeLeft = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(0.012, 0.008, 0.76, 4, 0.004)), edgeMat);
+  edgeLeft.position.set(-0.514, 0.012, 0);
+  group.add(edgeLeft);
+
+  const edgeRight = edgeLeft.clone();
+  edgeRight.position.x = 0.514;
+  group.add(edgeRight);
+
+  const glow = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(1.2, 0.95)), glowMat);
+  glow.rotation.x = -Math.PI * 0.5;
+  glow.position.set(0, -0.016, 0);
+  group.add(glow);
+
+  group.scale.setScalar(0.001);
+
+  return { group, edgeMat, glowMat, materials, geometries, glowTexture };
+}
+
+function createMouseAccessory() {
+  const group = new THREE.Group();
+  const materials = [];
+  const geometries = [];
+
+  const useMaterial = (material) => {
+    materials.push(material);
+    return material;
+  };
+
+  const useGeometry = (geometry) => {
+    geometries.push(geometry);
+    return geometry;
+  };
+
+  const shellMat = useMaterial(
+    new THREE.MeshPhysicalMaterial({
+      color: 0x12161f,
+      metalness: 0.18,
+      roughness: 0.52,
+      clearcoat: 0.22,
+      clearcoatRoughness: 0.5,
+    })
+  );
+
+  const shellTopMat = useMaterial(
+    new THREE.MeshPhysicalMaterial({
+      color: 0x1a202b,
+      metalness: 0.16,
+      roughness: 0.42,
+      clearcoat: 0.3,
+      clearcoatRoughness: 0.38,
+    })
+  );
+
+  const gripMat = useMaterial(
+    new THREE.MeshStandardMaterial({
+      color: 0x0b0f17,
+      metalness: 0.04,
+      roughness: 0.9,
+    })
+  );
+
+  const wheelMat = useMaterial(
+    new THREE.MeshStandardMaterial({
+      color: 0x0b0f16,
+      metalness: 0.06,
+      roughness: 0.92,
+    })
+  );
+
+  const sideLedMat = useMaterial(
+    new THREE.MeshStandardMaterial({
+      color: 0xa7ecff,
+      emissive: new THREE.Color(0x2ec8ff),
+      emissiveIntensity: 0.56,
+      metalness: 0.02,
+      roughness: 0.3,
+      transparent: true,
+      opacity: 0.62,
+    })
+  );
+
+  const accentMat = useMaterial(
+    new THREE.MeshStandardMaterial({
+      color: 0x2b313d,
+      metalness: 0.34,
+      roughness: 0.4,
+    })
+  );
+
+  const glowTexture = createSoftCircleTexture('rgba(255,255,255,0.96)', 'rgba(255,255,255,0)', 256);
+  const glowMat = useMaterial(
+    new THREE.MeshBasicMaterial({
+      map: glowTexture,
+      transparent: true,
+      opacity: 0.24,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      color: 0x2ec8ff,
+    })
+  );
+
+  const baseBody = new THREE.Mesh(useGeometry(new THREE.CapsuleGeometry(0.23, 0.55, 10, 30)), shellMat);
+  baseBody.rotation.x = Math.PI * 0.5;
+  baseBody.scale.set(1.06, 0.38, 1);
+  baseBody.position.y = 0.024;
+  group.add(baseBody);
+
+  const topShell = new THREE.Mesh(useGeometry(new THREE.CapsuleGeometry(0.2, 0.4, 10, 26)), shellTopMat);
+  topShell.rotation.x = Math.PI * 0.5;
+  topShell.scale.set(0.92, 0.29, 0.86);
+  topShell.position.set(0, 0.075, -0.03);
+  group.add(topShell);
+
+  const leftButton = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(0.194, 0.026, 0.36, 4, 0.024)), shellTopMat);
+  leftButton.position.set(-0.103, 0.11, -0.2);
+  group.add(leftButton);
+  const rightButton = leftButton.clone();
+  rightButton.position.x = 0.103;
+  group.add(rightButton);
+
+  const wheel = new THREE.Mesh(useGeometry(new THREE.CylinderGeometry(0.036, 0.036, 0.08, 24)), wheelMat);
+  wheel.rotation.x = Math.PI * 0.5;
+  wheel.position.set(0, 0.113, -0.168);
+  group.add(wheel);
+
+  const wheelCut = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(0.1, 0.018, 0.16, 3, 0.008)), accentMat);
+  wheelCut.position.set(0, 0.103, -0.166);
+  group.add(wheelCut);
+
+  const splitLine = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(0.007, 0.014, 0.5, 3, 0.004)), accentMat);
+  splitLine.position.set(0, 0.096, -0.02);
+  group.add(splitLine);
+
+  const lowerShell = new THREE.Mesh(useGeometry(new THREE.CapsuleGeometry(0.2, 0.44, 8, 22)), gripMat);
+  lowerShell.rotation.x = Math.PI * 0.5;
+  lowerShell.scale.set(1, 0.2, 0.84);
+  lowerShell.position.set(0, -0.015, 0.02);
+  group.add(lowerShell);
+
+  const leftGrip = new THREE.Mesh(useGeometry(new THREE.CapsuleGeometry(0.056, 0.26, 6, 14)), gripMat);
+  leftGrip.rotation.set(Math.PI * 0.5, 0, Math.PI * 0.16);
+  leftGrip.scale.set(0.7, 0.2, 0.95);
+  leftGrip.position.set(-0.255, 0.036, 0.07);
+  group.add(leftGrip);
+
+  const rightGrip = leftGrip.clone();
+  rightGrip.position.x = 0.255;
+  rightGrip.rotation.z = -Math.PI * 0.16;
+  group.add(rightGrip);
+
+  const sideButtonGeo = useGeometry(new RoundedBoxGeometry(0.062, 0.018, 0.1, 3, 0.01));
+  const sideBtnA = new THREE.Mesh(sideButtonGeo, accentMat);
+  sideBtnA.position.set(-0.242, 0.072, -0.065);
+  sideBtnA.rotation.y = -0.1;
+  group.add(sideBtnA);
+  const sideBtnB = sideBtnA.clone();
+  sideBtnB.position.z = 0.04;
+  group.add(sideBtnB);
+
+  const ledStrip = new THREE.Mesh(useGeometry(new RoundedBoxGeometry(0.17, 0.009, 0.04, 3, 0.008)), sideLedMat);
+  ledStrip.position.set(0, 0.045, 0.24);
+  group.add(ledStrip);
+
+  const ledTail = new THREE.Mesh(useGeometry(new THREE.TorusGeometry(0.048, 0.006, 6, 24)), sideLedMat);
+  ledTail.rotation.x = Math.PI * 0.5;
+  ledTail.position.set(0, 0.062, 0.23);
+  group.add(ledTail);
+
+  const glow = new THREE.Mesh(useGeometry(new THREE.PlaneGeometry(0.62, 0.34)), glowMat);
+  glow.rotation.x = -Math.PI * 0.5;
+  glow.position.set(0, -0.058, 0.14);
+  group.add(glow);
+
+  const footGeo = useGeometry(new RoundedBoxGeometry(0.11, 0.006, 0.055, 2, 0.003));
+  const feet = new THREE.InstancedMesh(footGeo, accentMat, 4);
+  const footDummy = new THREE.Object3D();
+  const footPos = [
+    [-0.115, -0.035, -0.22],
+    [0.115, -0.035, -0.22],
+    [-0.105, -0.035, 0.24],
+    [0.105, -0.035, 0.24],
+  ];
+  for (let i = 0; i < footPos.length; i++) {
+    footDummy.position.set(footPos[i][0], footPos[i][1], footPos[i][2]);
+    footDummy.rotation.set(0, 0, 0);
+    footDummy.updateMatrix();
+    feet.setMatrixAt(i, footDummy.matrix);
+  }
+  feet.instanceMatrix.needsUpdate = true;
+  group.add(feet);
+
+  group.scale.setScalar(0.001);
+
+  return { group, wheel, sideLedMat, glowMat, materials, geometries, glowTexture };
 }
 
 export function initThreeScene() {
@@ -77,9 +2014,50 @@ export function initThreeScene() {
   if (!canvas) return () => {};
 
   const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-  let manualReduced = document.body?.dataset.motion === 'reduced';
-  const isReduced = () => reducedMotionQuery.matches || manualReduced;
-  let destroyed = false;
+  let manualReducedMotion = document.body?.dataset.motion === 'reduced';
+  let prefersReducedMotion = reducedMotionQuery.matches || manualReducedMotion;
+
+  const isMobile = window.innerWidth < 920;
+  const SCENE_TUNING = {
+    maxPixelRatio: 1.8,
+    heroRangeMultiplier: 2.4,
+    heroViewportKickScale: 2.1,
+    minViewportKickHeight: 1380,
+    scrollBlendGlobal: 0.26,
+    scrollBlendViewport: 0.5,
+    laptopBaseXDesktop: 3.98,
+    laptopBaseXMobile: 0.56,
+    laptopBaseY: 0.04,
+    laptopBaseZ: -0.4,
+  };
+
+  const ACCESSORY_TUNING = {
+    minScale: 0.001,
+    carrierXDesktop: -2.32,
+    carrierXMobile: -5.36,
+    carrierYBase: -0.074,
+    carrierYScrollFactor: -0.01,
+    carrierZDesktop: -0.38,
+    carrierZMobile: 0.88,
+    padRevealStart: 0.015,
+    padRevealRange: 0.12,
+    padScale: 1.65,
+    padEdgeOpacityBase: 0.12,
+    padEdgeOpacityGain: 0.38,
+    padGlowOpacityBase: 0.05,
+    padGlowOpacityGain: 0.15,
+    mouseRevealStart: 0.16,
+    mouseRevealRange: 0.16,
+    mouseXDesktop: 0.01,
+    mouseXMobile: 0.08,
+    mouseHiddenOffsetX: -0.06,
+    mouseY: 0.016,
+    mouseZ: 0.01,
+    mouseScale: 0.92,
+    mouseRotX: 0.01,
+    mouseRotY: Math.PI + 0.06,
+    mouseRotZ: 0.015,
+  };
 
   let renderer;
   try {
@@ -91,63 +2069,84 @@ export function initThreeScene() {
     });
   } catch (error) {
     canvas.style.display = 'none';
-    console.warn('[three-scene] WebGL is not available in this environment.', error);
+    console.warn('[three-scene] WebGL context unavailable. Scene disabled.', error);
     return () => {};
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, SCENE_TUNING.maxPixelRatio));
   renderer.setSize(window.innerWidth, window.innerHeight, false);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMappingExposure = 0.98;
+
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const envRT = pmrem.fromScene(new RoomEnvironment(), 0.05);
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x0a0a0f, 8, 30);
+  scene.environment = envRT.texture;
+  scene.fog = new THREE.Fog(0x090b13, 9, 26);
 
-  const camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.set(1.18, 1.05, 6.3);
+  const camera = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 90);
+  camera.position.set(0.2, 1.26, 7.06);
 
-  const hemiLight = new THREE.HemisphereLight(0xaec6ff, 0x12152a, 0.6);
-  const keyLight = new THREE.DirectionalLight(0xffffff, 0.96);
-  keyLight.position.set(2.4, 4.6, 3.8);
-  const rimLight = new THREE.PointLight(0x7aa4ff, 0.7, 18, 2.1);
-  rimLight.position.set(-2.7, 1.7, -2.5);
-  scene.add(hemiLight, keyLight, rimLight);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.28));
 
-  const stars = createStarField(scene);
+  const hemi = new THREE.HemisphereLight(0x9db8ff, 0x080a12, 0.35);
+  hemi.position.set(0, 8, 0);
+  scene.add(hemi);
 
-  const laptopAnchor = new THREE.Group();
-  laptopAnchor.position.set(0.4, 0, -0.6);
-  scene.add(laptopAnchor);
+  const key = new THREE.DirectionalLight(0xffffff, 1.05);
+  key.position.set(4.8, 4.2, 5.2);
+  scene.add(key);
 
-  let laptop = null;
-  const loader = new GLTFLoader();
-  loader.load(
-    laptopModelUrl,
-    (gltf) => {
-      if (destroyed) {
-        if (gltf.scene) disposeObject(gltf.scene);
-        return;
-      }
-      laptop = gltf.scene || gltf.scenes?.[0] || null;
-      if (!laptop) return;
-      fitObjectToSize(laptop, 3.5);
-      laptop.rotation.set(0.12, 0.6, 0);
-      laptop.position.set(0, 0.08, 0);
-      laptop.traverse((node) => {
-        if (!node?.isMesh) return;
-        node.castShadow = false;
-        node.receiveShadow = false;
-        if (node.material && 'envMapIntensity' in node.material) {
-          node.material.envMapIntensity = Math.max(node.material.envMapIntensity || 0, 1.1);
-        }
-      });
-      laptopAnchor.add(laptop);
-    },
-    undefined,
-    (error) => {
-      console.warn('[three-scene] laptop GLB load failed', error);
-    }
-  );
+  const fill = new THREE.DirectionalLight(0x7aa4ff, 0.34);
+  fill.position.set(-4.2, 1.2, 2.4);
+  scene.add(fill);
+
+  const rim = new THREE.PointLight(0xc084fc, 0.7, 24, 2.1);
+  rim.position.set(-3.2, 1.9, -3.5);
+  scene.add(rim);
+
+  const starTexture = createStarTexture();
+  const shadowTexture = createSoftCircleTexture('rgba(0,0,0,0.95)', 'rgba(0,0,0,0)', 512);
+  const glowTexture = createSoftCircleTexture('rgba(255,255,255,0.95)', 'rgba(255,255,255,0)', 512);
+  const screenDisplay = createScreenTexture();
+
+  const laptop = createLaptopModel({
+    screen: screenDisplay,
+    shadow: shadowTexture,
+    glow: glowTexture,
+  });
+  scene.add(laptop.root);
+
+  let isDestroyed = false;
+  const accessoryCarrier = new THREE.Group();
+
+  let mousePadAccessory = createMousePadAccessory();
+  accessoryCarrier.add(mousePadAccessory.group);
+
+  let mouseAccessory = createMouseAccessory();
+  accessoryCarrier.add(mouseAccessory.group);
+
+  // Deterministic accessory scene: keep procedural mouse + mousepad as primary visuals.
+
+  const baseX = isMobile ? SCENE_TUNING.laptopBaseXMobile : SCENE_TUNING.laptopBaseXDesktop;
+  laptop.root.position.set(baseX, SCENE_TUNING.laptopBaseY, SCENE_TUNING.laptopBaseZ);
+  laptop.root.add(accessoryCarrier);
+
+  const layerConfig = prefersReducedMotion
+    ? [
+        { count: isMobile ? 200 : 280, spreadX: 42, spreadY: 24, depth: 22, size: 0.05, opacity: 0.13, parallax: 0.16, speed: 0.02 },
+        { count: isMobile ? 130 : 190, spreadX: 32, spreadY: 18, depth: 16, size: 0.07, opacity: 0.1, parallax: 0.24, speed: 0.028 },
+      ]
+    : [
+        { count: isMobile ? 320 : 500, spreadX: 46, spreadY: 26, depth: 28, size: 0.045, opacity: 0.15, parallax: 0.12, speed: 0.024 },
+        { count: isMobile ? 220 : 360, spreadX: 36, spreadY: 20, depth: 20, size: 0.062, opacity: 0.12, parallax: 0.22, speed: 0.032 },
+        { count: isMobile ? 100 : 180, spreadX: 26, spreadY: 15, depth: 12, size: 0.085, opacity: 0.095, parallax: 0.32, speed: 0.04 },
+      ];
+
+  const starLayers = layerConfig.map((cfg) => createStarLayer(cfg, starTexture));
+  starLayers.forEach((layer) => scene.add(layer.points));
 
   const state = {
     pointerTargetX: 0,
@@ -156,118 +2155,392 @@ export function initThreeScene() {
     pointerY: 0,
     scrollTarget: 0,
     scroll: 0,
+    scrollVelocity: 0,
+    prevScroll: 0,
+    rotX: -0.015,
+    rotY: 0.3,
+    rotZ: 0,
+    lastPointerMs: performance.now(),
   };
 
-  function updateScrollTarget() {
-    const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
-    const globalProgress = clamp(window.scrollY / maxScroll, 0, 1);
-    const hero = document.getElementById('hero');
-    if (!hero) {
-      state.scrollTarget = globalProgress;
-      return;
-    }
-    const heroRange = Math.max(hero.offsetHeight * 0.9, window.innerHeight * 1.2);
-    const heroProgress = clamp((window.scrollY - hero.offsetTop) / heroRange, 0, 1);
-    state.scrollTarget = Math.max(globalProgress * 0.4, heroProgress);
+  let rafId = 0;
+  const raycaster = new THREE.Raycaster();
+  const pointerNdc = new THREE.Vector2();
+  const screenTargets = [laptop.panelGlass, laptop.panel];
+
+  function isScreenHit(clientX, clientY) {
+    pointerNdc.x = (clientX / window.innerWidth) * 2 - 1;
+    pointerNdc.y = -(clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(pointerNdc, camera);
+    return raycaster.intersectObjects(screenTargets, false).length > 0;
+  }
+
+  function isLaptopHit(clientX, clientY) {
+    pointerNdc.x = (clientX / window.innerWidth) * 2 - 1;
+    pointerNdc.y = -(clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(pointerNdc, camera);
+    return raycaster.intersectObject(laptop.root, true).length > 0;
+  }
+
+  function updatePointer(clientX, clientY) {
+    state.pointerTargetX = (clientX / window.innerWidth) * 2 - 1;
+    state.pointerTargetY = (clientY / window.innerHeight) * 2 - 1;
+    state.lastPointerMs = performance.now();
   }
 
   function onPointerMove(event) {
-    state.pointerTargetX = (event.clientX / window.innerWidth) * 2 - 1;
-    state.pointerTargetY = (event.clientY / window.innerHeight) * 2 - 1;
+    if (prefersReducedMotion) return;
+    if (screenDisplay.isFocused()) return;
+    updatePointer(event.clientX, event.clientY);
+  }
+
+  function onMouseMove(event) {
+    if (prefersReducedMotion) return;
+    if (screenDisplay.isFocused()) return;
+    updatePointer(event.clientX, event.clientY);
+  }
+
+  function onPointerDown(event) {
+    updatePointer(event.clientX, event.clientY);
+    const screenHit = isScreenHit(event.clientX, event.clientY);
+    const laptopHit = isLaptopHit(event.clientX, event.clientY);
+    screenDisplay.setFocus(screenHit || laptopHit);
+    if ((screenHit || laptopHit) && typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('warp:pc-open', { detail: { source: 'scene' } }));
+    }
+  }
+
+  function onTouchStart(event) {
+    if (!event.touches || !event.touches[0]) return;
+    const touch = event.touches[0];
+    updatePointer(touch.clientX, touch.clientY);
+    const screenHit = isScreenHit(touch.clientX, touch.clientY);
+    const laptopHit = isLaptopHit(touch.clientX, touch.clientY);
+    screenDisplay.setFocus(screenHit || laptopHit);
+    if ((screenHit || laptopHit) && typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('warp:pc-open', { detail: { source: 'scene-touch' } }));
+    }
+  }
+
+  function onTouchMove(event) {
+    if (prefersReducedMotion) return;
+    if (screenDisplay.isFocused()) return;
+    if (!event.touches || !event.touches[0]) return;
+    updatePointer(event.touches[0].clientX, event.touches[0].clientY);
+  }
+
+  function resetPointer() {
+    state.pointerTargetX = 0;
+    state.pointerTargetY = 0;
   }
 
   function onScroll() {
-    updateScrollTarget();
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - window.innerHeight;
+    const globalProgress = clamp01(max > 0 ? doc.scrollTop / max : 0);
+
+    // Hero-local progress (strong response in first viewport) + global fallback.
+    const heroSection = document.getElementById('hero');
+    const heroStart = heroSection ? heroSection.offsetTop : 0;
+    const heroRange = heroSection
+      ? Math.max(heroSection.offsetHeight * SCENE_TUNING.heroRangeMultiplier, window.innerHeight * SCENE_TUNING.heroRangeMultiplier)
+      : Math.max(window.innerHeight * SCENE_TUNING.heroRangeMultiplier, 1200);
+    const heroProgress = clamp01((window.scrollY - heroStart) / heroRange);
+    const viewportKick = clamp01(
+      window.scrollY / Math.max(window.innerHeight * SCENE_TUNING.heroViewportKickScale, SCENE_TUNING.minViewportKickHeight)
+    );
+
+    state.scrollTarget = clamp01(
+      Math.max(globalProgress * SCENE_TUNING.scrollBlendGlobal, heroProgress, viewportKick * SCENE_TUNING.scrollBlendViewport)
+    );
   }
 
   function onResize() {
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setSize(window.innerWidth, window.innerHeight, false);
-    camera.aspect = window.innerWidth / window.innerHeight;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, SCENE_TUNING.maxPixelRatio));
+    renderer.setSize(width, height, false);
+    camera.aspect = width / height;
     camera.updateProjectionMatrix();
   }
 
-  function onMotionPreference(event) {
-    manualReduced = event?.detail?.mode === 'reduced' || document.body?.dataset.motion === 'reduced';
+  function onReducedMotionChange(event) {
+    prefersReducedMotion = event.matches || manualReducedMotion;
   }
 
-  function onReducedMotionChange() {
-    // The query value is read via isReduced() during rendering.
+  function onMotionModeChange(event) {
+    const mode = event?.detail?.mode;
+    manualReducedMotion = mode === 'reduced' || document.body?.dataset.motion === 'reduced';
+    prefersReducedMotion = reducedMotionQuery.matches || manualReducedMotion;
+  }
+
+  function onProjectRegistry(event) {
+    const incoming = event?.detail?.projects;
+    screenDisplay.setProjects(incoming);
+  }
+
+  function onTerminalRunProject(event) {
+    const projectId = event?.detail?.projectId;
+    if (!projectId) return;
+    screenDisplay.setFocus(true);
+    screenDisplay.runProjectById(projectId);
+  }
+
+  function onTerminalFocus() {
+    screenDisplay.setFocus(true);
+  }
+
+  function onVisibilityChange() {
+    if (document.hidden) resetPointer();
+  }
+
+  function onKeyDown(event) {
+    if (screenDisplay.handleKeyDown(event)) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
   }
 
   window.addEventListener('pointermove', onPointerMove, { passive: true });
+  window.addEventListener('pointerdown', onPointerDown, { passive: true });
+  window.addEventListener('mousemove', onMouseMove, { passive: true });
+  window.addEventListener('touchstart', onTouchStart, { passive: true });
+  window.addEventListener('touchmove', onTouchMove, { passive: true });
+  window.addEventListener('blur', resetPointer);
+  document.addEventListener('visibilitychange', onVisibilityChange);
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onResize);
-  window.addEventListener('warp:motion-mode', onMotionPreference);
-  if (reducedMotionQuery.addEventListener) reducedMotionQuery.addEventListener('change', onReducedMotionChange);
-  else reducedMotionQuery.addListener(onReducedMotionChange);
+  window.addEventListener('keydown', onKeyDown);
+  window.addEventListener('warp:motion-mode', onMotionModeChange);
+  window.addEventListener('warp:project-registry', onProjectRegistry);
+  window.addEventListener('warp:terminal-run-project', onTerminalRunProject);
+  window.addEventListener('warp:terminal-focus', onTerminalFocus);
 
+  if (reducedMotionQuery.addEventListener) {
+    reducedMotionQuery.addEventListener('change', onReducedMotionChange);
+  } else {
+    reducedMotionQuery.addListener(onReducedMotionChange);
+  }
+
+  onScroll();
   onResize();
-  updateScrollTarget();
 
   const clock = new THREE.Clock();
-  let rafId = 0;
+  const keyboardColor = new THREE.Color();
+  const frontLedColor = new THREE.Color();
+  let lastKeyboardColorTick = 0;
 
-  const render = () => {
-    if (destroyed) return;
+  function render() {
     rafId = requestAnimationFrame(render);
 
-    const delta = Math.min(clock.getDelta(), 0.05);
-    const elapsed = clock.getElapsedTime();
-    const motionFactor = isReduced() ? 0.42 : 1;
+    const dt = Math.min(clock.getDelta(), 0.05);
+    const t = clock.getElapsedTime();
 
-    state.pointerX = damp(state.pointerX, state.pointerTargetX, 7.8, delta);
-    state.pointerY = damp(state.pointerY, state.pointerTargetY, 7.8, delta);
-    state.scroll = damp(state.scroll, state.scrollTarget, 5.8, delta);
-
-    const floatY = Math.sin(elapsed * 0.85) * 0.08 * motionFactor;
-    const tiltX = -state.pointerY * 0.08 * motionFactor;
-    const tiltY = state.pointerX * 0.2 * motionFactor;
-    const scrollYaw = state.scroll * 0.3;
-    const scrollLift = state.scroll * -0.22;
-
-    if (laptop) {
-      laptopAnchor.rotation.x = damp(laptopAnchor.rotation.x, 0.08 + tiltX, 6.2, delta);
-      laptopAnchor.rotation.y = damp(laptopAnchor.rotation.y, 0.44 + tiltY + scrollYaw, 6.2, delta);
-      laptopAnchor.rotation.z = damp(laptopAnchor.rotation.z, -state.pointerX * 0.025 * motionFactor, 6.2, delta);
-      laptopAnchor.position.x = damp(laptopAnchor.position.x, 0.4 + state.pointerX * 0.22 * motionFactor, 5.8, delta);
-      laptopAnchor.position.y = damp(laptopAnchor.position.y, floatY + scrollLift, 5.8, delta);
-      laptopAnchor.position.z = damp(laptopAnchor.position.z, -0.6 - state.scroll * 0.5, 5.8, delta);
+    const idleTime = performance.now() - state.lastPointerMs;
+    if (idleTime > 900) {
+      state.pointerTargetX = damp(state.pointerTargetX, 0, 2.2, dt);
+      state.pointerTargetY = damp(state.pointerTargetY, 0, 2.2, dt);
     }
 
-    camera.position.x = damp(camera.position.x, 1.18 + state.pointerX * 0.16 * motionFactor, 4.6, delta);
-    camera.position.y = damp(camera.position.y, 1.05 - state.pointerY * 0.06 * motionFactor - state.scroll * 0.07, 4.6, delta);
-    camera.position.z = damp(camera.position.z, 6.3 + state.scroll * 0.2, 4.6, delta);
-    camera.lookAt(0.22, 0.3 - state.scroll * 0.06, -0.15);
+    const motionFactor = prefersReducedMotion ? 0.3 : 1;
 
-    stars.points.rotation.y += (0.008 + state.scroll * 0.025) * delta * motionFactor;
-    stars.points.rotation.x += 0.002 * delta * motionFactor;
-    stars.points.position.x = damp(stars.points.position.x, -state.pointerX * 0.5 * motionFactor, 2.5, delta);
-    stars.points.position.y = damp(stars.points.position.y, state.pointerY * 0.26 * motionFactor, 2.5, delta);
+    state.pointerX = damp(state.pointerX, state.pointerTargetX, prefersReducedMotion ? 2.8 : 10.2, dt);
+    state.pointerY = damp(state.pointerY, state.pointerTargetY, prefersReducedMotion ? 2.8 : 10.2, dt);
+    state.scroll = damp(state.scroll, state.scrollTarget, 6, dt);
+    const rawVelocity = (state.scroll - state.prevScroll) / Math.max(dt, 1 / 180);
+    state.scrollVelocity = damp(state.scrollVelocity, rawVelocity, 9, dt);
+    state.prevScroll = state.scroll;
+
+    const pointerCurveX = Math.tanh(state.pointerX * 1.22);
+    const pointerCurveY = Math.tanh(state.pointerY * 1.25);
+
+    const basePitch = 0.046 + Math.sin(t * 0.58) * 0.006 * motionFactor;
+    const baseYaw = 0.28 + state.scroll * 0.16;
+    const baseRoll = Math.sin(t * 0.45) * 0.006 * motionFactor;
+
+    const velocityKick = THREE.MathUtils.clamp(state.scrollVelocity * 0.22, -0.1, 0.1);
+    const targetPitch = basePitch - pointerCurveY * 0.09 * motionFactor - velocityKick * 0.18;
+    const targetYaw = baseYaw + pointerCurveX * 0.24 * motionFactor;
+    const targetRoll = baseRoll - pointerCurveX * 0.032 * motionFactor + velocityKick * 0.14;
+
+    state.rotX = damp(state.rotX, targetPitch, 8.8, dt);
+    state.rotY = damp(state.rotY, targetYaw, 8.8, dt);
+    state.rotZ = damp(state.rotZ, targetRoll, 7.2, dt);
+
+    laptop.root.rotation.set(state.rotX, state.rotY, state.rotZ);
+
+    const bob = Math.sin(t * 0.9) * 0.062 * motionFactor;
+    const sway = Math.sin(t * 0.45 + state.scroll * 1.45) * 0.038 * motionFactor;
+    const targetX = baseX + pointerCurveX * 0.29 * motionFactor + sway;
+    const targetY = 0.08 + bob - pointerCurveY * 0.05 * motionFactor - state.scroll * 0.22 - velocityKick * 0.04;
+    const targetZ = -0.36 - state.scroll * 0.62;
+
+    laptop.root.position.x = damp(laptop.root.position.x, targetX, 6.4, dt);
+    laptop.root.position.y = damp(laptop.root.position.y, targetY, 6.4, dt);
+    laptop.root.position.z = damp(laptop.root.position.z, targetZ, 6.4, dt);
+
+    const openAngle = -0.42 - state.scroll * 0.03 + Math.sin(t * 0.3) * 0.006 * motionFactor + velocityKick * 0.03;
+    laptop.lidPivot.rotation.x = damp(laptop.lidPivot.rotation.x, openAngle, 5, dt);
+
+    const pulse = 0.62 + Math.sin(t * 1.75) * 0.12 + state.scroll * 0.16 + Math.abs(state.scrollVelocity) * 0.04;
+    laptop.keyboardMat.emissiveIntensity = 0.28 + pulse * 0.24;
+    laptop.panelMat.emissiveIntensity = 0.34 + pulse * 0.17;
+    laptop.ledMat.emissiveIntensity = 0.58 + pulse * 0.42;
+    laptop.underGlowMat.opacity = 0.12 + pulse * 0.14;
+
+    const ledHue = 0.74 + Math.sin(t * 0.44 + state.scroll * 2.2) * 0.04;
+    frontLedColor.setHSL(ledHue, 0.74, 0.66);
+    laptop.ledMat.color.copy(frontLedColor);
+    laptop.ledMat.emissive.copy(frontLedColor).multiplyScalar(0.44);
+
+    if (!prefersReducedMotion && t - lastKeyboardColorTick > 0.028) {
+      lastKeyboardColorTick = t;
+      for (let i = 0; i < laptop.keyRows * laptop.keyCols; i++) {
+        const row = Math.floor(i / laptop.keyCols);
+        const col = i % laptop.keyCols;
+        const hue = 0.71 + (col / (laptop.keyCols - 1)) * 0.2 + Math.sin(t * 0.9 + row * 0.62 + state.scroll * 2.4) * 0.024;
+        const lightness = 0.49 + Math.sin(t * 1.7 + col * 0.4 + row * 0.2 + state.scroll * 5.2) * 0.08;
+        keyboardColor.setHSL((hue % 1 + 1) % 1, 0.74, THREE.MathUtils.clamp(lightness, 0.36, 0.68));
+        laptop.keys.setColorAt(i, keyboardColor);
+      }
+      if (laptop.keys.instanceColor) laptop.keys.instanceColor.needsUpdate = true;
+    }
+
+    screenDisplay.update(t, state.scroll, state.scrollVelocity, dt);
+
+    const mousePadReveal = clamp01((state.scroll - ACCESSORY_TUNING.padRevealStart) / ACCESSORY_TUNING.padRevealRange) * (prefersReducedMotion ? 0.72 : 1);
+    const mouseReveal = clamp01((state.scroll - ACCESSORY_TUNING.mouseRevealStart) / ACCESSORY_TUNING.mouseRevealRange) * (prefersReducedMotion ? 0.65 : 1);
+
+    // Keep accessories rigidly anchored to the laptop so they move exactly with it.
+    const carrierTargetX = isMobile ? ACCESSORY_TUNING.carrierXMobile : ACCESSORY_TUNING.carrierXDesktop;
+    const carrierTargetY = ACCESSORY_TUNING.carrierYBase + state.scroll * ACCESSORY_TUNING.carrierYScrollFactor;
+    const carrierTargetZ = isMobile ? ACCESSORY_TUNING.carrierZMobile : ACCESSORY_TUNING.carrierZDesktop;
+
+    accessoryCarrier.position.x = damp(accessoryCarrier.position.x, carrierTargetX, 7.2, dt);
+    accessoryCarrier.position.y = damp(accessoryCarrier.position.y, carrierTargetY, 7.2, dt);
+    accessoryCarrier.position.z = damp(accessoryCarrier.position.z, carrierTargetZ, 7.2, dt);
+    accessoryCarrier.rotation.x = damp(accessoryCarrier.rotation.x, 0, 7.2, dt);
+    accessoryCarrier.rotation.y = damp(accessoryCarrier.rotation.y, 0, 7.2, dt);
+    accessoryCarrier.rotation.z = damp(accessoryCarrier.rotation.z, 0, 7.2, dt);
+
+    mousePadAccessory.group.position.x = damp(mousePadAccessory.group.position.x, 0, 7.2, dt);
+    mousePadAccessory.group.position.y = damp(mousePadAccessory.group.position.y, 0, 7.2, dt);
+    mousePadAccessory.group.position.z = damp(mousePadAccessory.group.position.z, 0, 7.2, dt);
+    mousePadAccessory.group.rotation.x = damp(mousePadAccessory.group.rotation.x, 0, 7.2, dt);
+    mousePadAccessory.group.rotation.y = damp(mousePadAccessory.group.rotation.y, 0, 7.2, dt);
+    mousePadAccessory.group.rotation.z = damp(mousePadAccessory.group.rotation.z, 0, 7.2, dt);
+
+    const padScale = ACCESSORY_TUNING.minScale + mousePadReveal * ACCESSORY_TUNING.padScale;
+    mousePadAccessory.group.scale.set(padScale, padScale, padScale);
+    if (mousePadAccessory.edgeMat) {
+      if ('opacity' in mousePadAccessory.edgeMat) {
+        mousePadAccessory.edgeMat.opacity = ACCESSORY_TUNING.padEdgeOpacityBase + mousePadReveal * ACCESSORY_TUNING.padEdgeOpacityGain;
+      }
+      if ('emissiveIntensity' in mousePadAccessory.edgeMat) {
+        mousePadAccessory.edgeMat.emissiveIntensity = 0.24 + mousePadReveal * 0.42 + pulse * 0.1;
+      }
+    }
+    if (mousePadAccessory.glowMat && 'opacity' in mousePadAccessory.glowMat) {
+      mousePadAccessory.glowMat.opacity = ACCESSORY_TUNING.padGlowOpacityBase + mousePadReveal * ACCESSORY_TUNING.padGlowOpacityGain;
+    }
+
+    const mouseLocalX = (isMobile ? ACCESSORY_TUNING.mouseXMobile : ACCESSORY_TUNING.mouseXDesktop) + (1 - mouseReveal) * ACCESSORY_TUNING.mouseHiddenOffsetX;
+    const mouseLocalY = ACCESSORY_TUNING.mouseY;
+    const mouseLocalZ = ACCESSORY_TUNING.mouseZ;
+
+    mouseAccessory.group.position.x = damp(mouseAccessory.group.position.x, mouseLocalX, 7.2, dt);
+    mouseAccessory.group.position.y = damp(mouseAccessory.group.position.y, mouseLocalY, 7.2, dt);
+    mouseAccessory.group.position.z = damp(mouseAccessory.group.position.z, mouseLocalZ, 7.2, dt);
+
+    const mouseScale = ACCESSORY_TUNING.minScale + mouseReveal * ACCESSORY_TUNING.mouseScale;
+    mouseAccessory.group.scale.setScalar(mouseScale);
+    mouseAccessory.group.rotation.x = damp(mouseAccessory.group.rotation.x, ACCESSORY_TUNING.mouseRotX, 7.2, dt);
+    mouseAccessory.group.rotation.y = damp(mouseAccessory.group.rotation.y, ACCESSORY_TUNING.mouseRotY, 7.2, dt);
+    mouseAccessory.group.rotation.z = damp(mouseAccessory.group.rotation.z, ACCESSORY_TUNING.mouseRotZ, 7.2, dt);
+    if (mouseAccessory.wheel && mouseAccessory.wheel.rotation) {
+      mouseAccessory.wheel.rotation.z += (1.1 + state.scroll * 7 + Math.abs(state.scrollVelocity) * 4) * dt;
+    }
+    if (mouseAccessory.sideLedMat) {
+      if ('opacity' in mouseAccessory.sideLedMat) mouseAccessory.sideLedMat.opacity = 0.14 + mouseReveal * 0.46;
+      if ('emissiveIntensity' in mouseAccessory.sideLedMat) {
+        mouseAccessory.sideLedMat.emissiveIntensity = 0.5 + mouseReveal * 0.55 + pulse * 0.16;
+      }
+    }
+    if (mouseAccessory.glowMat && 'opacity' in mouseAccessory.glowMat) {
+      mouseAccessory.glowMat.opacity = 0.08 + mouseReveal * 0.24;
+    }
+
+    const camTargetX = (pointerCurveX * 0.34 + (isMobile ? 0.08 : 0.16) + state.scroll * 0.05) * motionFactor;
+    const camTargetY = (1.18 - pointerCurveY * 0.062 - state.scroll * 0.055) * motionFactor + (1 - motionFactor) * 0.34;
+    const camTargetZ = 7.0 + state.scroll * 0.17;
+
+    camera.position.x = damp(camera.position.x, camTargetX, 4.7, dt);
+    camera.position.y = damp(camera.position.y, camTargetY, 4.7, dt);
+    camera.position.z = damp(camera.position.z, camTargetZ, 4.2, dt);
+    camera.lookAt(baseX * 0.38, 0.26 - state.scroll * 0.045, -0.06);
+
+    starLayers.forEach((layer, index) => {
+      const depth = 1 + index * 0.28;
+      layer.points.rotation.y += layer.speed * depth * dt * (1 + state.scroll * 0.7) * motionFactor;
+      layer.points.rotation.x += layer.speed * 0.28 * dt * motionFactor;
+
+      const layerX = -state.pointerX * layer.parallax * 0.7 * motionFactor;
+      const layerY = state.pointerY * layer.parallax * 0.58 * motionFactor;
+
+      layer.points.position.x = damp(layer.points.position.x, layerX, 2.5, dt);
+      layer.points.position.y = damp(layer.points.position.y, layerY, 2.5, dt);
+      layer.points.position.z = Math.sin(t * 0.22 + layer.phase) * 0.25 * depth * motionFactor;
+
+      layer.material.opacity = layer.baseOpacity * (1 - layer.twinkleAmount + Math.sin(t * layer.twinkleSpeed + layer.phase) * layer.twinkleAmount);
+    });
 
     renderer.render(scene, camera);
-  };
+  }
 
   render();
 
   return () => {
-    destroyed = true;
     cancelAnimationFrame(rafId);
+    isDestroyed = true;
+
     window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerdown', onPointerDown);
+    window.removeEventListener('mousemove', onMouseMove);
+    window.removeEventListener('touchstart', onTouchStart);
+    window.removeEventListener('touchmove', onTouchMove);
+    window.removeEventListener('blur', resetPointer);
+    document.removeEventListener('visibilitychange', onVisibilityChange);
     window.removeEventListener('scroll', onScroll);
     window.removeEventListener('resize', onResize);
-    window.removeEventListener('warp:motion-mode', onMotionPreference);
-    if (reducedMotionQuery.removeEventListener) reducedMotionQuery.removeEventListener('change', onReducedMotionChange);
-    else reducedMotionQuery.removeListener(onReducedMotionChange);
+    window.removeEventListener('keydown', onKeyDown);
+    window.removeEventListener('warp:motion-mode', onMotionModeChange);
+    window.removeEventListener('warp:project-registry', onProjectRegistry);
+    window.removeEventListener('warp:terminal-run-project', onTerminalRunProject);
+    window.removeEventListener('warp:terminal-focus', onTerminalFocus);
 
-    if (laptop) {
-      laptopAnchor.remove(laptop);
-      disposeObject(laptop);
+    if (reducedMotionQuery.removeEventListener) {
+      reducedMotionQuery.removeEventListener('change', onReducedMotionChange);
+    } else {
+      reducedMotionQuery.removeListener(onReducedMotionChange);
     }
 
-    scene.remove(stars.points);
-    stars.geometry.dispose();
-    stars.material.dispose();
+    starLayers.forEach((layer) => {
+      layer.geometry.dispose();
+      layer.material.dispose();
+    });
+
+    laptop.geometries.forEach((geometry) => geometry.dispose());
+    laptop.materials.forEach((material) => material.dispose());
+    disposeAccessoryResources(mousePadAccessory);
+    disposeAccessoryResources(mouseAccessory);
+
+    starTexture.dispose();
+    shadowTexture.dispose();
+    glowTexture.dispose();
+    screenDisplay.texture.dispose();
+
+    envRT.dispose();
+    pmrem.dispose();
     renderer.dispose();
   };
 }
