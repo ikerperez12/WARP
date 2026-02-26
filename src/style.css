@@ -2197,6 +2197,180 @@ body[data-cursor='off'] .custom-cursor-dot {
 }
 
 /* ========================================
+   Stock Composition Section
+   ======================================== */
+.stock-composition-section {
+  padding: var(--section-padding) 0 calc(var(--section-padding) + 30px);
+  background:
+    radial-gradient(900px 520px at 14% 18%, rgba(96, 165, 250, 0.11), transparent 60%),
+    radial-gradient(780px 460px at 84% 82%, rgba(255, 107, 157, 0.1), transparent 58%),
+    linear-gradient(180deg, rgba(7, 9, 18, 0.98), rgba(8, 10, 18, 1));
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.stock-composition-scroll {
+  position: relative;
+  min-height: 320vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(270px, 0.8fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.stock-composition-stage,
+.stock-composition-script {
+  position: sticky;
+  top: calc(var(--nav-height) + 18px);
+}
+
+.stock-composition-stage {
+  min-height: calc(100vh - var(--nav-height) - 34px);
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  background: rgba(9, 12, 24, 0.9);
+  box-shadow: 0 24px 52px rgba(2, 4, 12, 0.44);
+  isolation: isolate;
+}
+
+.stock-composition-stack {
+  position: absolute;
+  inset: 0;
+}
+
+.stock-composition-frame {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translate3d(0, 0, 0) scale(1.02);
+  transition: opacity var(--motion-base) linear, transform var(--motion-medium) var(--ease-premium);
+  will-change: opacity, transform;
+}
+
+.stock-composition-frame.is-active {
+  opacity: 1;
+}
+
+.stock-composition-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.06) contrast(1.05);
+}
+
+.stock-composition-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(160deg, rgba(6, 8, 15, 0.62), rgba(6, 8, 15, 0.16) 48%, rgba(6, 8, 15, 0.58)),
+    radial-gradient(circle at 82% 22%, rgba(96, 165, 250, 0.22), transparent 54%);
+}
+
+.stock-composition-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(0, 0, 0, 0) 42%, rgba(0, 0, 0, 0.64) 100%),
+    linear-gradient(180deg, rgba(7, 9, 16, 0.14), rgba(7, 9, 16, 0.62) 88%);
+  z-index: 2;
+}
+
+.stock-composition-overlay {
+  position: relative;
+  z-index: 3;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: clamp(22px, 4vw, 34px);
+}
+
+.stock-composition-overlay h3 {
+  font-size: clamp(1.3rem, 2.6vw, 2.05rem);
+  line-height: 1.2;
+  max-width: 20ch;
+}
+
+.stock-composition-overlay p {
+  max-width: 52ch;
+  color: rgba(226, 234, 255, 0.9);
+  line-height: 1.68;
+}
+
+.stock-composition-progress-track {
+  width: min(360px, 100%);
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.stock-composition-progress-bar {
+  display: block;
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #60a5fa, #c084fc, #ff6b9d);
+  transition: width var(--motion-fast) linear;
+}
+
+.stock-composition-script {
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(10, 13, 24, 0.85);
+  padding: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.stock-composition-steps {
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.stock-composition-step {
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 12px 13px;
+  transition: border-color var(--motion-base) var(--ease-premium), background var(--motion-base) var(--ease-premium), transform var(--motion-base) var(--ease-premium);
+}
+
+.stock-composition-step.is-active {
+  border-color: rgba(96, 165, 250, 0.56);
+  background: rgba(96, 165, 250, 0.16);
+  transform: translateX(2px);
+}
+
+.stock-composition-time {
+  display: inline-flex;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.28px;
+  text-transform: uppercase;
+  color: rgba(210, 223, 255, 0.78);
+  margin-bottom: 6px;
+}
+
+.stock-composition-step p {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  line-height: 1.56;
+}
+
+.stock-composition-caption {
+  margin-top: 12px;
+  font-size: 0.8rem;
+  color: rgba(206, 220, 255, 0.84);
+  text-transform: uppercase;
+  letter-spacing: 0.26px;
+}
+
+/* ========================================
    Footer
    ======================================== */
 .footer {
@@ -2345,6 +2519,16 @@ body[data-cursor='off'] .custom-cursor-dot {
 
   .motion-visual {
     min-height: 260px;
+  }
+
+  .stock-composition-scroll {
+    grid-template-columns: 1fr;
+    min-height: 280vh;
+  }
+
+  .stock-composition-script {
+    position: relative;
+    top: auto;
   }
 }
 
@@ -2506,6 +2690,24 @@ body[data-cursor='off'] .custom-cursor-dot {
     border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 
+  .stock-composition-scroll {
+    min-height: 240vh;
+    gap: 14px;
+  }
+
+  .stock-composition-stage {
+    top: calc(var(--nav-height) + 10px);
+    min-height: min(72vh, 560px);
+  }
+
+  .stock-composition-overlay {
+    padding: 20px;
+  }
+
+  .stock-composition-overlay p {
+    font-size: 0.94rem;
+  }
+
   .timeline::before {
     left: 0;
   }
@@ -2612,6 +2814,23 @@ body[data-cursor='off'] .custom-cursor-dot {
   .motion-ui h3 {
     font-size: 1.14rem;
   }
+
+  .stock-composition-scroll {
+    min-height: 210vh;
+  }
+
+  .stock-composition-stage {
+    min-height: 62vh;
+    border-radius: 16px;
+  }
+
+  .stock-composition-step {
+    padding: 10px 11px;
+  }
+
+  .stock-composition-step p {
+    font-size: 0.82rem;
+  }
 }
 
 /* ========================================
@@ -2693,6 +2912,9 @@ body[data-motion='reduced'] .service-chip,
 body[data-motion='reduced'] .narrative-video,
 body[data-motion='reduced'] .motion-video-shell video,
 body[data-motion='reduced'] .motion-progress-bar,
+body[data-motion='reduced'] .stock-composition-frame,
+body[data-motion='reduced'] .stock-composition-progress-bar,
+body[data-motion='reduced'] .stock-composition-step,
 body[data-motion='reduced'] .highlight,
 body[data-motion='reduced'] .timeline-content,
 body[data-motion='reduced'] .contact-card,
@@ -2706,6 +2928,10 @@ body[data-motion='reduced'] .ticker-track {
 
 body[data-motion='reduced'] .narrative-video,
 body[data-motion='reduced'] .motion-video-shell video {
+  transform: none !important;
+}
+
+body[data-motion='reduced'] .stock-composition-frame {
   transform: none !important;
 }
 

@@ -424,6 +424,55 @@ document.addEventListener('DOMContentLoaded', () => {
   const motionDemo = document.getElementById('motion-demo');
   const motionProgressBar = document.getElementById('motion-progress-bar');
   const motionVideo = document.getElementById('motion-video');
+  const stockCompositionScroll = document.getElementById('stock-composition-scroll');
+  const stockCompositionStage = document.getElementById('stock-composition-stage');
+  const stockCompositionFrames = Array.from(document.querySelectorAll('.stock-composition-frame'));
+  const stockCompositionSteps = Array.from(document.querySelectorAll('#stock-composition-steps .stock-composition-step'));
+  const stockCompositionProgressBar = document.getElementById('stock-composition-progress-bar');
+  const stockCompositionCaption = document.getElementById('stock-composition-caption');
+
+  const updateStockComposition = (progress) => {
+    if (!stockCompositionFrames.length) return;
+    const reduced = isReduced();
+    const frameCount = stockCompositionFrames.length;
+    const maxIndex = Math.max(frameCount - 1, 1);
+    const timelinePosition = progress * maxIndex;
+    const lowerIndex = Math.floor(timelinePosition);
+    const upperIndex = Math.min(frameCount - 1, lowerIndex + 1);
+    const blend = timelinePosition - lowerIndex;
+    const activeIndex = Math.round(timelinePosition);
+
+    stockCompositionFrames.forEach((frame, index) => {
+      let opacity = 0;
+      if (reduced) {
+        opacity = index === activeIndex ? 1 : 0;
+        frame.style.transform = 'none';
+      } else {
+        if (index === lowerIndex) opacity = 1 - blend;
+        else if (index === upperIndex) opacity = blend;
+        const depth = index - timelinePosition;
+        const translateX = clamp(depth * -10, -26, 26);
+        const translateY = Math.abs(depth) * 18;
+        const scale = 1 - Math.min(0.14, Math.abs(depth) * 0.035);
+        frame.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
+      }
+      frame.style.opacity = opacity.toFixed(3);
+      frame.classList.toggle('is-active', index === activeIndex);
+    });
+
+    if (stockCompositionSteps.length) {
+      const stepIndex = Math.min(stockCompositionSteps.length - 1, Math.round(progress * (stockCompositionSteps.length - 1)));
+      stockCompositionSteps.forEach((step, index) => {
+        const active = index === stepIndex;
+        step.classList.toggle('is-active', active);
+        if (active) step.setAttribute('aria-current', 'step');
+        else step.removeAttribute('aria-current');
+      });
+    }
+
+    if (stockCompositionProgressBar) stockCompositionProgressBar.style.width = `${(progress * 100).toFixed(1)}%`;
+    if (stockCompositionCaption) stockCompositionCaption.textContent = `Plano ${Math.min(frameCount, activeIndex + 1)} de ${frameCount}`;
+  };
 
   const onScroll = () => {
     const y = window.scrollY;
@@ -486,6 +535,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (Math.abs(motionVideo.currentTime - targetTime) > 0.18) motionVideo.currentTime = targetTime;
       }
     }
+
+    if (stockCompositionScroll && stockCompositionStage && stockCompositionFrames.length) {
+      const rect = stockCompositionScroll.getBoundingClientRect();
+      const range = Math.max(rect.height - window.innerHeight, 1);
+      const stockProgress = clamp(-rect.top / range, 0, 1);
+      stockCompositionStage.style.setProperty('--stock-progress', stockProgress.toFixed(3));
+      updateStockComposition(stockProgress);
+    }
   };
 
   window.addEventListener('scroll', () => {
@@ -497,6 +554,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }, { passive: true });
   onScroll();
+  window.addEventListener('warp:motion-mode', onScroll);
+  if (typeof reducedMotionMedia.addEventListener === 'function') reducedMotionMedia.addEventListener('change', onScroll);
+  else if (typeof reducedMotionMedia.addListener === 'function') reducedMotionMedia.addListener(onScroll);
   if (backToTop) backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: isReduced() ? 'auto' : 'smooth' }));
 
   const navToggle = document.getElementById('nav-toggle');
