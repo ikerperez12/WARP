@@ -1,6 +1,8 @@
 import { toText } from '../utils/helpers.js';
 import { announce } from '../utils/dom.js';
 
+const EMAIL_PATTERN = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+
 export function initContactForm() {
   const contactForm = document.getElementById('contact-form');
   const contactStatus = document.getElementById('contact-status');
@@ -97,13 +99,16 @@ export function initContactForm() {
       announce('Contact form has missing fields.');
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!EMAIL_PATTERN.test(email)) {
       setFormStatus('El email no es valido.', 'error');
       announce('Invalid email format.');
       return;
     }
 
-    if (submitButton) submitButton.disabled = true;
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.classList.add('is-loading');
+    }
     if (submitText) submitText.textContent = 'Enviando...';
     setFormStatus('Enviando mensaje de forma segura...', '');
 
@@ -158,7 +163,10 @@ export function initContactForm() {
       if (contactError) contactError.classList.remove('is-hidden');
       announce('Message send failed.');
     } finally {
-      if (submitButton) submitButton.disabled = false;
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.classList.remove('is-loading');
+      }
       if (submitText) submitText.textContent = idleText;
     }
   });

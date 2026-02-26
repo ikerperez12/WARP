@@ -122,7 +122,7 @@ function fetchProjects() {
   projectMap.clear();
   projectRegistry.forEach((item) => projectMap.set(item.id, item));
 
-  fetch('/projects.json', { cache: 'no-store' })
+  fetch('/projects.json')
     .then((response) => (response.ok ? response.json() : Promise.reject(new Error(`HTTP ${response.status}`))))
     .then((data) => {
       const normalized = Array.isArray(data)

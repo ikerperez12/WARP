@@ -6,7 +6,7 @@ const MAX_EMAIL = 180;
 const MAX_TOPIC = 80;
 const MAX_MESSAGE = 4000;
 const PROVIDER_TIMEOUT_MS = 12_000;
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_PATTERN = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
 
 const rateStore = globalThis.__warpContactRateStore || new Map();
 globalThis.__warpContactRateStore = rateStore;
