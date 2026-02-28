@@ -1,4 +1,4 @@
-import { writeFile } from 'node:fs/promises';
+﻿import { writeFile } from 'node:fs/promises';
 
 const USERNAME = 'ikerperez12';
 const OUTPUT_PATH = new URL('../public/projects.json', import.meta.url);
@@ -199,3 +199,4 @@ main().catch((error) => {
   console.error('[sync:projects] failed', error);
   process.exitCode = 1;
 });
+

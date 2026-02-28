@@ -4,6 +4,7 @@ import { initUI } from './features/ui.js';
 import { initCursor } from './features/cursor.js';
 import { initScroll } from './features/scroll.js';
 import { initProjects } from './features/projects.js';
+import { initSiteContent } from './features/site-content.js';
 import { initStats } from './features/stats.js';
 import { initContactForm } from './features/contact.js';
 import { initImmersiveSections } from './features/immersive.js';
@@ -26,6 +27,7 @@ if (import.meta.hot) {
 
 document.addEventListener('DOMContentLoaded', () => {
   initLiveRegion();
+  initSiteContent();
   initUI();
   initCursor();
   initScroll();

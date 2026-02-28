@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>WARP Admin</title>
+  <link rel="stylesheet" href="/src/style.css" />
+  <link rel="stylesheet" href="/src/admin.css" />
+</head>
+<body class="admin-page">
+  <main class="admin-shell">
+    <section class="admin-topbar">
+      <div>
+        <div class="footer-logo"><span class="logo-bracket">&lt;</span>IP<span class="logo-bracket">/&gt;</span></div>
+        <div class="admin-meta">
+          <span>Panel seguro de contenido</span>
+          <span>Sesion protegida por cookie HttpOnly</span>
+          <span>Persistencia en Vercel KV</span>
+        </div>
+      </div>
+      <div class="admin-actions">
+        <button class="btn btn-secondary" id="admin-refresh-preview" type="button">Recargar preview</button>
+        <button class="btn btn-secondary admin-hidden" id="admin-logout" type="button">Cerrar sesion</button>
+      </div>
+    </section>
+
+    <section class="admin-grid">
+      <div class="admin-stack">
+        <article class="admin-card" id="admin-login-card">
+          <h1>Acceso de editor</h1>
+          <p>Solo servidor. Las credenciales no se guardan en cliente y la sesion va en cookie segura.</p>
+          <form class="admin-form" id="admin-login-form">
+            <label>Usuario
+              <input type="text" name="username" autocomplete="username" required />
+            </label>
+            <label>Contraseña
+              <input type="password" name="password" autocomplete="current-password" required />
+            </label>
+            <div class="admin-actions">
+              <button class="btn btn-primary" type="submit">Entrar</button>
+            </div>
+          </form>
+          <div class="admin-status" id="admin-login-status"></div>
+        </article>
+
+        <article class="admin-card admin-hidden" id="admin-content-card">
+          <h2>Contenido global</h2>
+          <p>Edita el JSON que alimenta metadatos, hero y contacto.</p>
+          <form class="admin-form" id="admin-content-form">
+            <textarea id="admin-content-editor" spellcheck="false"></textarea>
+            <div class="admin-actions">
+              <button class="btn btn-primary" type="submit">Guardar contenido</button>
+            </div>
+          </form>
+          <div class="admin-status" id="admin-content-status"></div>
+        </article>
+
+        <article class="admin-card admin-hidden" id="admin-projects-card">
+          <h2>Proyectos</h2>
+          <p>Edita el array de proyectos visible en la web. Puedes mezclar repos sincronizados con cambios manuales.</p>
+          <form class="admin-form" id="admin-projects-form">
+            <textarea id="admin-projects-editor" spellcheck="false"></textarea>
+            <div class="admin-actions">
+              <button class="btn btn-primary" type="submit">Guardar proyectos</button>
+            </div>
+          </form>
+          <div class="admin-status" id="admin-projects-status"></div>
+        </article>
+      </div>
+
+      <article class="admin-card admin-preview">
+        <h2>Vista previa</h2>
+        <p>La preview carga la misma portada publica que vera el usuario final.</p>
+        <iframe id="admin-preview-frame" src="/" title="Vista previa del portfolio"></iframe>
+      </article>
+    </section>
+  </main>
+
+  <script type="module" src="/src/admin.js"></script>
+</body>
+</html>

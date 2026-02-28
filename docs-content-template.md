@@ -1,4 +1,4 @@
-# Plantilla editable del portfolio
+﻿# Plantilla editable del portfolio
 
 Archivo principal: `content-template.json`
 
@@ -49,3 +49,4 @@ Eso rehace `public/projects.json` con repos publicos recientes de `ikerperez12`.
 2. Edita `public/projects.json` si quieres curar manualmente algun proyecto.
 3. Si prefieres refresco automatico, usa `npm run sync:projects`.
 4. Cuando me pases los cambios, adapto la web al nuevo contenido.
+
