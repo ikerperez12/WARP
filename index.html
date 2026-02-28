@@ -135,7 +135,7 @@
       <div class="hero-content">
         <div class="hero-badge anim-fade-up">
           <span class="badge-dot"></span>
-          Disponible para prácticas y proyectos tech de alto impacto
+          <span class="hero-badge-text">Disponible para prácticas y proyectos tech de alto impacto</span>
         </div>
         <h1 class="hero-title">
           <span class="hero-line anim-fade-up delay-100">Iker Perez Garcia</span>
@@ -143,9 +143,9 @@
           <span class="hero-line anim-fade-up delay-300">Product Engineer</span>
         </h1>
         <p class="hero-description anim-fade-up delay-400">
-          Ingeniero de Software especializado en crear sistemas distribuidos, seguros y de alto rendimiento. 
+          <span class="hero-description-text">Ingeniero de Software especializado en crear sistemas distribuidos, seguros y de alto rendimiento. 
           Enfoque integral en arquitectura backend, hardening de sistemas y experiencias de usuario inmersivas.
-          Especial interés en <span class="typed-text" id="typed-text"></span><span class="cursor">|</span>
+          Especial interés en</span> <span class="typed-text" id="typed-text"></span><span class="cursor">|</span>
         </p>
         <div class="hero-value-grid anim-fade-up delay-450">
           <div class="hero-value-pill">SICUE en UPM - enfoque empresarial</div>
@@ -484,118 +484,33 @@
         </div>
         <p class="project-filter-status anim-reveal" id="project-filter-status" aria-live="polite"></p>
 
-        <div class="projects-grid">
-          <article class="project-card anim-reveal" data-project-id="fullstack-product-engineering" data-domain="web frontend ux core production">
+        <div class="project-data-strip anim-reveal">
+          <span class="project-data-pill">Repos actualizados desde GitHub</span>
+          <span class="project-data-pill">Portadas con preview visual</span>
+          <span class="project-data-pill">Curacion editable en <code>public/projects.json</code></span>
+        </div>
+
+        <div class="projects-grid" id="projects-grid">
+          <article class="project-card is-skeleton">
             <div class="project-image">
-              <div class="project-image-placeholder accent-1">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-              </div>
-              <div class="project-overlay">
-                <a href="https://github.com/ikerperez12" rel="noopener noreferrer" class="project-link" aria-label="Abrir repositorio en GitHub">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                </a>
-              </div>
+              <div class="project-image-placeholder accent-1"></div>
             </div>
             <div class="project-info">
-              <div class="project-tags"><span>React</span><span>Node.js</span><span>UX</span><span>API</span></div>
-              <h3 class="project-title">Full-stack Product Engineering</h3>
-              <p class="project-desc">Aplicaciones web mantenibles con frontend moderno, backend robusto y foco en seguridad desde el diseño.</p>
-              <p class="project-impact"><strong>Impacto:</strong> mejor tiempo de entrega y experiencia de usuario consistente en desktop y mobile.</p>
+              <div class="project-tags"><span></span><span></span><span></span></div>
+              <div class="project-title"></div>
+              <div class="project-desc"></div>
+              <div class="project-desc"></div>
             </div>
           </article>
-
-          <article class="project-card anim-reveal" data-project-id="ia-ml-nlp-lab" data-domain="ai data exploratory">
+          <article class="project-card is-skeleton">
             <div class="project-image">
-              <div class="project-image-placeholder accent-2">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-              </div>
-              <div class="project-overlay">
-                <a href="https://github.com/ikerperez12" rel="noopener noreferrer" class="project-link" aria-label="Abrir repositorio en GitHub">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                </a>
-              </div>
+              <div class="project-image-placeholder accent-2"></div>
             </div>
             <div class="project-info">
-              <div class="project-tags"><span>Python</span><span>NLP</span><span>Streamlit</span><span>Kaggle</span></div>
-              <h3 class="project-title">IA, ML y NLP Lab</h3>
-              <p class="project-desc">Prototipos aplicados de IA y analítica para validar ideas, medir resultados y escalar soluciones útiles.</p>
-              <p class="project-impact"><strong>Impacto:</strong> aceleracion de discovery tecnico y pruebas rapidas de producto.</p>
-            </div>
-          </article>
-
-          <article class="project-card anim-reveal" data-project-id="cybersecurity-lab" data-domain="security backend core production">
-            <div class="project-image">
-              <div class="project-image-placeholder accent-3">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              </div>
-              <div class="project-overlay">
-                <a href="https://github.com/ikerperez12" rel="noopener noreferrer" class="project-link" aria-label="Abrir repositorio en GitHub">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                </a>
-              </div>
-            </div>
-            <div class="project-info">
-              <div class="project-tags"><span>PQC</span><span>Wireshark</span><span>Hardening</span><span>Auditing</span></div>
-              <h3 class="project-title">Laboratorio de ciberseguridad</h3>
-              <p class="project-desc">Analisis de trafico, pruebas de seguridad y estudio de criptografia post-cuantica en entorno controlado.</p>
-              <p class="project-impact"><strong>Impacto:</strong> deteccion temprana de riesgos y mejor postura de seguridad en desarrollo.</p>
-            </div>
-          </article>
-
-          <article class="project-card anim-reveal" data-project-id="cloud-cicd-automation" data-domain="cloud backend production">
-            <div class="project-image">
-              <div class="project-image-placeholder accent-4">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-              </div>
-              <div class="project-overlay">
-                <a href="https://github.com/ikerperez12" rel="noopener noreferrer" class="project-link" aria-label="Abrir repositorio en GitHub">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                </a>
-              </div>
-            </div>
-            <div class="project-info">
-              <div class="project-tags"><span>AWS</span><span>Azure</span><span>CI/CD</span><span>Docker</span></div>
-              <h3 class="project-title">Cloud y automatización de despliegues</h3>
-              <p class="project-desc">Entornos reproducibles, pipelines CI/CD y automatización de despliegues con foco en trazabilidad.</p>
-              <p class="project-impact"><strong>Impacto:</strong> menos errores manuales y releases mas estables.</p>
-            </div>
-          </article>
-
-          <article class="project-card anim-reveal" data-project-id="data-architecture-sql" data-domain="backend data core exploratory">
-            <div class="project-image">
-              <div class="project-image-placeholder accent-2">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-              </div>
-              <div class="project-overlay">
-                <a href="https://github.com/ikerperez12" rel="noopener noreferrer" class="project-link" aria-label="Abrir repositorio en GitHub">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                </a>
-              </div>
-            </div>
-            <div class="project-info">
-              <div class="project-tags"><span>SQL</span><span>PostgreSQL</span><span>Modeling</span><span>Performance</span></div>
-              <h3 class="project-title">Arquitectura de datos y SQL</h3>
-              <p class="project-desc">Modelado relacional y consultas optimizadas para productos orientados a datos y escalabilidad sostenible.</p>
-              <p class="project-impact"><strong>Impacto:</strong> tiempos de respuesta mas bajos y base de datos preparada para crecer.</p>
-            </div>
-          </article>
-
-          <article class="project-card anim-reveal" data-project-id="systems-hardware-infra" data-domain="backend systems production core">
-            <div class="project-image">
-              <div class="project-image-placeholder accent-1">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M7 20h10"/><path d="M9 16v4"/><path d="M15 16v4"/></svg>
-              </div>
-              <div class="project-overlay">
-                <a href="https://github.com/ikerperez12" rel="noopener noreferrer" class="project-link" aria-label="Abrir repositorio en GitHub">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                </a>
-              </div>
-            </div>
-            <div class="project-info">
-              <div class="project-tags"><span>Linux</span><span>Networks</span><span>Diagnostics</span><span>Automation</span></div>
-              <h3 class="project-title">Systems Reliability Lab</h3>
-              <p class="project-desc">Integración de software + infraestructura para diagnóstico, estabilización de entornos y mejora operativa continua.</p>
-              <p class="project-impact"><strong>Impacto:</strong> menos incidencias de producción y mayor fiabilidad en sistemas reales.</p>
+              <div class="project-tags"><span></span><span></span><span></span></div>
+              <div class="project-title"></div>
+              <div class="project-desc"></div>
+              <div class="project-desc"></div>
             </div>
           </article>
         </div>
