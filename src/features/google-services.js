@@ -12,6 +12,11 @@ export function initGoogleServicesSection() {
     if (!count) return;
     const visible = cards.filter((card) => card.style.display !== 'none').length;
     count.textContent = String(visible);
+    const countLabel = root.querySelector('.google-count');
+    if (countLabel) {
+      const isEn = document.documentElement.lang === 'en';
+      countLabel.childNodes[0].textContent = isEn ? 'Visible cases: ' : 'Casos visibles: ';
+    }
   };
 
   const applyFilters = () => {
@@ -50,7 +55,8 @@ export function initGoogleServicesSection() {
       const text = button.dataset.copy || '';
       if (!text) return;
 
-      const previous = button.textContent || 'Copy link';
+      const isEn = document.documentElement.lang === 'en';
+      const previous = button.textContent || (isEn ? 'Copy stack' : 'Copiar stack');
       button.disabled = true;
 
       try {
@@ -59,9 +65,9 @@ export function initGoogleServicesSection() {
         } else {
           fallbackCopy(text);
         }
-        button.textContent = 'Copied';
+        button.textContent = isEn ? 'Copied' : 'Copiado';
       } catch {
-        button.textContent = 'Copy failed';
+        button.textContent = isEn ? 'Copy failed' : 'Copia fallida';
       } finally {
         window.setTimeout(() => {
           button.textContent = previous;
@@ -69,5 +75,16 @@ export function initGoogleServicesSection() {
         }, 1200);
       }
     });
+  });
+
+  window.addEventListener('warp:lang-changed', () => {
+    const isEn = document.documentElement.lang === 'en';
+    root.querySelector('label[for="google-service-filter"]')?.replaceChildren(isEn ? 'Objective' : 'Objetivo');
+    root.querySelector('label[for="google-search-service"]')?.replaceChildren(isEn ? 'Search case' : 'Buscar caso');
+    if (search) search.placeholder = isEn ? 'Eg: deploy, observability, AI, data...' : 'Ej: deploy, observabilidad, IA, datos...';
+    root.querySelectorAll('.google-service-copy').forEach((button) => {
+      button.textContent = isEn ? 'Copy stack' : 'Copiar stack';
+    });
+    updateCount();
   });
 }

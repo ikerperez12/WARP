@@ -46,12 +46,45 @@ let activeProjectFilter = 'all';
 let activeServiceFilter = 'all';
 let projectRegistry = FALLBACK_PROJECTS.slice();
 const projectMap = new Map();
+const PROJECT_COPY = {
+  es: {
+    allCategories: 'todas las categorias',
+    showing: (shown, total, label) => `Mostrando ${shown} de ${total} proyectos (${label})`,
+    updated: 'Actualizado',
+    updatedToday: 'Actualizado hoy',
+    agoDays: (days) => `Hace ${days} dias`,
+    topPick: 'Top pick',
+    github: 'GitHub',
+    impact: 'Impacto:',
+    stackBase: 'stack base',
+    stars: 'stars',
+    forks: 'forks',
+  },
+  en: {
+    allCategories: 'all categories',
+    showing: (shown, total, label) => `Showing ${shown} of ${total} projects (${label})`,
+    updated: 'Updated',
+    updatedToday: 'Updated today',
+    agoDays: (days) => `${days} days ago`,
+    topPick: 'Top pick',
+    github: 'GitHub',
+    impact: 'Impact:',
+    stackBase: 'core stack',
+    stars: 'stars',
+    forks: 'forks',
+  },
+};
 
 export function initProjects() {
   initFilters();
   applyProjectFilter(activeProjectFilter);
   applyServiceFilter(activeServiceFilter);
   fetchProjects();
+  window.addEventListener('warp:lang-changed', () => {
+    renderProjectCards();
+    initCardInteractions();
+    applyProjectFilter(activeProjectFilter);
+  });
 }
 
 function initFilters() {
@@ -116,8 +149,9 @@ function applyProjectFilter(filter) {
 
   const status = document.getElementById('project-filter-status');
   if (status) {
-    const label = activeProjectFilter === 'all' ? 'todas las categorias' : activeProjectFilter;
-    status.textContent = `Mostrando ${shown} de ${cards.length} proyectos (${label})`;
+    const copy = PROJECT_COPY[document.documentElement.lang === 'en' ? 'en' : 'es'];
+    const label = activeProjectFilter === 'all' ? copy.allCategories : activeProjectFilter;
+    status.textContent = copy.showing(shown, cards.length, label);
   }
 
   if (!isReduced()) {
@@ -215,11 +249,12 @@ function renderProjectCards() {
 }
 
 function createProjectCardMarkup(project, index) {
+  const copy = PROJECT_COPY[document.documentElement.lang === 'en' ? 'en' : 'es'];
   const updatedLabel = formatRelativeDate(project.updatedAt);
   const metrics = [
-    `<li><strong>${project.language}</strong><span>stack base</span></li>`,
-    `<li><strong>${project.stars}</strong><span>stars</span></li>`,
-    `<li><strong>${project.forks}</strong><span>forks</span></li>`,
+    `<li><strong>${project.language}</strong><span>${copy.stackBase}</span></li>`,
+    `<li><strong>${project.stars}</strong><span>${copy.stars}</span></li>`,
+    `<li><strong>${project.forks}</strong><span>${copy.forks}</span></li>`,
   ].join('');
 
   const actions = [
@@ -247,7 +282,7 @@ function createProjectCardMarkup(project, index) {
           <div class="project-actions">${actions.join('')}</div>
         </div>
         <div class="project-badges">
-          <span class="project-flag">${index < 3 ? 'Top pick' : 'GitHub'}</span>
+          <span class="project-flag">${index < 3 ? copy.topPick : copy.github}</span>
           <span class="project-update">${escapeHtml(updatedLabel)}</span>
         </div>
       </div>
@@ -256,7 +291,7 @@ function createProjectCardMarkup(project, index) {
         <h3 class="project-title">${escapeHtml(project.name)}</h3>
         <p class="project-desc">${escapeHtml(project.description)}</p>
         <ul class="project-metrics">${metrics}</ul>
-        <p class="project-impact"><strong>Impacto:</strong> ${escapeHtml(project.impact)}</p>
+        <p class="project-impact"><strong>${copy.impact}</strong> ${escapeHtml(project.impact)}</p>
       </div>
     </article>
   `;
@@ -279,13 +314,14 @@ function bindCardMediaFallbacks(grid) {
 }
 
 function formatRelativeDate(value) {
-  if (!value) return 'Actualizado';
+  const copy = PROJECT_COPY[document.documentElement.lang === 'en' ? 'en' : 'es'];
+  if (!value) return copy.updated;
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return 'Actualizado';
+  if (Number.isNaN(date.getTime())) return copy.updated;
   const diffDays = Math.max(0, Math.round((Date.now() - date.getTime()) / 86400000));
-  if (diffDays <= 1) return 'Actualizado hoy';
-  if (diffDays < 30) return `Hace ${diffDays} dias`;
-  const formatter = new Intl.DateTimeFormat('es-ES', { month: 'short', year: 'numeric' });
+  if (diffDays <= 1) return copy.updatedToday;
+  if (diffDays < 30) return copy.agoDays(diffDays);
+  const formatter = new Intl.DateTimeFormat(document.documentElement.lang === 'en' ? 'en-US' : 'es-ES', { month: 'short', year: 'numeric' });
   return formatter.format(date);
 }
 

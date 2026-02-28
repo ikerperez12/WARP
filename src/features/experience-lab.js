@@ -30,6 +30,7 @@ function initFlowSimulator() {
     const progress = clamp(Number(value) || 0, 0, 100);
     const ratio = progress / 100;
     const currentIndex = Math.min(stageLabels.length - 1, Math.round(ratio * (stageLabels.length - 1)));
+    const isEn = document.documentElement.lang === 'en';
 
     steps.forEach((step, index) => {
       step.classList.toggle('is-past', index < currentIndex);
@@ -37,7 +38,9 @@ function initFlowSimulator() {
     });
 
     meterBar.style.width = `${progress.toFixed(2)}%`;
-    status.textContent = `Etapa activa: ${stageLabels[currentIndex]} ${Math.round(progress)}%`;
+    status.textContent = isEn
+      ? `Active stage: ${stageLabels[currentIndex]} ${Math.round(progress)}%`
+      : `Etapa activa: ${stageLabels[currentIndex]} ${Math.round(progress)}%`;
   };
 
   const stop = () => {
@@ -45,7 +48,8 @@ function initFlowSimulator() {
     rafId = 0;
     isPlaying = false;
     startTime = 0;
-    playButton.textContent = Number(range.value) >= 99 ? 'Repetir demo' : 'Auto demo';
+    const isEn = document.documentElement.lang === 'en';
+    playButton.textContent = Number(range.value) >= 99 ? (isEn ? 'Replay demo' : 'Repetir demo') : 'Auto demo';
   };
 
   const animate = (timestamp) => {
@@ -77,7 +81,7 @@ function initFlowSimulator() {
     if (isReduced()) {
       range.value = '100';
       render(100);
-      playButton.textContent = 'Repetir demo';
+      playButton.textContent = document.documentElement.lang === 'en' ? 'Replay demo' : 'Repetir demo';
       return;
     }
 
@@ -87,11 +91,12 @@ function initFlowSimulator() {
     }
 
     isPlaying = true;
-    playButton.textContent = 'Ejecutando...';
+    playButton.textContent = document.documentElement.lang === 'en' ? 'Running...' : 'Ejecutando...';
     rafId = window.requestAnimationFrame(animate);
   });
 
   render(range.value);
+  window.addEventListener('warp:lang-changed', () => render(range.value));
 }
 
 function initTopologyLab() {
@@ -104,11 +109,20 @@ function initTopologyLab() {
   if (!root || !stage || !ring || !status || !filters.length || !nodes.length) return;
 
   const descriptions = {
-    all: 'Cluster activo: sistema completo',
-    cloud: 'Cluster activo: ejecuci√≥n cloud',
-    security: 'Cluster activo: capa de seguridad',
-    ai: 'Cluster activo: inferencia IA',
-    data: 'Cluster activo: capa de datos',
+    es: {
+      all: 'Cluster activo: sistema completo',
+      cloud: 'Cluster activo: ejecuciÛn cloud',
+      security: 'Cluster activo: capa de seguridad',
+      ai: 'Cluster activo: inferencia IA',
+      data: 'Cluster activo: capa de datos',
+    },
+    en: {
+      all: 'Active cluster: full system',
+      cloud: 'Active cluster: cloud delivery',
+      security: 'Active cluster: security layer',
+      ai: 'Active cluster: AI inference',
+      data: 'Active cluster: data layer',
+    },
   };
 
   const applyFilter = (type) => {
@@ -126,7 +140,8 @@ function initTopologyLab() {
       node.classList.toggle('is-hot', selected !== 'all' && visible);
     });
 
-    status.textContent = descriptions[selected] || descriptions.all;
+    const lang = document.documentElement.lang === 'en' ? 'en' : 'es';
+    status.textContent = descriptions[lang][selected] || descriptions[lang].all;
   };
 
   filters.forEach((button) => {
@@ -152,6 +167,7 @@ function initTopologyLab() {
 
   stage.addEventListener('pointerleave', resetTilt);
   applyFilter('all');
+  window.addEventListener('warp:lang-changed', () => applyFilter('all'));
 }
 
 function initSplitReveal() {
@@ -170,10 +186,11 @@ function initSplitReveal() {
     afterLayer.style.clipPath = `inset(0 ${(100 - progress).toFixed(2)}% 0 0)`;
     handle.style.left = `${progress.toFixed(2)}%`;
 
-    let state = 'Transici√≥n balanceada';
-    if (progress < 45) state = 'Estado base';
-    else if (progress > 55) state = 'Versi√≥n optimizada';
-    caption.textContent = `${state} | ${Math.round(progress)}% optimizado`;
+    const isEn = document.documentElement.lang === 'en';
+    let state = isEn ? 'Balanced transition' : 'TransiciÛn balanceada';
+    if (progress < 45) state = isEn ? 'Base state' : 'Estado base';
+    else if (progress > 55) state = isEn ? 'Optimized version' : 'VersiÛn optimizada';
+    caption.textContent = isEn ? `${state} | ${Math.round(progress)}% optimized` : `${state} | ${Math.round(progress)}% optimizado`;
   };
 
   const setFromPointer = (event) => {
@@ -205,4 +222,5 @@ function initSplitReveal() {
   }
 
   render(range.value);
+  window.addEventListener('warp:lang-changed', () => render(range.value));
 }

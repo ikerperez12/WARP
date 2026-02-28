@@ -74,6 +74,38 @@
         <a href="#showcase" class="nav-link" data-section="showcase">Media</a>
         <a href="#contact" class="nav-link" data-section="contact">Contacto</a>
       </div>
+      <div class="nav-tools">
+        <button class="lang-toggle" id="lang-toggle" type="button" aria-label="Cambiar idioma">
+          <span class="lang-toggle-label">ES</span>
+          <span class="lang-toggle-divider"></span>
+          <span class="lang-toggle-label muted">EN</span>
+        </button>
+        <label class="cosmic-toggle" aria-label="Cambiar tema">
+          <input class="toggle" id="theme-toggle-input" type="checkbox" />
+          <span class="slider">
+            <span class="cosmos"></span>
+            <span class="energy-line"></span>
+            <span class="energy-line"></span>
+            <span class="energy-line"></span>
+            <span class="particles">
+              <span class="particle"></span>
+              <span class="particle"></span>
+              <span class="particle"></span>
+              <span class="particle"></span>
+              <span class="particle"></span>
+              <span class="particle"></span>
+            </span>
+            <span class="toggle-orb">
+              <span class="inner-orb"></span>
+              <span class="ring"></span>
+            </span>
+          </span>
+        </label>
+        <button class="admin-entry-btn" id="admin-entry-btn" type="button" aria-label="Abrir editor">
+          <span class="admin-entry-dot"></span>
+          <span class="admin-entry-text">Editor</span>
+        </button>
+      </div>
       <button
         class="ui-toggle"
         id="ui-toggle"
@@ -119,6 +151,36 @@
     <a href="#experience" class="mobile-link">Trayectoria</a>
     <a href="#showcase" class="mobile-link">Media</a>
     <a href="#contact" class="mobile-link">Contacto</a>
+    <div class="mobile-tools">
+      <button class="mobile-tool-btn" id="mobile-lang-toggle" type="button">ES / EN</button>
+      <button class="mobile-tool-btn" id="mobile-theme-toggle" type="button">Tema</button>
+      <button class="mobile-tool-btn" id="mobile-admin-entry-btn" type="button">Editor</button>
+    </div>
+  </div>
+
+  <div class="admin-denied" id="admin-denied" aria-hidden="true">
+    <div class="admin-denied-backdrop"></div>
+    <div class="admin-denied-card">
+      <div class="not-admin-racer" aria-hidden="true">
+        <div class="not-admin-lines">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="not-admin-loader">
+          <span><span></span><span></span><span></span><span></span></span>
+          <div class="not-admin-base"><span></span><div class="not-admin-face"></div></div>
+        </div>
+      </div>
+      <div class="admin-denied-pet" aria-hidden="true">
+        <div class="pet-face">
+          <span class="pet-eye"></span>
+          <span class="pet-eye"></span>
+          <span class="pet-mouth"></span>
+        </div>
+      </div>
+      <h3>Not admin</h3>
+      <p>Este portal solo se abre desde tu red autorizada o desde un navegador ya confiado.</p>
+      <button class="btn btn-secondary" id="admin-denied-close" type="button">Cerrar</button>
+    </div>
   </div>
 
   <!-- Scroll Progress Bar -->

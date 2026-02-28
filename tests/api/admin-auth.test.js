@@ -31,6 +31,24 @@ test('session tokens are signed and verified', () => {
 test('same-origin guard accepts matching host and origin', () => {
   assert.equal(__testing.assertSameOrigin({ headers: { origin: 'https://example.com', host: 'example.com' } }), true);
   assert.equal(__testing.assertSameOrigin({ headers: { origin: 'https://evil.com', host: 'example.com' } }), false);
+  assert.equal(__testing.assertSameOrigin({ headers: { host: 'example.com' } }), false);
+});
+
+test('admin network allowlist accepts configured prefixes', () => {
+  process.env.ADMIN_ALLOWED_IPS = '';
+  process.env.ADMIN_ALLOWED_IP_PREFIXES = '79.146.,192.168.';
+  assert.equal(__testing.isAllowedAdminNetwork({ headers: { 'x-forwarded-for': '79.146.22.10, 10.0.0.1' } }), true);
+  assert.equal(__testing.isAllowedAdminNetwork({ headers: { 'x-forwarded-for': '8.8.8.8' } }), false);
+});
+
+test('trusted device tokens are signed and verified', () => {
+  process.env.ADMIN_SESSION_SECRET = '0123456789abcdef0123456789abcdef';
+  const token = __testing.createTrustedDeviceToken('iker');
+  const payload = __testing.verifyTrustedDeviceToken(token);
+
+  assert.equal(payload.u, 'iker');
+  assert.equal(payload.kind, 'device');
+  assert.equal(__testing.verifyTrustedDeviceToken(`${token}broken`), null);
 });
 
 process.on('exit', () => {

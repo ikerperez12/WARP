@@ -27,6 +27,7 @@ export async function initSiteContent() {
     const payload = await response.json();
     if (!payload?.ok || !payload.data) return;
     applySiteContent(payload.data);
+    window.dispatchEvent(new CustomEvent('warp:site-content-applied'));
   } catch (error) {
     console.warn('[content] failed to load site content', error);
   }

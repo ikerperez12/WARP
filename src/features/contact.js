@@ -1,5 +1,6 @@
 import { toText } from '../utils/helpers.js';
 import { announce } from '../utils/dom.js';
+import { prefs } from './preferences.js';
 
 const EMAIL_PATTERN = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
 
@@ -16,7 +17,34 @@ export function initContactForm() {
 
   const submitButton = contactForm.querySelector('button[type="submit"]');
   const submitText = submitButton?.querySelector('span');
-  const idleText = submitText?.textContent || 'Enviar mensaje';
+  const messages = {
+    es: {
+      idle: 'Enviar mensaje',
+      missing: 'Completa categoria, nombre, email y mensaje.',
+      invalidEmail: 'El email no es valido.',
+      sending: 'Enviando mensaje de forma segura...',
+      fallbackSent: 'Mensaje enviado por plataforma de respaldo. Te respondere pronto.',
+      fallbackOpened: 'Se abrio tu cliente de correo como respaldo final.',
+      sent: 'Mensaje enviado. Te respondere pronto.',
+      failed: 'No se pudo enviar el mensaje.',
+      noFallback: 'No hay correo de destino configurado para el respaldo.',
+      formSubmitActivation: 'FormSubmit requiere activar el receptor. Abre el correo de activacion y confirma el formulario.',
+    },
+    en: {
+      idle: 'Send message',
+      missing: 'Complete category, name, email and message.',
+      invalidEmail: 'The email is not valid.',
+      sending: 'Sending message securely...',
+      fallbackSent: 'Message sent through backup platform. I will reply soon.',
+      fallbackOpened: 'Your mail client was opened as a final fallback.',
+      sent: 'Message sent. I will reply soon.',
+      failed: 'The message could not be sent.',
+      noFallback: 'No fallback recipient email is configured.',
+      formSubmitActivation: 'FormSubmit requires recipient activation. Open the activation email and confirm the form.',
+    },
+  };
+  const getCopy = () => messages[prefs.lang] || messages.es;
+  const idleText = submitText?.textContent || getCopy().idle;
   const fallbackMailLink = document.querySelector('.contact-card a[href^="mailto:"]');
   const fallbackRecipient = (() => {
     const href = toText(fallbackMailLink?.getAttribute('href') || '');
@@ -33,7 +61,7 @@ export function initContactForm() {
   };
 
   const sendViaFormSubmitClient = async ({ topic, name, email, message }) => {
-    if (!fallbackRecipient) throw new Error('No hay correo de destino configurado para el respaldo.');
+    if (!fallbackRecipient) throw new Error(getCopy().noFallback);
 
     const body = new URLSearchParams({
       _subject: `Portfolio contact [${topic}] - ${name}`,
@@ -57,7 +85,7 @@ export function initContactForm() {
       const detail = toText(payload?.message || payload?.error, `Error ${response.status}`);
       const normalized = detail.toLowerCase();
       if (response.status === 403 && (normalized.includes('activate') || normalized.includes('activation'))) {
-        throw new Error('FormSubmit requiere activar el receptor. Abre el correo de activacion y confirma el formulario.');
+        throw new Error(getCopy().formSubmitActivation);
       }
       throw new Error(`FormSubmit fallo: ${detail}`);
     }
@@ -94,13 +122,13 @@ export function initContactForm() {
     if (contactError) contactError.classList.add('is-hidden');
 
     if (!topic || !name || !email || !message) {
-      setFormStatus('Completa categoria, nombre, email y mensaje.', 'error');
+      setFormStatus(getCopy().missing, 'error');
       if (contactError) contactError.classList.remove('is-hidden');
       announce('Contact form has missing fields.');
       return;
     }
     if (!EMAIL_PATTERN.test(email)) {
-      setFormStatus('El email no es valido.', 'error');
+      setFormStatus(getCopy().invalidEmail, 'error');
       announce('Invalid email format.');
       return;
     }
@@ -109,8 +137,8 @@ export function initContactForm() {
       submitButton.disabled = true;
       submitButton.classList.add('is-loading');
     }
-    if (submitText) submitText.textContent = 'Enviando...';
-    setFormStatus('Enviando mensaje de forma segura...', '');
+    if (submitText) submitText.textContent = getCopy().sending;
+    setFormStatus(getCopy().sending, '');
 
     try {
       const response = await fetch('/api/contact', {
@@ -129,7 +157,7 @@ export function initContactForm() {
         if (shouldTryBrowserFallback) {
           try {
             await sendViaFormSubmitClient({ topic, name, email, message });
-            setFormStatus('Mensaje enviado por plataforma de respaldo. Te respondere pronto.', 'success');
+            setFormStatus(getCopy().fallbackSent, 'success');
             if (contactSuccess) contactSuccess.classList.remove('is-hidden');
             contactForm.reset();
             announce('Message sent successfully via fallback provider.');
@@ -140,7 +168,7 @@ export function initContactForm() {
               const opened = openMailtoDraft({ topic, name, email, message });
               if (opened) {
                 setFormStatus(
-                  `${fallbackMessage} Se abrio tu cliente de correo como respaldo final.`,
+                  `${fallbackMessage} ${getCopy().fallbackOpened}`,
                   'error'
                 );
                 if (contactError) contactError.classList.remove('is-hidden');
@@ -154,12 +182,12 @@ export function initContactForm() {
 
         throw new Error(toText(payload?.error, `Error ${response.status}`));
       }
-      setFormStatus('Mensaje enviado. Te respondere pronto.', 'success');
+      setFormStatus(getCopy().sent, 'success');
       if (contactSuccess) contactSuccess.classList.remove('is-hidden');
       contactForm.reset();
       announce('Message sent successfully.');
     } catch (error) {
-      setFormStatus(toText(error.message, 'No se pudo enviar el mensaje.'), 'error');
+      setFormStatus(toText(error.message, getCopy().failed), 'error');
       if (contactError) contactError.classList.remove('is-hidden');
       announce('Message send failed.');
     } finally {
@@ -167,7 +195,7 @@ export function initContactForm() {
         submitButton.disabled = false;
         submitButton.classList.remove('is-loading');
       }
-      if (submitText) submitText.textContent = idleText;
+      if (submitText) submitText.textContent = getCopy().idle || idleText;
     }
   });
 }

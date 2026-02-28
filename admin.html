@@ -16,6 +16,7 @@
         <div class="admin-meta">
           <span>Panel seguro de contenido</span>
           <span>Sesion protegida por cookie HttpOnly</span>
+          <span>Passkey local opcional</span>
           <span>Persistencia en Vercel KV</span>
         </div>
       </div>
@@ -29,7 +30,7 @@
       <div class="admin-stack">
         <article class="admin-card" id="admin-login-card">
           <h1>Acceso de editor</h1>
-          <p>Solo servidor. Las credenciales no se guardan en cliente y la sesion va en cookie segura.</p>
+          <p>Solo servidor. Puedes entrar con usuario y contraseña desde red autorizada o usar una passkey ya registrada en este dispositivo.</p>
           <form class="admin-form" id="admin-login-form">
             <label>Usuario
               <input type="text" name="username" autocomplete="username" required />
@@ -39,9 +40,19 @@
             </label>
             <div class="admin-actions">
               <button class="btn btn-primary" type="submit">Entrar</button>
+              <button class="btn btn-secondary" id="admin-passkey-login" type="button">Entrar con passkey</button>
             </div>
           </form>
           <div class="admin-status" id="admin-login-status"></div>
+        </article>
+
+        <article class="admin-card admin-hidden" id="admin-passkey-card">
+          <h2>Seguridad del dispositivo</h2>
+          <p>Registra una passkey local para que este equipo pueda volver a entrar sin depender solo de red + contraseña.</p>
+          <div class="admin-actions">
+            <button class="btn btn-secondary" id="admin-passkey-register" type="button">Registrar passkey</button>
+          </div>
+          <div class="admin-status" id="admin-passkey-status"></div>
         </article>
 
         <article class="admin-card admin-hidden" id="admin-content-card">

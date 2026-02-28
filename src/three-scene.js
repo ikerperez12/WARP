@@ -13,12 +13,14 @@ export function initThreeScene() {
   if (!canvas) return () => {};
 
   const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const coarsePointerQuery = window.matchMedia('(hover: none), (pointer: coarse)');
   let manualReducedMotion = document.body?.dataset.motion === 'reduced';
   let prefersReducedMotion = reducedMotionQuery.matches || manualReducedMotion;
+  const isCoarsePointer = coarsePointerQuery.matches;
 
-  const isMobile = window.innerWidth < 920;
+  const isMobile = window.innerWidth < 920 || isCoarsePointer;
   const SCENE_TUNING = {
-    maxPixelRatio: 1.8,
+    maxPixelRatio: isMobile ? 1 : 1.6,
     heroRangeMultiplier: 2.4,
     heroViewportKickScale: 2.1,
     minViewportKickHeight: 1380,
@@ -36,7 +38,7 @@ export function initThreeScene() {
   try {
     renderer = new THREE.WebGLRenderer({
       canvas,
-      antialias: true,
+      antialias: !isMobile,
       alpha: true,
       powerPreference: 'high-performance',
     });
@@ -107,13 +109,13 @@ export function initThreeScene() {
 
   const layerConfig = prefersReducedMotion
     ? [
-        { count: isMobile ? 200 : 280, spreadX: 42, spreadY: 24, depth: 22, size: 0.05, opacity: 0.13, parallax: 0.16, speed: 0.02 },
-        { count: isMobile ? 130 : 190, spreadX: 32, spreadY: 18, depth: 16, size: 0.07, opacity: 0.1, parallax: 0.24, speed: 0.028 },
+        { count: isMobile ? 96 : 280, spreadX: 42, spreadY: 24, depth: 22, size: 0.05, opacity: 0.13, parallax: 0.16, speed: 0.02 },
+        { count: isMobile ? 56 : 190, spreadX: 32, spreadY: 18, depth: 16, size: 0.07, opacity: 0.1, parallax: 0.24, speed: 0.028 },
       ]
     : [
-        { count: isMobile ? 320 : 500, spreadX: 46, spreadY: 26, depth: 28, size: 0.045, opacity: 0.15, parallax: 0.12, speed: 0.024 },
-        { count: isMobile ? 220 : 360, spreadX: 36, spreadY: 20, depth: 20, size: 0.062, opacity: 0.12, parallax: 0.22, speed: 0.032 },
-        { count: isMobile ? 100 : 180, spreadX: 26, spreadY: 15, depth: 12, size: 0.085, opacity: 0.095, parallax: 0.32, speed: 0.04 },
+        { count: isMobile ? 140 : 500, spreadX: 46, spreadY: 26, depth: 28, size: 0.045, opacity: 0.15, parallax: 0.12, speed: 0.024 },
+        { count: isMobile ? 84 : 360, spreadX: 36, spreadY: 20, depth: 20, size: 0.062, opacity: 0.12, parallax: 0.22, speed: 0.032 },
+        { count: isMobile ? 40 : 180, spreadX: 26, spreadY: 15, depth: 12, size: 0.085, opacity: 0.095, parallax: 0.32, speed: 0.04 },
       ];
 
   const starLayers = layerConfig.map((cfg) => createStarLayer(cfg, starTexture));
@@ -136,6 +138,8 @@ export function initThreeScene() {
   const cameraLookTarget = new THREE.Vector3(baseX * 0.36, 0.24, -0.08);
 
   let rafId = 0;
+  let loopRunning = false;
+  let heroVisible = true;
   const raycaster = new THREE.Raycaster();
   const pointerNdc = new THREE.Vector2();
   const screenTargets = [laptop.panelGlass, laptop.panel];
@@ -300,6 +304,16 @@ export function initThreeScene() {
     reducedMotionQuery.addListener(onReducedMotionChange);
   }
 
+  const hero = document.getElementById('hero');
+  const heroObserver = hero && 'IntersectionObserver' in window
+    ? new IntersectionObserver((entries) => {
+        heroVisible = entries.some((entry) => entry.isIntersecting);
+        if (heroVisible) startRenderLoop();
+        else if (isMobile) stopRenderLoop();
+      }, { threshold: 0.02 })
+    : null;
+  heroObserver?.observe(hero);
+
   onScroll();
   onResize();
 
@@ -310,6 +324,7 @@ export function initThreeScene() {
 
   function render() {
     if (isDestroyed || !renderer) return;
+    if (!loopRunning) return;
     rafId = requestAnimationFrame(render);
 
     const dt = Math.min(clock.getDelta(), 0.05);
@@ -423,16 +438,29 @@ export function initThreeScene() {
       renderer.render(scene, camera);
     } catch (error) {
       isDestroyed = true;
-      cancelAnimationFrame(rafId);
+      stopRenderLoop();
       console.warn('[three-scene] Render failed. Animation loop stopped.', error);
     }
   }
 
-  render();
+  function startRenderLoop() {
+    if (loopRunning || isDestroyed) return;
+    loopRunning = true;
+    render();
+  }
+
+  function stopRenderLoop() {
+    loopRunning = false;
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = 0;
+  }
+
+  startRenderLoop();
 
   return () => {
-    cancelAnimationFrame(rafId);
     isDestroyed = true;
+    stopRenderLoop();
+    heroObserver?.disconnect();
 
     window.removeEventListener('pointermove', onPointerMove);
     window.removeEventListener('pointerdown', onPointerDown);

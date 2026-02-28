@@ -1,4 +1,6 @@
-﻿const state = {
+﻿import { startAuthentication, startRegistration } from '@simplewebauthn/browser';
+
+const state = {
   authenticated: false,
 };
 
@@ -10,6 +12,10 @@ const els = {
   refreshPreview: document.getElementById('admin-refresh-preview'),
   contentCard: document.getElementById('admin-content-card'),
   projectsCard: document.getElementById('admin-projects-card'),
+  passkeyCard: document.getElementById('admin-passkey-card'),
+  passkeyStatus: document.getElementById('admin-passkey-status'),
+  passkeyRegister: document.getElementById('admin-passkey-register'),
+  passkeyLogin: document.getElementById('admin-passkey-login'),
   contentForm: document.getElementById('admin-content-form'),
   projectsForm: document.getElementById('admin-projects-form'),
   contentEditor: document.getElementById('admin-content-editor'),
@@ -29,6 +35,8 @@ async function boot() {
 function bindEvents() {
   els.loginForm?.addEventListener('submit', onLogin);
   els.logout?.addEventListener('click', onLogout);
+  els.passkeyRegister?.addEventListener('click', onRegisterPasskey);
+  els.passkeyLogin?.addEventListener('click', onPasskeyLogin);
   els.contentForm?.addEventListener('submit', (event) => onSaveJson(event, {
     editor: els.contentEditor,
     endpoint: '/api/admin-content',
@@ -60,6 +68,7 @@ async function checkSession() {
 function renderAuth(authenticated) {
   state.authenticated = authenticated;
   els.loginCard?.classList.toggle('admin-hidden', authenticated);
+  els.passkeyCard?.classList.toggle('admin-hidden', !authenticated);
   els.contentCard?.classList.toggle('admin-hidden', !authenticated);
   els.projectsCard?.classList.toggle('admin-hidden', !authenticated);
   els.logout?.classList.toggle('admin-hidden', !authenticated);
@@ -90,6 +99,77 @@ async function onLogin(event) {
   renderAuth(true);
   await Promise.all([loadContent(), loadProjects()]);
   reloadPreview();
+}
+
+async function onPasskeyLogin() {
+  setStatus(els.loginStatus, 'Solicitando passkey...');
+  try {
+    const optionsRes = await fetch('/api/admin-passkey?mode=auth-options', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}',
+    });
+    const optionsPayload = await optionsRes.json().catch(() => ({}));
+    if (!optionsRes.ok || !optionsPayload?.options) {
+      setStatus(els.loginStatus, optionsPayload?.error || 'No se pudieron obtener opciones de passkey.', true);
+      return;
+    }
+
+    const authResponse = await startAuthentication({ optionsJSON: optionsPayload.options });
+    const verifyRes = await fetch('/api/admin-passkey?mode=auth-verify', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(authResponse),
+    });
+    const verifyPayload = await verifyRes.json().catch(() => ({}));
+    if (!verifyRes.ok) {
+      setStatus(els.loginStatus, verifyPayload?.error || 'La passkey no pudo verificarse.', true);
+      return;
+    }
+
+    setStatus(els.loginStatus, 'Acceso por passkey completado.', false, true);
+    renderAuth(true);
+    await Promise.all([loadContent(), loadProjects()]);
+    reloadPreview();
+  } catch (error) {
+    setStatus(els.loginStatus, error?.message || 'El acceso por passkey fue cancelado o fallo.', true);
+  }
+}
+
+async function onRegisterPasskey() {
+  setStatus(els.passkeyStatus, 'Generando registro de passkey...');
+  try {
+    const optionsRes = await fetch('/api/admin-passkey?mode=register-options', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}',
+    });
+    const optionsPayload = await optionsRes.json().catch(() => ({}));
+    if (!optionsRes.ok || !optionsPayload?.options) {
+      setStatus(els.passkeyStatus, optionsPayload?.error || 'No se pudieron obtener opciones de registro.', true);
+      return;
+    }
+
+    const registrationResponse = await startRegistration({ optionsJSON: optionsPayload.options });
+    const verifyRes = await fetch('/api/admin-passkey?mode=register-verify', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(registrationResponse),
+    });
+    const verifyPayload = await verifyRes.json().catch(() => ({}));
+    if (!verifyRes.ok) {
+      setStatus(els.passkeyStatus, verifyPayload?.error || 'La passkey no pudo registrarse.', true);
+      return;
+    }
+
+    setStatus(els.passkeyStatus, 'Passkey registrada en este dispositivo.', false, true);
+  } catch (error) {
+    setStatus(els.passkeyStatus, error?.message || 'El registro de passkey fue cancelado o fallo.', true);
+  }
 }
 
 async function onLogout() {
@@ -161,4 +241,3 @@ function setStatus(node, message, isError = false, isOk = false) {
   node.classList.toggle('is-error', Boolean(isError));
   node.classList.toggle('is-ok', Boolean(isOk));
 }
-

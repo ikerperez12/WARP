@@ -1,10 +1,12 @@
 ﻿import {
   assertSameOrigin,
+  canAccessAdminEntry,
   createSessionToken,
+  createTrustedDeviceToken,
   readJsonBody,
   sendJson,
   setApiSecurityHeaders,
-  setSessionCookie,
+  setSessionCookies,
   validateAdminCredentials,
 } from '../lib/admin.js';
 
@@ -19,7 +21,14 @@ export default async function handler(req, res) {
     return sendJson(res, 403, { ok: false, error: 'Invalid origin.' });
   }
 
+  if (!canAccessAdminEntry(req)) {
+    return sendJson(res, 403, { ok: false, error: 'This admin login is only available from an allowed network or a trusted browser.' });
+  }
+
   const body = readJsonBody(req);
+  if (!body) {
+    return sendJson(res, 400, { ok: false, error: 'Malformed JSON body.' });
+  }
   const username = body.username;
   const password = body.password;
 
@@ -29,10 +38,10 @@ export default async function handler(req, res) {
 
   try {
     const token = createSessionToken(username);
-    setSessionCookie(res, token);
+    const trustedDeviceToken = createTrustedDeviceToken(username);
+    setSessionCookies(res, token, trustedDeviceToken);
     return sendJson(res, 200, { ok: true, username });
   } catch (error) {
     return sendJson(res, 500, { ok: false, error: error.message || 'Admin session setup failed.' });
   }
 }
-

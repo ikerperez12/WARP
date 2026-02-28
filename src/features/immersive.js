@@ -49,7 +49,9 @@ function initScrollReel() {
     });
 
     if (progressBar) progressBar.style.width = `${(progress * 100).toFixed(1)}%`;
-    if (caption) caption.textContent = `Frame ${Math.min(frameCount, activeIndex + 1)} / ${frameCount}`;
+    if (caption) caption.textContent = document.documentElement.lang === 'en'
+      ? `Frame ${Math.min(frameCount, activeIndex + 1)} / ${frameCount}`
+      : `Frame ${Math.min(frameCount, activeIndex + 1)} / ${frameCount}`;
   };
 
   const onScroll = () => {
@@ -62,6 +64,7 @@ function initScrollReel() {
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
   window.addEventListener('warp:motion-mode', onScroll);
+  window.addEventListener('warp:lang-changed', onScroll);
 }
 
 function initNeumorphismLab() {
@@ -76,9 +79,8 @@ function initNeumorphismLab() {
   if (!neoLayout || !neoConsole || !switches.length || !slider || !depthValue || !profileValue) return;
 
   const profileNames = {
-    focus: 'Calidad',
-    cinematic: 'PresentaciÃ³n',
-    delivery: 'Entrega',
+    es: { focus: 'Calidad', cinematic: 'Presentación', delivery: 'Entrega' },
+    en: { focus: 'Quality', cinematic: 'Presentation', delivery: 'Delivery' },
   };
 
   const updateDepth = () => {
@@ -93,7 +95,8 @@ function initNeumorphismLab() {
   const setProfile = (button) => {
     switches.forEach((entry) => entry.classList.toggle('is-active', entry === button));
     const key = button.dataset.neoProfile || 'focus';
-    profileValue.textContent = profileNames[key] || 'Calidad';
+    const lang = document.documentElement.lang === 'en' ? 'en' : 'es';
+    profileValue.textContent = profileNames[lang][key] || profileNames[lang].focus;
     neoLayout.setAttribute('data-neo-profile', key);
 
     if (!neoPreviewCard || isReduced()) return;
@@ -126,6 +129,10 @@ function initNeumorphismLab() {
   });
 
   neoConsole.addEventListener('pointerleave', resetLight);
+  window.addEventListener('warp:lang-changed', () => {
+    const active = switches.find((entry) => entry.classList.contains('is-active')) || switches[0];
+    setProfile(active);
+  });
 }
 
 function initAnimeMotionLab() {
@@ -136,10 +143,21 @@ function initAnimeMotionLab() {
 
   if (!grid || !tiles.length || !replayButton || !phaseLabel) return;
 
+  const setPhase = (key) => {
+    const isEn = document.documentElement.lang === 'en';
+    const map = {
+      idle: isEn ? 'Flow idle' : 'Flujo en espera',
+      running: isEn ? 'Flow running' : 'Flujo en ejecución',
+      reduced: isEn ? 'Reduced motion active' : 'Motion reducido activo',
+      done: isEn ? 'Flow complete' : 'Flujo completado',
+    };
+    phaseLabel.textContent = map[key];
+  };
+
   const playSequence = () => {
-    phaseLabel.textContent = 'Flujo en ejecuciÃ³n';
+    setPhase('running');
     if (isReduced()) {
-      phaseLabel.textContent = 'Motion reducido activo';
+      setPhase('reduced');
       tiles.forEach((tile) => {
         tile.style.opacity = '1';
         tile.style.transform = 'none';
@@ -157,9 +175,7 @@ function initAnimeMotionLab() {
       delay: anime.stagger(110),
       duration: 720,
       easing: 'easeOutExpo',
-      complete: () => {
-        phaseLabel.textContent = 'Flujo completado';
-      },
+      complete: () => setPhase('done'),
     });
   };
 
@@ -173,4 +189,8 @@ function initAnimeMotionLab() {
   observer.observe(grid);
 
   replayButton.addEventListener('click', playSequence);
+  window.addEventListener('warp:lang-changed', () => {
+    replayButton.textContent = document.documentElement.lang === 'en' ? 'Replay flow' : 'Reproducir flujo';
+    setPhase('idle');
+  });
 }

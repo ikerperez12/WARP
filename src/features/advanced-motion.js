@@ -12,7 +12,8 @@ function initPadGrid() {
   if (!padButtons.length || !padStatus) return;
 
   const updateStatus = (label) => {
-    padStatus.textContent = `Prioridad activa: ${label}`;
+    const isEn = document.documentElement.lang === 'en';
+    padStatus.textContent = isEn ? `Active priority: ${label}` : `Prioridad activa: ${label}`;
   };
 
   padButtons.forEach((button) => {
@@ -29,6 +30,8 @@ function initPadGrid() {
       updateStatus(label);
     });
   });
+
+  window.addEventListener('warp:lang-changed', () => updateStatus(padButtons[0]?.dataset.pad || 'Latency'));
 }
 
 function initTiltCards() {
