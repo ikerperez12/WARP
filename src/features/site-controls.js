@@ -70,6 +70,34 @@ const translations = {
       playbookTitle: 'Playbook Técnico Interactivo',
       playbookSubtitle: 'Escenarios reales para enseñar cómo aterrizo arquitectura, seguridad y observabilidad según objetivo de negocio.',
     },
+    visualDna: {
+      title: 'Arquitectura Visual',
+      subtitle: 'Segunda capa de la experiencia: sistema visual, ritmo editorial y decisiones de composición documentadas.',
+      cards: [
+        {
+          title: 'Ritmo editorial',
+          text: 'Mapa de beats que alterna apertura, detalle técnico y cierre orientado a conversión.',
+          tags: ['Beat map', 'Scroll sync', 'Timing'],
+        },
+        {
+          title: 'Profundidad realista',
+          text: 'Capas de luz, grano y sombra suave para mantener legibilidad sin perder atmósfera.',
+          tags: ['Depth', 'Film grain', 'Contrast'],
+        },
+        {
+          title: 'UI táctil',
+          text: 'Botones y paneles con micro-feedback y peso visual inspirado en hardware.',
+          tags: ['Neumorphism', 'Micro motion', 'Haptics'],
+        },
+        {
+          title: 'Entrega técnica',
+          text: 'Visualización clara del stack, resultados y garantías técnicas para perfiles senior.',
+          tags: ['Stack clarity', 'Metrics', 'QA'],
+        },
+      ],
+      stripLabel: 'Stack visual',
+      stripTags: ['Three.js', 'Anime.js', 'Motion tokens', 'Scroll staging', 'Color grading'],
+    },
     contact: {
       cards: ['Email', 'GitHub', 'LinkedIn', 'Ubicación'],
       topicLabel: 'Categoría',
@@ -161,6 +189,34 @@ const translations = {
       eliteSubtitle: 'Production-like examples with impact metrics and a modern stack for backend, security, cloud and AI.',
       playbookTitle: 'Interactive Technical Playbook',
       playbookSubtitle: 'Real scenarios showing how I land architecture, security and observability based on business goals.',
+    },
+    visualDna: {
+      title: 'Visual Architecture',
+      subtitle: 'Second layer of the experience: visual system, editorial rhythm, and documented composition decisions.',
+      cards: [
+        {
+          title: 'Editorial rhythm',
+          text: 'Beat map alternating opening, technical detail, and conversion-focused closure.',
+          tags: ['Beat map', 'Scroll sync', 'Timing'],
+        },
+        {
+          title: 'Realistic depth',
+          text: 'Light, grain and soft shadow layers to keep legibility without losing atmosphere.',
+          tags: ['Depth', 'Film grain', 'Contrast'],
+        },
+        {
+          title: 'Tactile UI',
+          text: 'Buttons and panels with micro feedback and hardware-inspired weight.',
+          tags: ['Neumorphism', 'Micro motion', 'Haptics'],
+        },
+        {
+          title: 'Technical delivery',
+          text: 'Clear view of stack, results, and technical guarantees for senior profiles.',
+          tags: ['Stack clarity', 'Metrics', 'QA'],
+        },
+      ],
+      stripLabel: 'Visual stack',
+      stripTags: ['Three.js', 'Anime.js', 'Motion tokens', 'Scroll staging', 'Color grading'],
     },
     contact: {
       cards: ['Email', 'GitHub', 'LinkedIn', 'Location'],
@@ -350,6 +406,24 @@ function applyLanguage() {
   setSectionSubtitle('elite-cases', copy.sections.eliteSubtitle);
   setSectionTitle('tech-playbook', copy.sections.playbookTitle);
   setSectionSubtitle('tech-playbook', copy.sections.playbookSubtitle);
+
+  if (copy.visualDna) {
+    setSectionTitle('visual-dna', copy.visualDna.title);
+    setSectionSubtitle('visual-dna', copy.visualDna.subtitle);
+    const visualCards = Array.from(document.querySelectorAll('#visual-dna .visual-dna-card'));
+    visualCards.forEach((card, index) => {
+      const cardCopy = copy.visualDna.cards?.[index];
+      if (!cardCopy) return;
+      setNodeText(card.querySelector('h3'), cardCopy.title);
+      setNodeText(card.querySelector('p'), cardCopy.text);
+      const pills = Array.from(card.querySelectorAll('.visual-dna-pills span'));
+      pills.forEach((pill, pillIndex) => setNodeText(pill, cardCopy.tags?.[pillIndex]));
+    });
+    setText('#visual-dna .visual-dna-label', copy.visualDna.stripLabel);
+    document.querySelectorAll('#visual-dna .visual-dna-tags span').forEach((tag, index) => {
+      setNodeText(tag, copy.visualDna.stripTags?.[index]);
+    });
+  }
 
   document.querySelectorAll('#contact .contact-card h4').forEach((node, index) => setNodeText(node, copy.contact.cards[index]));
   setFormField('#topic', '#contact label[for="topic"]', copy.contact.topicPlaceholder, copy.contact.topicLabel, copy.contact.topicOptions);
