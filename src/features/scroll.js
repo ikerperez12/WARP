@@ -98,6 +98,21 @@ function updateBackToTop(y) {
 function updateActiveSection(y) {
   const sections = Array.from(document.querySelectorAll('.section'));
   const navLinks = Array.from(document.querySelectorAll('.nav-link'));
+  const visualSections = new Set([
+    'experience-hero',
+    'experience-cta',
+    'showcase',
+    'motion-reel',
+    'neo-lab',
+    'anime-lab',
+    'interaction-deck',
+    'google-services-section',
+    'flow-simulator',
+    'topology-lab',
+    'split-reveal',
+    'elite-cases',
+    'tech-playbook',
+  ]);
 
   let current = '';
   sections.forEach((section) => {
@@ -107,7 +122,8 @@ function updateActiveSection(y) {
   });
 
   navLinks.forEach((link) => {
-    const active = link.dataset.section === current;
+    const key = link.dataset.section || '';
+    const active = (key === 'showcase' || key === 'experience-cta') ? visualSections.has(current) : key === current;
     link.classList.toggle('active', active);
     if (active) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');

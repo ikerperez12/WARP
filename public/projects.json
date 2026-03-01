@@ -27,8 +27,8 @@
     "id": "auditoria-pqc",
     "repoName": "1.2-AuditoriaPQC",
     "name": "Auditoria PQC",
-    "description": "Analisis aplicado de protocolos criptograficos post-cuanticos, trazas de red y validacion de seguridad en laboratorio.",
-    "impact": "Refuerza criterio técnico en criptografia, auditoria y evaluacion de riesgo.",
+    "description": "Análisis aplicado de protocolos criptográficos post-cuanticos, trazas de red y validación de seguridad en laboratorio.",
+    "impact": "Refuerza criterio técnico en criptografía, auditoría y evaluación de riesgo.",
     "language": "Python",
     "stack": [
       "Python",
@@ -52,7 +52,7 @@
     "repoName": "GPT_CMD",
     "name": "GPT CMD",
     "description": "CLI experimental para automatizar flujos asistidos por IA y acelerar tareas repetitivas en entorno técnico.",
-    "impact": "Reduce tiempo operativo en prompts, ejecucion y experimentacion local.",
+    "impact": "Reduce tiempo operativo en prompts, ejecución y experimentación local.",
     "language": "Python",
     "stack": [
       "Python",
@@ -146,7 +146,7 @@
     "repoName": "Software-Design",
     "name": "Software Design",
     "description": "Trabajo orientado a modelado de software, estructura de dominio y patrones de diseno aplicados.",
-    "impact": "Refuerza base de analisis, modelado y mantenimiento de sistemas complejos.",
+    "impact": "Refuerza base de análisis, modelado y mantenimiento de sistemas complejos.",
     "language": "Java",
     "stack": [
       "Java",
