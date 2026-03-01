@@ -350,6 +350,22 @@ body[data-cursor='off'] .custom-cursor-dot {
   gap: 12px;
 }
 
+.nav-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.nav-topline {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.32px;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
 .nav-logo {
   font-family: var(--font-mono);
   font-size: 1.4rem;
@@ -591,6 +607,29 @@ body[data-cursor='off'] .custom-cursor-dot {
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.experience-hero .section-header,
+.experience-cta .section-header {
+  text-align: left;
+  max-width: 720px;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.experience-hero-actions,
+.experience-cta-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.experience-cta-body p {
+  margin: 0;
+  max-width: 640px;
+  color: var(--text-secondary);
 }
 
 .gradient-text {
@@ -4458,8 +4497,24 @@ body[data-cursor='off'] .custom-cursor-dot {
     padding: 0 20px;
   }
 
+  .nav-topline {
+    display: none;
+  }
+
   .section-container {
     padding: 0 20px;
+  }
+
+  .experience-hero .section-header,
+  .experience-cta .section-header {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .experience-hero-actions,
+  .experience-cta-body {
+    justify-content: center;
   }
 
   .hero-section {
@@ -4885,6 +4940,103 @@ textarea:focus-visible {
 .project-link:focus-visible,
 .contact-card a:focus-visible {
   box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.28);
+}
+
+/* ========================================
+   Light Theme Overrides
+   ======================================== */
+body[data-theme='light'] .navbar.scrolled {
+  background: rgba(237, 243, 255, 0.92);
+  border-bottom: 1px solid rgba(15, 23, 40, 0.08);
+}
+
+body[data-theme='light'] .nav-link:hover,
+body[data-theme='light'] .nav-link.active,
+body[data-theme='light'] .nav-link[aria-current='page'] {
+  background: rgba(15, 23, 40, 0.06);
+}
+
+body[data-theme='light'] .admin-entry-btn,
+body[data-theme='light'] .lang-toggle,
+body[data-theme='light'] .ui-toggle {
+  background: rgba(255, 255, 255, 0.84);
+  border-color: rgba(15, 23, 40, 0.12);
+  color: var(--text-primary);
+}
+
+body[data-theme='light'] .cosmic-toggle .slider {
+  background: linear-gradient(45deg, #f6f9ff, #e6eefc);
+  box-shadow: 0 0 18px rgba(15, 23, 40, 0.12), inset 0 0 12px rgba(255, 255, 255, 0.7);
+}
+
+body[data-theme='light'] .section {
+  background: var(--bg-primary);
+}
+
+body[data-theme='light'] .showcase-section,
+body[data-theme='light'] .reel-section,
+body[data-theme='light'] .neo-lab-section,
+body[data-theme='light'] .anime-lab-section,
+body[data-theme='light'] .interaction-deck-section,
+body[data-theme='light'] .google-services-section,
+body[data-theme='light'] .flow-simulator-section,
+body[data-theme='light'] .topology-section,
+body[data-theme='light'] .split-reveal-section,
+body[data-theme='light'] .elite-cases-section,
+body[data-theme='light'] .tech-playbook-section {
+  background:
+    radial-gradient(900px 520px at 80% 10%, rgba(72, 130, 200, 0.12), transparent 60%),
+    radial-gradient(700px 520px at 15% 85%, rgba(235, 120, 170, 0.12), transparent 60%),
+    linear-gradient(180deg, #eef3ff, #f7faff);
+}
+
+body[data-theme='light'] .showcase-script,
+body[data-theme='light'] .reel-viewport,
+body[data-theme='light'] .neo-console,
+body[data-theme='light'] .neo-preview-card,
+body[data-theme='light'] .pad-panel,
+body[data-theme='light'] .tilt-card,
+body[data-theme='light'] .google-service-card,
+body[data-theme='light'] .flow-shell,
+body[data-theme='light'] .topology-controls,
+body[data-theme='light'] .topology-stage,
+body[data-theme='light'] .split-shell,
+body[data-theme='light'] .elite-card,
+body[data-theme='light'] .playbook-panel,
+body[data-theme='light'] .service-card,
+body[data-theme='light'] .project-card,
+body[data-theme='light'] .timeline-content,
+body[data-theme='light'] .contact-card {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(15, 23, 40, 0.12);
+  box-shadow: 0 18px 44px rgba(15, 23, 40, 0.12);
+}
+
+body[data-theme='light'] .showcase-overlay,
+body[data-theme='light'] .reel-overlay {
+  background: linear-gradient(180deg, rgba(237, 243, 255, 0.2) 0, rgba(237, 243, 255, 0.9) 60%, rgba(237, 243, 255, 0.98) 100%);
+}
+
+body[data-theme='light'] .showcase-step,
+body[data-theme='light'] .project-data-pill,
+body[data-theme='light'] .service-chip,
+body[data-theme='light'] .project-filter,
+body[data-theme='light'] .elite-filter,
+body[data-theme='light'] .playbook-btn,
+body[data-theme='light'] .topology-filter,
+body[data-theme='light'] .pad-btn,
+body[data-theme='light'] .neo-pill,
+body[data-theme='light'] .google-service-copy,
+body[data-theme='light'] .google-card-actions a {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(15, 23, 40, 0.16);
+  color: var(--text-primary);
+}
+
+body[data-theme='light'] .admin-denied-card {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(15, 23, 40, 0.12);
+  color: var(--text-primary);
 }
 
 body[data-motion='reduced'] .badge-dot,

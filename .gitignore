@@ -9,6 +9,7 @@ dist/
 .history/
 agent-diseno-ia/
 .pr-integrate/
+agent-handoff/
 
 # Reports and audits
 reports/

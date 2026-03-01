@@ -1,41 +1,41 @@
 ﻿{
   "meta": {
-    "siteTitle": "Iker Perez Garcia | Portfolio",
+    "siteTitle": "Iker Pérez García | Portfolio",
     "siteDescription": "Portfolio profesional centrado en software, cloud, IA y seguridad.",
-    "ogTitle": "Iker Perez | Portfolio",
+    "ogTitle": "Iker Pérez | Portfolio",
     "ogDescription": "Software, ciberseguridad, cloud e IA aplicada."
   },
   "hero": {
-    "badge": "Disponible para practicas y proyectos tech de alto impacto",
-    "name": "Iker Perez Garcia",
+    "badge": "Disponible para prácticas y proyectos tech de alto impacto",
+    "name": "Iker Pérez García",
     "roleLineA": "Software & Security",
     "roleLineB": "Product Engineer",
     "description": "Ingeniero de Software especializado en sistemas distribuidos, backend robusto, seguridad y experiencias digitales de alto nivel.",
     "highlights": [
       "SICUE en UPM - enfoque empresarial",
-      "ES / GL nativo + Ingles B2",
-      "Cloud, redes y automatizacion",
+      "ES / GL nativo + Inglés B2",
+      "Cloud, redes y automatización",
       "IA aplicada y ciberseguridad"
     ],
     "ctaPrimary": "Ver proyectos",
     "ctaSecondary": "Contactar"
   },
   "about": {
-    "intro": "Soy Iker Perez, estudiante de Ingenieria Informatica en la Universidade da Coruna, con interes profesional en software de calidad, seguridad y arquitectura.",
+    "intro": "Soy Iker Pérez, estudiante de Ingeniería Informática en la Universidade da Coruña, con interés profesional en software de calidad, seguridad y arquitectura.",
     "body": [
-      "Mi formacion combina algoritmos, sistemas operativos, redes, bases de datos y desarrollo full-stack.",
-      "Tambien tengo experiencia practica en hardware, diagnostico y optimizacion de equipos."
+      "Mi formación combina algoritmos, sistemas operativos, redes, bases de datos y desarrollo full-stack.",
+      "También tengo experiencia práctica en hardware, diagnóstico y optimización de equipos."
     ],
     "highlights": [
       {
         "label": "UDC",
-        "title": "Ingenieria Informatica",
-        "text": "Mencion en Tecnologias para la Sociedad de la Informacion"
+        "title": "Ingeniería Informática",
+        "text": "Mención en Tecnologías para la Sociedad de la Información"
       },
       {
         "label": "UPM",
         "title": "Programa SICUE",
-        "text": "Enfoque en sistemas de informacion orientados a negocio"
+        "text": "Enfoque en sistemas de información orientados a negocio"
       }
     ]
   },
@@ -48,7 +48,7 @@
     {
       "label": "Backend Systems",
       "title": "APIs y arquitectura distribuida",
-      "text": "Servicios robustos con observabilidad, contratos claros y evolucion sostenible."
+      "text": "Servicios robustos con observabilidad, contratos claros y evolución sostenible."
     }
   ],
   "projectsNotes": {
@@ -63,7 +63,10 @@
   "visualAssets": {
     "heroBackground": "Mantener canvas 3D del portatil",
     "projectCards": "Preferir previews Open Graph, renders propios o capturas de dashboard",
-    "showcaseMedia": "Usar imagenes cinematicas 16:9 con contraste alto y contexto tecnico"
+    "showcaseMedia": "Usar imágenes cinematicas 16:9 con contraste alto y contexto técnico"
   }
 }
+
+
+
 

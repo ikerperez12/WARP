@@ -1,21 +1,21 @@
-import { prefs, togglePref } from './preferences.js';
+ï»¿import { prefs, togglePref } from './preferences.js';
 
 const translations = {
   es: {
-    nav: ['Sobre mí', 'Skills', 'Servicios', 'Proyectos', 'Método', 'Trayectoria', 'Media', 'Contacto'],
+    nav: ['Sobre mÃ­', 'Skills', 'Servicios', 'Proyectos', 'MÃ©todo', 'Trayectoria', 'Visual', 'Contacto'],
     editor: 'Editor',
-    heroBadge: 'Disponible para prácticas y proyectos tech de alto impacto',
-    heroLines: ['Iker Perez Garcia', 'Software & Security', 'Product Engineer'],
-    heroDescription: 'Ingeniero de Software especializado en crear sistemas distribuidos, seguros y de alto rendimiento. Enfoque integral en arquitectura backend, hardening de sistemas y experiencias de usuario inmersivas. Especial interés en',
-    heroHighlights: ['SICUE en UPM - enfoque empresarial', 'ES / GL nativo + Inglés B2', 'Cloud, redes y automatización', 'IA aplicada y ciberseguridad'],
+    heroBadge: 'Disponible para prÃ¡cticas y proyectos tech de alto impacto',
+    heroLines: ['Iker PÃ©rez GarcÃ­a', 'Software & Security', 'Product Engineer'],
+    heroDescription: 'Ingeniero de Software especializado en crear sistemas distribuidos, seguros y de alto rendimiento. Enfoque integral en arquitectura backend, hardening de sistemas y experiencias de usuario inmersivas. Especial interÃ©s en',
+    heroHighlights: ['SICUE en UPM - enfoque empresarial', 'ES / GL nativo + InglÃ©s B2', 'Cloud, redes y automatizaciÃ³n', 'IA aplicada y ciberseguridad'],
     ctas: ['Ver proyectos', 'Contactar'],
-    stats: ['Año de carrera', 'Proyectos y prácticas', 'Cursos y certificaciones'],
+    stats: ['AÃ±o de carrera', 'Proyectos y prÃ¡cticas', 'Cursos y certificaciones'],
     ui: ['Grano', 'Cursor', 'Motion'],
     misc: {
       skip: 'Saltar al contenido principal',
       backTop: 'Volver arriba',
-      threeCanvas: 'Escena 3D interactiva de portátil en movimiento',
-      threeDesc: 'Fondo 3D decorativo de un portátil que responde al puntero y al scroll.',
+      threeCanvas: 'Escena 3D interactiva de portÃ¡til en movimiento',
+      threeDesc: 'Fondo 3D decorativo de un portÃ¡til que responde al puntero y al scroll.',
       uiToggle: 'Visual',
       mobileTheme: { dark: 'Oscuro', light: 'Claro' },
       themeAria: 'Cambiar tema',
@@ -27,69 +27,77 @@ const translations = {
     },
     ticker: ['Secure by design', 'Backend architecture', 'Cloud automation', 'AI product prototyping', 'Data reliability', 'UX with performance', 'Full stack delivery', 'Continuous improvement'],
     sections: {
-      aboutTitle: 'Sobre mí',
+      aboutTitle: 'Sobre mÃ­',
       skillsTitle: 'Tech Stack',
-      skillsSubtitle: 'Tecnologías y herramientas con las que trabajo',
-      servicesTitle: 'Categorias de valor',
-      servicesSubtitle: 'Trabajo por dominios claros para entregar resultados medibles, no solo código.',
+      skillsSubtitle: 'TecnologÃ­as y herramientas con las que trabajo',
+      servicesTitle: 'CategorÃ­as de valor',
+      servicesSubtitle: 'Trabajo por dominios claros para entregar resultados medibles, no solo cÃ³digo.',
       projectsTitle: 'Proyectos con impacto',
-      projectsSubtitle: 'Trabajo técnico real: rendimiento, seguridad, experiencia de usuario y escalabilidad.',
-      processTitle: 'Cómo trabajo',
-      processSubtitle: 'Método de trabajo para entregar software útil, seguro y mantenible',
-      experienceTitle: 'Formación & trayectoria',
-      contactTitle: '¿Hablamos?',
-      contactSubtitle: 'Busco prácticas, colaboraciones y proyectos interesantes',
+      projectsSubtitle: 'Trabajo tÃ©cnico real: rendimiento, seguridad, experiencia de usuario y escalabilidad.',
+      processTitle: 'CÃ³mo trabajo',
+      processSubtitle: 'MÃ©todo de trabajo para entregar software Ãºtil, seguro y mantenible',
+      experienceTitle: 'FormaciÃ³n & trayectoria',
+      contactTitle: 'Â¿Hablamos?',
+      contactSubtitle: 'Busco prÃ¡cticas, colaboraciones y proyectos interesantes',
+      experienceHeroTitle: 'Experiencia CinematogrÃ¡fica',
+      experienceHeroSubtitle: 'Visuales guiados por scroll, paneles interactivos y storytelling tÃ©cnico concentrados en una pÃ¡gina para explorarlos sin fricciones.',
+      experienceHeroPrimary: 'Volver al portfolio',
+      experienceHeroSecondary: 'Contactar',
+      experienceCtaTitle: 'Experiencia Visual',
+      experienceCtaSubtitle: 'Accede a la narrativa cinematogrÃ¡fica, los laboratorios interactivos y el playbook tÃ©cnico en una pÃ¡gina dedicada.',
+      experienceCtaBody: 'He separado las escenas de motion, los paneles y los comparadores para que la home cargue mÃ¡s rÃ¡pido sin perder el bloque visual.',
+      experienceCtaButton: 'Ver experiencia visual',
       showcaseTitle: 'Cinematic Composition',
-      showcaseSubtitle: 'Dirección visual y ritmo de movimiento sincronizados al scroll para presentar producto con lectura editorial.',
+      showcaseSubtitle: 'DirecciÃ³n visual y ritmo de movimiento sincronizados al scroll para presentar producto con lectura editorial.',
       reelTitle: 'Casos Reales en Movimiento',
-      reelSubtitle: 'Narrativa visual de proyectos con enfoque en impacto, ejecución técnica y resultado en producto.',
-      neoTitle: 'Panel de Decision Tecnica',
-      neoSubtitle: 'Simulación de priorización para elegir foco de sprint en proyectos reales: calidad, velocidad y seguridad.',
+      reelSubtitle: 'Narrativa visual de proyectos con enfoque en impacto, ejecuciÃ³n tÃ©cnica y resultado en producto.',
+      neoTitle: 'Panel de DecisiÃ³n TÃ©cnica',
+      neoSubtitle: 'SimulaciÃ³n de priorizaciÃ³n para elegir foco de sprint en proyectos reales: calidad, velocidad y seguridad.',
       animeTitle: 'Cadencia de Entrega',
-      animeSubtitle: 'Bloques que muestran el flujo de trabajo real en un proyecto: entrada, transformación, release y aprendizaje.',
+      animeSubtitle: 'Bloques que muestran el flujo de trabajo real en un proyecto: entrada, transformaciÃ³n, release y aprendizaje.',
       deckTitle: 'Matriz de Prioridades',
-      deckSubtitle: 'Mapa interactivo para decidir qué atacar primero en un proyecto: fiabilidad, experiencia, seguridad o velocidad.',
+      deckSubtitle: 'Mapa interactivo para decidir quÃ© atacar primero en un proyecto: fiabilidad, experiencia, seguridad o velocidad.',
       cloudTitle: 'Stack Cloud Aplicado a Proyectos',
       cloudSubtitle: 'No es una lista de herramientas: son escenarios de portfolio donde cloud e IA aportan valor real.',
-      flowTitle: 'Roadmap de Ejecucion en Proyectos',
-      flowSubtitle: 'Panel interactivo para explicar cómo paso de discovery a release estable con decisiones técnicas trazables.',
-      topologyTitle: 'Arquitectura de Proyecto en Produccion',
-      topologySubtitle: 'Mapa interactivo para explicar cómo conecto cloud, seguridad, IA y datos en casos reales.',
-      splitTitle: 'Evolucion Visual de Proyecto',
-      splitSubtitle: 'Comparador para mostrar el salto desde una versión base hasta una entrega optimizada y lista para escalar.',
+      flowTitle: 'Roadmap de EjecuciÃ³n en Proyectos',
+      flowSubtitle: 'Panel interactivo para explicar cÃ³mo paso de discovery a release estable con decisiones tÃ©cnicas trazables.',
+      topologyTitle: 'Arquitectura de Proyecto en ProducciÃ³n',
+      topologySubtitle: 'Mapa interactivo para explicar cÃ³mo conecto cloud, seguridad, IA y datos en casos reales.',
+      splitTitle: 'EvoluciÃ³n Visual de Proyecto',
+      splitSubtitle: 'Comparador para mostrar el salto desde una versiÃ³n base hasta una entrega optimizada y lista para escalar.',
       eliteTitle: 'Casos de Portfolio High Impact',
-      eliteSubtitle: 'Ejemplos tipo producción con métricas de impacto y stack moderno para backend, seguridad, cloud e IA.',
-      playbookTitle: 'Playbook Técnico Interactivo',
-      playbookSubtitle: 'Escenarios reales para enseñar cómo aterrizo arquitectura, seguridad y observabilidad según objetivo de negocio.',
+      eliteSubtitle: 'Ejemplos tipo producciÃ³n con mÃ©tricas de impacto y stack moderno para backend, seguridad, cloud e IA.',
+      playbookTitle: 'Playbook TÃ©cnico Interactivo',
+      playbookSubtitle: 'Escenarios reales para enseÃ±ar cÃ³mo aterrizo arquitectura, seguridad y observabilidad segÃºn objetivo de negocio.',
     },
     contact: {
-      cards: ['Email', 'GitHub', 'LinkedIn', 'Ubicación'],
-      topicLabel: 'Categoria',
-      topicPlaceholder: 'Selecciona una categoria',
-      topicOptions: ['Frontend + UX', 'Backend + APIs', 'Cloud + DevOps', 'Security review', 'AI / Data prototype', 'Otra colaboracion'],
+      cards: ['Email', 'GitHub', 'LinkedIn', 'UbicaciÃ³n'],
+      topicLabel: 'CategorÃ­a',
+      topicPlaceholder: 'Selecciona una categorÃ­a',
+      topicOptions: ['Frontend + UX', 'Backend + APIs', 'Cloud + DevOps', 'Security review', 'AI / Data prototype', 'Otra colaboraciÃ³n'],
       nameLabel: 'Nombre',
       namePlaceholder: 'Tu nombre',
       emailLabel: 'Email',
       emailPlaceholder: 'tu@email.com',
       messageLabel: 'Mensaje',
-      messagePlaceholder: 'Cuéntame tu propuesta...',
+      messagePlaceholder: 'CuÃ©ntame tu propuesta...',
       websiteLabel: 'Website',
       submit: 'Enviar mensaje',
       success: 'Gracias. El mensaje se ha enviado correctamente.',
       error: 'No se pudo enviar el mensaje. Revisa los datos e intenta de nuevo.',
     },
     footer: {
-      byline: 'Diseñado y desarrollado por Iker Pérez.',
+      byline: 'DiseÃ±ado y desarrollado por Iker PÃ©rez.',
       meta: 'Software, seguridad, cloud e IA aplicada.',
-      nav: ['Sobre mí', 'Servicios', 'Proyectos', 'Contacto'],
-      availability: 'Disponible para prácticas y colaboraciones técnicas.',
+      nav: ['Sobre mÃ­', 'Servicios', 'Proyectos', 'Contacto'],
+      availability: 'Disponible para prÃ¡cticas y colaboraciones tÃ©cnicas.',
     },
   },
   en: {
-    nav: ['About', 'Skills', 'Services', 'Projects', 'Method', 'Journey', 'Media', 'Contact'],
+    nav: ['About', 'Skills', 'Services', 'Projects', 'Method', 'Journey', 'Visual', 'Contact'],
     editor: 'Editor',
     heroBadge: 'Available for internships and high-impact tech projects',
-    heroLines: ['Iker Perez Garcia', 'Software & Security', 'Product Engineer'],
+    heroLines: ['Iker PÃ©rez GarcÃ­a', 'Software & Security', 'Product Engineer'],
     heroDescription: 'Software Engineer focused on building distributed, secure and high-performance systems. End-to-end approach across backend architecture, system hardening and immersive product experiences. Special interest in',
     heroHighlights: ['SICUE at UPM - business-oriented perspective', 'Native ES / GL + English B2', 'Cloud, networking and automation', 'Applied AI and cybersecurity'],
     ctas: ['View projects', 'Contact'],
@@ -123,6 +131,14 @@ const translations = {
       experienceTitle: 'Education & journey',
       contactTitle: 'Let\'s talk',
       contactSubtitle: 'I am looking for internships, collaborations and interesting projects',
+      experienceHeroTitle: 'Cinematic Experience',
+      experienceHeroSubtitle: 'Scroll-driven visuals, interactive panels, and technical storytelling curated on a dedicated page.',
+      experienceHeroPrimary: 'Back to portfolio',
+      experienceHeroSecondary: 'Contact',
+      experienceCtaTitle: 'Visual Experience',
+      experienceCtaSubtitle: 'Access the cinematic narrative, interactive labs, and technical playbook on a dedicated page.',
+      experienceCtaBody: 'I separated motion scenes, panels, and comparators so the home loads faster without losing the visual block.',
+      experienceCtaButton: 'Open visual experience',
       showcaseTitle: 'Cinematic Composition',
       showcaseSubtitle: 'Visual direction and motion rhythm synchronized to scroll to present product with editorial clarity.',
       reelTitle: 'Real Cases in Motion',
@@ -163,7 +179,7 @@ const translations = {
       error: 'The message could not be sent. Check the data and try again.',
     },
     footer: {
-      byline: 'Designed and developed by Iker Pérez.',
+      byline: 'Designed and developed by Iker PÃ©rez.',
       meta: 'Software, security, cloud and applied AI.',
       nav: ['About', 'Services', 'Projects', 'Contact'],
       availability: 'Available for internships and technical collaborations.',
@@ -266,6 +282,7 @@ function applyLanguage() {
   document.querySelectorAll('.ticker-item').forEach((node, index) => setNodeText(node, copy.ticker[index]));
 
   setText('.skip-link', copy.misc.skip);
+  setText('.nav-topline', copy.heroBadge);
   setAria('#back-to-top', copy.misc.backTop);
   setAria('#three-canvas', copy.misc.threeCanvas);
   setText('#three-scene-desc', copy.misc.threeDesc);
@@ -302,6 +319,15 @@ function applyLanguage() {
   setSectionTitle('experience', copy.sections.experienceTitle);
   setSectionTitle('contact', copy.sections.contactTitle);
   setSectionSubtitle('contact', copy.sections.contactSubtitle);
+  setSectionTitle('experience-hero', copy.sections.experienceHeroTitle);
+  setSectionSubtitle('experience-hero', copy.sections.experienceHeroSubtitle);
+  const experienceActions = document.querySelectorAll('#experience-hero .experience-hero-actions a');
+  if (experienceActions[0]) experienceActions[0].textContent = copy.sections.experienceHeroPrimary;
+  if (experienceActions[1]) experienceActions[1].textContent = copy.sections.experienceHeroSecondary;
+  setSectionTitle('experience-cta', copy.sections.experienceCtaTitle);
+  setSectionSubtitle('experience-cta', copy.sections.experienceCtaSubtitle);
+  setText('#experience-cta .experience-cta-body p', copy.sections.experienceCtaBody);
+  setText('#experience-cta .experience-cta-body a', copy.sections.experienceCtaButton);
   setSectionTitle('showcase', copy.sections.showcaseTitle);
   setSectionSubtitle('showcase', copy.sections.showcaseSubtitle);
   setSectionTitle('motion-reel', copy.sections.reelTitle);
@@ -392,3 +418,4 @@ function setAria(selector, value) {
 function setNodeText(node, value) {
   if (node && typeof value === 'string') node.textContent = value;
 }
+
