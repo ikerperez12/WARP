@@ -12,6 +12,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node --test \"src/features/gaming/**/*.test.js\"",
+    "capture:gaming": "node scripts/capture-gaming-visuals.mjs",
     "export:original-glb": "node scripts/export-original-glb.mjs",
     "sync:projects": "node scripts/sync-github-projects.mjs"
   },

@@ -48,6 +48,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  if (['127.0.0.1', 'localhost'].includes(window.location.hostname)) {
+    window.__warpApp = app;
+  }
+
   refs.buttons.start?.addEventListener('click', () => app.start());
   refs.buttons.pause?.addEventListener('click', () => app.pause());
   refs.buttons.resume?.addEventListener('click', () => app.resume());

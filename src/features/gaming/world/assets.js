@@ -151,12 +151,20 @@ export function instantiateAsset(asset, options = {}) {
     tint,
     tintStrength,
     emissiveBoost,
+    upAxis = asset?.scene?.userData?.warpUpAxis ?? 'y',
   } = options;
 
-  const object = cloneAssetScene(asset);
+  const source = cloneAssetScene(asset);
+  const object = new THREE.Group();
+  if (upAxis === 'z') {
+    source.rotation.x = -Math.PI / 2;
+  }
+  object.add(source);
+  object.updateMatrixWorld(true);
   const bounds = new THREE.Box3().setFromObject(object);
   const size = bounds.getSize(new THREE.Vector3());
-  const scaleByHeight = height ? height / Math.max(size.y, 0.001) : null;
+  const normalizedHeight = size.y > 0.08 ? size.y : Math.max(size.x * 0.42, size.z * 0.28, 0.001);
+  const scaleByHeight = height ? height / Math.max(normalizedHeight, 0.001) : null;
   const scaleByWidth = width ? width / Math.max(size.x, 0.001) : null;
   const scaleByDepth = depth ? depth / Math.max(size.z, 0.001) : null;
   const scalar = scaleByHeight ?? scaleByWidth ?? scaleByDepth ?? 1;
@@ -183,7 +191,7 @@ export function instantiateAsset(asset, options = {}) {
   return object;
 }
 
-export async function loadGameAssets({ onProgress } = {}) {
+export async function loadGameAssets({ onProgress, preloadOptional = false } = {}) {
   if (assetCache) {
     onProgress?.(1);
     return assetCache;
@@ -191,7 +199,9 @@ export async function loadGameAssets({ onProgress } = {}) {
 
   if (!assetPromise) {
     assetPromise = (async () => {
-      const totalAssets = Object.keys(REQUIRED_MODEL_MANIFEST).length + Object.keys(TEXTURE_MANIFEST).length;
+      const totalAssets = Object.keys(REQUIRED_MODEL_MANIFEST).length
+        + Object.keys(TEXTURE_MANIFEST).length
+        + (preloadOptional ? Object.keys(OPTIONAL_MODEL_MANIFEST).length : 0);
       const dracoLoader = new DRACOLoader();
       dracoLoader.setDecoderPath('/gaming-assets/draco/gltf/');
       dracoLoader.setDecoderConfig({ type: 'js' });
@@ -209,6 +219,9 @@ export async function loadGameAssets({ onProgress } = {}) {
       const requiredResults = await Promise.allSettled([
         ...Object.entries(REQUIRED_MODEL_MANIFEST).map(async ([key, path]) => {
           const asset = await withTimeout(gltfLoader.loadAsync(path), path, 20000);
+          if (path.includes('/gaming-assets/folio2019/')) {
+            asset.scene.userData.warpUpAxis = 'z';
+          }
           return [key, asset];
         }),
         ...Object.entries(TEXTURE_MANIFEST).map(async ([key, path]) => {
@@ -222,20 +235,35 @@ export async function loadGameAssets({ onProgress } = {}) {
       ]);
 
       assetCache = Object.fromEntries(collectFulfilledEntries(requiredResults));
-      window.setTimeout(async () => {
+
+      const loadOptionalAssets = async (timeoutMs) => {
         try {
-          const optionalLoader = new GLTFLoader();
+          const optionalLoader = new GLTFLoader(loadingManager);
           optionalLoader.setDRACOLoader(dracoLoader);
           const optionalResults = await loadManifestEntries(
             Object.entries(OPTIONAL_MODEL_MANIFEST),
-            (path) => optionalLoader.loadAsync(path),
-            8000,
+            async (path) => {
+              const asset = await optionalLoader.loadAsync(path);
+              if (path.includes('/gaming-assets/folio2019/')) {
+                asset.scene.userData.warpUpAxis = 'z';
+              }
+              return asset;
+            },
+            timeoutMs,
           );
           Object.assign(assetCache, Object.fromEntries(collectFulfilledEntries(optionalResults)));
         } catch (error) {
           console.warn('[gaming-assets] Optional asset warmup failed', error);
         }
-      }, 0);
+      };
+
+      if (preloadOptional) {
+        await loadOptionalAssets(16000);
+      } else {
+        window.setTimeout(() => {
+          void loadOptionalAssets(8000);
+        }, 0);
+      }
       onProgress?.(1);
       return assetCache;
     })();

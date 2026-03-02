@@ -1,12 +1,21 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import * as THREE from 'three';
 import { computeVehicleFeedback, hasImportedVehicleCore } from './vehicle.js';
 
-test('hasImportedVehicleCore requires chassis and wheel assets', () => {
+function createMockAsset(width = 1, height = 1, depth = 1) {
+  const scene = new THREE.Group();
+  scene.add(new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), new THREE.MeshBasicMaterial()));
+  return { scene };
+}
+
+test('hasImportedVehicleCore requires a renderable asset set', () => {
   assert.equal(hasImportedVehicleCore(null), false);
-  assert.equal(hasImportedVehicleCore({ cybertruckChassis: {} }), false);
-  assert.equal(hasImportedVehicleCore({ cybertruckWheel: {} }), false);
-  assert.equal(hasImportedVehicleCore({ cybertruckChassis: {}, cybertruckWheel: {} }), true);
+  assert.equal(hasImportedVehicleCore({ cybertruckChassis: {}, cybertruckWheel: {} }), false);
+  assert.equal(hasImportedVehicleCore({
+    defaultCarChassis: createMockAsset(2, 1, 4),
+    defaultCarWheel: createMockAsset(0.7, 0.7, 0.4),
+  }), true);
 });
 
 test('computeVehicleFeedback raises brake strength while decelerating', () => {

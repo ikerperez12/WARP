@@ -64,8 +64,123 @@ function createFallbackBrakeLight() {
   );
 }
 
+function measureRenderableAsset(asset) {
+  if (!asset?.scene) return null;
+  asset.scene.updateMatrixWorld?.(true);
+  const bounds = new THREE.Box3();
+  let meshCount = 0;
+  let initialized = false;
+
+  asset.scene.traverse((child) => {
+    if (!child?.isMesh || !child.geometry?.attributes?.position?.count) return;
+    const childBounds = new THREE.Box3().setFromObject(child);
+    if (!Number.isFinite(childBounds.min.x) || !Number.isFinite(childBounds.max.x)) return;
+    if (initialized) bounds.union(childBounds);
+    else {
+      bounds.copy(childBounds);
+      initialized = true;
+    }
+    meshCount += 1;
+  });
+
+  if (!initialized || meshCount === 0) return null;
+  const size = bounds.getSize(new THREE.Vector3());
+  return {
+    bounds,
+    size,
+    meshCount,
+    maxSpan: Math.max(size.x, size.y, size.z),
+    footprint: Math.max(size.x, size.z),
+  };
+}
+
+function isRenderableVehicleAsset(asset) {
+  const metrics = measureRenderableAsset(asset);
+  if (!metrics) return false;
+  return metrics.maxSpan > 0.32 && metrics.footprint > 0.22;
+}
+
+function resolveVehicleAssetSet(assets = null) {
+  const candidates = [
+    {
+      id: 'default',
+      chassis: assets?.defaultCarChassis,
+      wheel: assets?.defaultCarWheel,
+      antenna: assets?.defaultCarAntenna,
+      brake: assets?.defaultCarBrake,
+    },
+    {
+      id: 'cybertruck',
+      chassis: assets?.cybertruckChassis,
+      wheel: assets?.cybertruckWheel,
+      antenna: assets?.cybertruckAntenna,
+      brake: assets?.cybertruckBrake,
+    },
+  ];
+
+  for (const candidate of candidates) {
+    if (!isRenderableVehicleAsset(candidate.chassis) || !isRenderableVehicleAsset(candidate.wheel)) continue;
+    return candidate;
+  }
+
+  return null;
+}
+
+function createHeroFallbackVehicle(materials) {
+  const group = new THREE.Group();
+  const chassis = new THREE.Mesh(
+    new THREE.BoxGeometry(2.3, 0.72, 4.4),
+    new THREE.MeshStandardMaterial({
+      color: '#b9d5ff',
+      emissive: '#46d7ff',
+      emissiveIntensity: 0.16,
+      metalness: 0.62,
+      roughness: 0.24,
+    }),
+  );
+  chassis.position.y = 0.76;
+  chassis.castShadow = true;
+  chassis.receiveShadow = true;
+
+  const cabin = new THREE.Mesh(
+    new THREE.BoxGeometry(1.54, 0.86, 1.9),
+    materials.glass.clone(),
+  );
+  cabin.position.set(0, 1.3, -0.16);
+  cabin.castShadow = true;
+  cabin.receiveShadow = true;
+
+  const nose = new THREE.Mesh(
+    new THREE.BoxGeometry(1.8, 0.18, 0.86),
+    materials.emissive('#7de9ff', 1.08),
+  );
+  nose.position.set(0, 0.88, 2.16);
+
+  const rearBar = createFallbackBrakeLight();
+  rearBar.scale.set(1.16, 1, 1);
+  rearBar.position.set(0, 0.76, -2.22);
+
+  group.add(chassis, cabin, nose, rearBar);
+  return { group, brake: rearBar };
+}
+
+function deriveVehicleLayout(bounds) {
+  const size = bounds.getSize(new THREE.Vector3());
+  return {
+    wheelHeight: Math.max(0.72, Math.min(1.05, size.y * 0.44)),
+    wheelX: Math.max(0.68, size.x * 0.34),
+    wheelFrontZ: -Math.max(0.84, size.z * 0.28),
+    wheelRearZ: Math.max(0.92, size.z * 0.29),
+    wheelY: Math.max(0.28, size.y * 0.17),
+    antennaPosition: new THREE.Vector3(size.x * 0.03, Math.max(1.08, size.y * 0.84), -size.z * 0.3),
+    brakePosition: new THREE.Vector3(0, Math.max(0.38, size.y * 0.34), Math.max(1.02, size.z * 0.47)),
+    shadowWidth: Math.max(2.8, size.x * 1.46),
+    shadowDepth: Math.max(4.4, size.z * 1.24),
+  };
+}
+
 export function hasImportedVehicleCore(assets = null) {
-  return Boolean(assets?.cybertruckChassis && assets?.cybertruckWheel);
+  return Boolean(resolveVehicleAssetSet(assets));
 }
 
 export function computeVehicleFeedback({
@@ -134,50 +249,64 @@ export class VehicleEntity {
     this.shadow.position.y = 0.04;
     this.group.add(this.shadow);
 
-    if (hasImportedVehicleCore(assets)) {
-      const chassis = instantiateAsset(assets.cybertruckChassis, {
-        height: 2.1,
-        tint: '#3cf5d2',
-        tintStrength: 0.16,
-        emissiveBoost: 0.14,
+    const vehicleAssets = resolveVehicleAssetSet(assets);
+
+    if (vehicleAssets) {
+      const chassisTint = vehicleAssets.id === 'default' ? '#9ee6ff' : '#3cf5d2';
+      const chassis = instantiateAsset(vehicleAssets.chassis, {
+        height: vehicleAssets.id === 'default' ? 2.45 : 2.18,
+        tint: chassisTint,
+        tintStrength: vehicleAssets.id === 'default' ? 0.08 : 0.16,
+        emissiveBoost: vehicleAssets.id === 'default' ? 0.08 : 0.14,
       });
-      chassis.position.y = 0.14;
+      chassis.position.y = 0.08;
+      const chassisBounds = new THREE.Box3().setFromObject(chassis);
+      const layout = deriveVehicleLayout(chassisBounds);
+      this.shadow.scale.set(layout.shadowWidth / 2.2, 1, layout.shadowDepth / 2.2);
       this.accentMaterials.push(...collectEmissiveMaterials(chassis));
       this.group.add(chassis);
 
-      this.antenna = assets?.cybertruckAntenna
-        ? instantiateAsset(assets.cybertruckAntenna, {
-            height: 1.05,
+      const canopyHalo = new THREE.Mesh(
+        new THREE.TorusGeometry(Math.max(0.42, layout.shadowWidth * 0.18), 0.06, 8, 28),
+        materials.emissive(vehicleAssets.id === 'default' ? '#7be3ff' : '#3cf5d2', 0.82),
+      );
+      canopyHalo.rotation.x = Math.PI / 2;
+      canopyHalo.position.set(0, Math.max(0.96, chassisBounds.max.y * 0.64), -layout.brakePosition.z * 0.18);
+      this.group.add(canopyHalo);
+
+      this.antenna = vehicleAssets.antenna
+        ? instantiateAsset(vehicleAssets.antenna, {
+            height: Math.max(0.88, layout.wheelHeight),
             tint: '#8ceaff',
             tintStrength: 0.24,
             emissiveBoost: 0.16,
           })
         : createFallbackAntenna();
-      this.antenna.position.set(0.08, 1.82, -0.95);
+      this.antenna.position.copy(layout.antennaPosition);
       this.group.add(this.antenna);
 
-      const brake = assets?.cybertruckBrake
-        ? instantiateAsset(assets.cybertruckBrake, {
-            height: 0.3,
+      const brake = vehicleAssets.brake
+        ? instantiateAsset(vehicleAssets.brake, {
+            height: 0.32,
             tint: '#ffb703',
             tintStrength: 0.5,
             emissiveBoost: 0.5,
           })
         : createFallbackBrakeLight();
-      brake.position.set(0, 0.74, 1.36);
+      brake.position.copy(layout.brakePosition);
       this.brakeMaterials = collectEmissiveMaterials(brake);
       this.group.add(brake);
 
       const wheelOffsets = [
-        [-0.88, 0.34, -1.14],
-        [0.88, 0.34, -1.14],
-        [-0.88, 0.34, 1.18],
-        [0.88, 0.34, 1.18],
+        [-layout.wheelX, layout.wheelY, layout.wheelFrontZ],
+        [layout.wheelX, layout.wheelY, layout.wheelFrontZ],
+        [-layout.wheelX, layout.wheelY, layout.wheelRearZ],
+        [layout.wheelX, layout.wheelY, layout.wheelRearZ],
       ];
 
       this.wheels = wheelOffsets.map(([x, y, z], index) => {
-        const wheel = instantiateAsset(assets.cybertruckWheel, {
-          height: 1.08,
+        const wheel = instantiateAsset(vehicleAssets.wheel, {
+          height: layout.wheelHeight,
           tint: '#111a27',
           tintStrength: 0.18,
         });
@@ -189,27 +318,43 @@ export class VehicleEntity {
         return wheel;
       });
     } else {
-      const body = new THREE.Mesh(new THREE.BoxGeometry(6, 2.4, 8.4), materials.neutral);
-      body.position.y = 2.1;
-      body.castShadow = true;
-
-      const cabin = new THREE.Mesh(new THREE.BoxGeometry(3.6, 2.2, 3.6), materials.glass);
-      cabin.position.set(0, 3.2, -0.2);
-
-      const nose = new THREE.Mesh(new THREE.BoxGeometry(4.8, 1, 1.4), materials.emissive('#ffb703', 1.4));
-      nose.position.set(0, 2.1, 4.2);
-
-      const fin = new THREE.Mesh(new THREE.BoxGeometry(1.1, 2.8, 0.6), materials.emissive('#3cf5d2', 1.1));
-      fin.position.set(0, 3.6, -3.9);
+      const fallback = createHeroFallbackVehicle(materials);
+      const fallbackBounds = new THREE.Box3().setFromObject(fallback.group);
+      const layout = deriveVehicleLayout(fallbackBounds);
+      this.shadow.scale.set(layout.shadowWidth / 2.2, 1, layout.shadowDepth / 2.2);
+      this.accentMaterials.push(...collectEmissiveMaterials(fallback.group));
+      this.group.add(fallback.group);
 
       this.antenna = createFallbackAntenna();
-      this.antenna.position.set(0, 4.2, -2.8);
+      this.antenna.position.copy(layout.antennaPosition);
+      this.group.add(this.antenna);
 
-      const brake = createFallbackBrakeLight();
-      brake.position.set(0, 2.08, -4.18);
+      const brake = fallback.brake;
       this.brakeMaterials = collectEmissiveMaterials(brake);
 
-      this.group.add(body, cabin, nose, fin, this.antenna, brake);
+      const wheelGeometry = new THREE.CylinderGeometry(0.34, 0.34, 0.28, 16);
+      const wheelMaterial = new THREE.MeshStandardMaterial({
+        color: '#111827',
+        metalness: 0.44,
+        roughness: 0.36,
+      });
+      const wheelOffsets = [
+        [-layout.wheelX, layout.wheelY, layout.wheelFrontZ],
+        [layout.wheelX, layout.wheelY, layout.wheelFrontZ],
+        [-layout.wheelX, layout.wheelY, layout.wheelRearZ],
+        [layout.wheelX, layout.wheelY, layout.wheelRearZ],
+      ];
+      this.wheels = wheelOffsets.map(([x, y, z], index) => {
+        const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+        wheel.rotation.z = Math.PI / 2;
+        wheel.position.set(x, y, z);
+        wheel.castShadow = true;
+        wheel.receiveShadow = true;
+        wheel.userData.baseRotationY = index > 1 ? Math.PI : 0;
+        wheel.rotation.y = wheel.userData.baseRotationY;
+        this.group.add(wheel);
+        return wheel;
+      });
     }
     this.group.position.set(0, 0, 0);
     this.group.userData.entity = 'vehicle';

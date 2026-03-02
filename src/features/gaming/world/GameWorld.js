@@ -7,6 +7,7 @@ import { instantiateAsset, loadGameAssets, tintImportedModel } from './assets.js
 
 let shadowTexture;
 const labelTextureCache = new Map();
+const districtSurfaceTextureCache = new Map();
 
 function nextFrame() {
   return new Promise((resolve) => {
@@ -176,12 +177,14 @@ export function createWorldProfile(env = globalThis) {
     low,
     medium,
     perimeterStep: low ? 2 : 1,
-    parkedCars: low ? 4 : 6,
-    flowerCount: low ? 4 : medium ? 5 : 6,
-    backdropDistricts: low ? 2 : medium ? 3 : 4,
-    backdropBlocks: low ? 1 : medium ? 2 : 3,
-    backdropRobot: !low,
-    ambientSparks: low ? 8 : medium ? 12 : 20,
+    parkedCars: low ? 5 : medium ? 8 : 10,
+    flowerCount: low ? 5 : medium ? 8 : 10,
+    backdropDistricts: low ? 3 : 4,
+    backdropBlocks: low ? 2 : medium ? 3 : 4,
+    backdropRobot: true,
+    ambientSparks: low ? 12 : medium ? 18 : 28,
+    roadsideColumns: low ? 10 : medium ? 16 : 22,
+    plazaMarkers: low ? 10 : medium ? 14 : 18,
   };
 }
 
@@ -216,6 +219,65 @@ function getShadowTexture() {
   shadowTexture = new THREE.CanvasTexture(canvas);
   shadowTexture.colorSpace = THREE.SRGBColorSpace;
   return shadowTexture;
+}
+
+function getDistrictSurfaceTexture(theme = 'dark') {
+  if (districtSurfaceTextureCache.has(theme)) return districtSurfaceTextureCache.get(theme);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 1024;
+  const context = canvas.getContext('2d');
+  const isLight = theme === 'light';
+
+  const gradient = context.createLinearGradient(0, 0, canvas.width, canvas.height);
+  gradient.addColorStop(0, isLight ? '#ebf4ff' : '#07111f');
+  gradient.addColorStop(0.5, isLight ? '#ddeaff' : '#0b1730');
+  gradient.addColorStop(1, isLight ? '#d2e3fb' : '#091524');
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
+  context.globalAlpha = isLight ? 0.08 : 0.12;
+  for (let y = -canvas.height; y < canvas.height * 2; y += 42) {
+    context.strokeStyle = isLight ? '#6f95c8' : '#2f4f74';
+    context.lineWidth = 2;
+    context.beginPath();
+    context.moveTo(0, y);
+    context.lineTo(canvas.width, y + canvas.height * 0.4);
+    context.stroke();
+  }
+
+  context.globalAlpha = isLight ? 0.06 : 0.1;
+  for (let i = 0; i <= 32; i += 1) {
+    const p = (canvas.width / 32) * i;
+    context.strokeStyle = i % 4 === 0 ? (isLight ? '#7d9dcc' : '#2d4666') : (isLight ? '#9ab3d6' : '#173050');
+    context.lineWidth = i % 4 === 0 ? 3 : 1;
+    context.beginPath();
+    context.moveTo(p, 0);
+    context.lineTo(p, canvas.height);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(0, p);
+    context.lineTo(canvas.width, p);
+    context.stroke();
+  }
+
+  context.globalAlpha = isLight ? 0.12 : 0.2;
+  context.fillStyle = isLight ? '#a7c7f8' : '#45dfff';
+  for (let i = 0; i < 96; i += 1) {
+    const x = (i * 97) % canvas.width;
+    const y = (i * 151) % canvas.height;
+    context.fillRect(x, y, 4 + (i % 3), 4 + (i % 2));
+  }
+
+  context.globalAlpha = 1;
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(3.4, 3.4);
+  districtSurfaceTextureCache.set(theme, texture);
+  return texture;
 }
 
 function createGroundShadow(width = 6, depth = width, opacity = 0.22, color = '#02060c') {
@@ -352,6 +414,7 @@ export class GameWorld {
     try {
       this.assets = await loadGameAssets({
         onProgress: (value) => setProgress(value * 0.72),
+        preloadOptional: !this.compatibility,
       });
     } catch (error) {
       console.warn('[gaming] Asset preload failed, continuing with scenic fallback', error);
@@ -684,6 +747,22 @@ export class GameWorld {
     ground.receiveShadow = true;
     this.scene.add(ground);
 
+    const surfaceOverlay = new THREE.Mesh(
+      new THREE.PlaneGeometry(500, 500),
+      new THREE.MeshStandardMaterial({
+        color: '#ffffff',
+        map: getDistrictSurfaceTexture(this.theme),
+        transparent: true,
+        opacity: this.theme === 'light' ? 0.68 : 0.9,
+        roughness: 0.92,
+        metalness: 0.04,
+      }),
+    );
+    surfaceOverlay.rotation.x = -Math.PI / 2;
+    surfaceOverlay.position.y = 0.03;
+    surfaceOverlay.receiveShadow = true;
+    this.scene.add(surfaceOverlay);
+
     const underlay = new THREE.Mesh(
       new THREE.CircleGeometry(190, 72),
       new THREE.MeshBasicMaterial({
@@ -720,6 +799,56 @@ export class GameWorld {
     innerRoad.position.y = 0.065;
     this.scene.add(innerRoad);
 
+    const centralAvenues = [
+      { width: 28, depth: 184, x: 0, z: 0 },
+      { width: 184, depth: 22, x: 0, z: 0 },
+      { width: 18, depth: 104, x: -39, z: -6 },
+      { width: 18, depth: 104, x: 42, z: -5 },
+      { width: 88, depth: 18, x: 0, z: 46 },
+      { width: 88, depth: 18, x: 0, z: -48 },
+    ];
+    centralAvenues.forEach((avenue, avenueIndex) => {
+      const mesh = new THREE.Mesh(
+        new THREE.BoxGeometry(avenue.width, 0.14, avenue.depth),
+        new THREE.MeshStandardMaterial({
+          color: this.theme === 'light' ? '#cfdef5' : '#0b1a2b',
+          roughness: 0.78,
+          metalness: 0.12,
+        }),
+      );
+      mesh.position.set(avenue.x, 0.09, avenue.z);
+      mesh.receiveShadow = true;
+      this.scene.add(mesh);
+
+      const strip = new THREE.Mesh(
+        new THREE.BoxGeometry(
+          avenue.width > avenue.depth ? avenue.width * 0.62 : 1.1,
+          0.06,
+          avenue.width > avenue.depth ? 1.1 : avenue.depth * 0.62,
+        ),
+        this.materials.emissive(avenueIndex % 2 === 0 ? '#5edfff' : '#72f1d5', this.theme === 'light' ? 0.18 : 0.42),
+      );
+      strip.position.set(avenue.x, 0.19, avenue.z);
+      this.scene.add(strip);
+    });
+
+    const laneDashMaterial = new THREE.MeshBasicMaterial({
+      color: this.theme === 'light' ? '#86a7d6' : '#9fefff',
+      transparent: true,
+      opacity: this.theme === 'light' ? 0.36 : 0.56,
+    });
+    for (let index = -6; index <= 6; index += 1) {
+      const verticalDash = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 7.2), laneDashMaterial);
+      verticalDash.rotation.x = -Math.PI / 2;
+      verticalDash.position.set(0, 0.2, index * 12);
+      this.scene.add(verticalDash);
+
+      const horizontalDash = new THREE.Mesh(new THREE.PlaneGeometry(7.2, 1.3), laneDashMaterial);
+      horizontalDash.rotation.x = -Math.PI / 2;
+      horizontalDash.position.set(index * 12, 0.2, 0);
+      this.scene.add(horizontalDash);
+    }
+
     [-64, 64].forEach((x) => {
       const lane = new THREE.Mesh(
         new THREE.BoxGeometry(24, 0.18, 160),
@@ -753,6 +882,18 @@ export class GameWorld {
     grid.material.opacity = this.theme === 'light' ? 0.1 : 0.16;
     grid.material.transparent = true;
     this.scene.add(grid);
+
+    const curbRing = new THREE.Mesh(
+      new THREE.RingGeometry(30.8, 33.6, 80),
+      new THREE.MeshStandardMaterial({
+        color: this.theme === 'light' ? '#f7fbff' : '#16263d',
+        roughness: 0.4,
+        metalness: 0.18,
+      }),
+    );
+    curbRing.rotation.x = -Math.PI / 2;
+    curbRing.position.y = 0.16;
+    this.scene.add(curbRing);
   }
 
   buildSectorPlaza(sector) {
@@ -795,6 +936,45 @@ export class GameWorld {
     innerRing.position.set(sector.center.x, 1.03, sector.center.z);
     group.add(innerRing);
 
+    for (let index = 0; index < 8; index += 1) {
+      const angle = (Math.PI * 2 * index) / 8;
+      const radius = sector.radius * 0.48;
+      const plate = new THREE.Mesh(
+        new THREE.BoxGeometry(6.6, 0.2, 2.8),
+        new THREE.MeshStandardMaterial({
+          color: this.theme === 'light' ? '#edf5ff' : '#10243c',
+          roughness: 0.34,
+          metalness: 0.32,
+        }),
+      );
+      plate.position.set(
+        sector.center.x + Math.cos(angle) * radius,
+        1.01,
+        sector.center.z + Math.sin(angle) * radius,
+      );
+      plate.rotation.y = -angle;
+      plate.receiveShadow = true;
+      plate.castShadow = true;
+      group.add(plate);
+
+      const accentStrip = new THREE.Mesh(
+        new THREE.PlaneGeometry(4.8, 0.24),
+        new THREE.MeshBasicMaterial({
+          color: index % 2 === 0 ? sector.accent : sector.glow,
+          transparent: true,
+          opacity: this.theme === 'light' ? 0.4 : 0.68,
+        }),
+      );
+      accentStrip.rotation.x = -Math.PI / 2;
+      accentStrip.rotation.z = -angle;
+      accentStrip.position.set(
+        sector.center.x + Math.cos(angle) * radius,
+        1.12,
+        sector.center.z + Math.sin(angle) * radius,
+      );
+      group.add(accentStrip);
+    }
+
     for (let index = 0; index < 6; index += 1) {
       const angle = (Math.PI * 2 * index) / 6;
       const radius = sector.radius * 0.78;
@@ -810,6 +990,18 @@ export class GameWorld {
       plinth.castShadow = true;
       plinth.receiveShadow = true;
       group.add(plinth);
+
+      const cap = new THREE.Mesh(
+        new THREE.OctahedronGeometry(0.54 + (index % 2) * 0.08),
+        this.materials.emissive(index % 2 === 0 ? sector.accent : sector.glow, this.theme === 'light' ? 0.24 : 0.62),
+      );
+      cap.position.set(
+        sector.center.x + Math.cos(angle) * radius,
+        2.08,
+        sector.center.z + Math.sin(angle) * radius,
+      );
+      group.add(cap);
+      this.orbiters.push({ object: cap, radius: 0, speed: 0.14 + index * 0.01 });
     }
 
     const sign = createDistrictSign(
@@ -905,7 +1097,57 @@ export class GameWorld {
           tint: '#48dcff',
           bunny: true,
         });
+        this.createParkedCar({
+          position: { x: sector.center.x - 6.8, z: sector.center.z - 17.2 },
+          rotationY: 0.42,
+          tint: '#8ceaff',
+        });
         this.createFlowerPatch({ x: sector.center.x - 22, z: sector.center.z + 6 }, 7, '#5ef2e3');
+
+        const servicePosts = [
+          { x: -8.4, z: -22 },
+          { x: 8.4, z: -22 },
+          { x: -8.4, z: 21 },
+          { x: 8.4, z: 21 },
+        ];
+        servicePosts.forEach((item, serviceIndex) => {
+          const post = createColumn(this.materials.border, 4.8, 0.46);
+          post.position.set(sector.center.x + item.x, 2.4, sector.center.z + item.z);
+          group.add(post);
+
+          const halo = new THREE.Mesh(
+            new THREE.TorusGeometry(0.74, 0.08, 8, 24),
+            this.materials.emissive(serviceIndex % 2 === 0 ? '#5edfff' : '#72f1d5', this.theme === 'light' ? 0.28 : 0.72),
+          );
+          halo.rotation.x = Math.PI / 2;
+          halo.position.set(sector.center.x + item.x, 4.9, sector.center.z + item.z);
+          group.add(halo);
+        });
+
+        [
+          { x: -12, z: -6, tile: 'tileC', tint: '#72f1d5', rot: 0.12 },
+          { x: -8, z: 10, tile: 'tileD', tint: '#5edfff', rot: -0.18 },
+          { x: 10, z: -8, tile: 'tileB', tint: '#79dfff', rot: 0.28 },
+          { x: 13, z: 9, tile: 'tileE', tint: '#8cf4ff', rot: -0.08 },
+          { x: 0, z: 17, tile: 'tileA', tint: '#72f1d5', rot: 0 },
+        ].forEach((item) => {
+          this.addImportedInstance(group, item.tile, {
+            height: 1.18,
+            rotationY: item.rot,
+            position: { x: sector.center.x + item.x, y: 1.04, z: sector.center.z + item.z },
+            tint: item.tint,
+            tintStrength: 0.14,
+            emissiveBoost: 0.08,
+            shadow: { width: 2.8, depth: 2.8, opacity: 0.12 },
+          });
+        });
+
+        const bayBeam = new THREE.Mesh(
+          new THREE.BoxGeometry(18, 0.56, 1.2),
+          this.materials.emissive('#5edfff', this.theme === 'light' ? 0.3 : 0.8),
+        );
+        bayBeam.position.set(sector.center.x, 4.6, sector.center.z + 16.8);
+        group.add(bayBeam);
       }
 
       if (sector.id === 'firewall-sector') {
@@ -1424,6 +1666,27 @@ export class GameWorld {
         top.position.set(x, height + 0.6, z);
         this.scene.add(top);
         this.orbiters.push({ object: top, radius: 0, speed: 0.2 + (index % 4) * 0.05 });
+
+        if (index < perimeter.length - 1) {
+          const [nextX, nextZ] = perimeter[index + 1];
+          const distance = Math.hypot(nextX - x, nextZ - z);
+          if (distance < 72) {
+            const span = new THREE.Mesh(
+              new THREE.BoxGeometry(distance, 0.54, 2.4),
+              new THREE.MeshStandardMaterial({
+                color: this.theme === 'light' ? '#d9e7fb' : '#11253c',
+                roughness: 0.6,
+                metalness: 0.22,
+              }),
+            );
+            span.position.set((x + nextX) / 2, 4.4, (z + nextZ) / 2);
+            span.lookAt(nextX, 4.4, nextZ);
+            span.rotateY(Math.PI / 2);
+            span.castShadow = true;
+            span.receiveShadow = true;
+            this.scene.add(span);
+          }
+        }
       });
     });
 
@@ -1442,6 +1705,60 @@ export class GameWorld {
       flowerPatches.forEach((patch) => {
         this.createFlowerPatch({ x: patch.x, z: patch.z }, 6, patch.tint);
       });
+    });
+
+    sceneryPhases.push(() => {
+      const roadsideCount = this.worldProfile.roadsideColumns;
+      for (let index = 0; index < roadsideCount; index += 1) {
+        const angle = (Math.PI * 2 * index) / roadsideCount;
+        const radius = 92 + (index % 4) * 14;
+        const x = Math.cos(angle) * radius;
+        const z = Math.sin(angle) * radius;
+        const height = 4.8 + (index % 3) * 1.6;
+        const post = createColumn(this.materials.border, height, 0.34 + (index % 2) * 0.06);
+        post.position.set(x, height / 2, z);
+        this.scene.add(post);
+
+        const halo = new THREE.Mesh(
+          new THREE.TorusGeometry(0.64, 0.08, 8, 24),
+          this.materials.emissive(index % 2 === 0 ? '#5edfff' : '#ff9f82', this.theme === 'light' ? 0.22 : 0.58),
+        );
+        halo.position.set(x, height + 0.36, z);
+        halo.rotation.x = Math.PI / 2;
+        this.scene.add(halo);
+      }
+    });
+
+    sceneryPhases.push(() => {
+      const markerCount = this.worldProfile.plazaMarkers;
+      for (let index = 0; index < markerCount; index += 1) {
+        const angle = (Math.PI * 2 * index) / markerCount;
+        const radius = 24 + (index % 2) * 2.8;
+        const panel = new THREE.Mesh(
+          new THREE.BoxGeometry(3.8, 0.18, 1.2),
+          new THREE.MeshStandardMaterial({
+            color: this.theme === 'light' ? '#ecf4ff' : '#10253d',
+            roughness: 0.36,
+            metalness: 0.34,
+          }),
+        );
+        panel.position.set(Math.cos(angle) * radius, 0.18, Math.sin(angle) * radius);
+        panel.rotation.y = -angle;
+        this.scene.add(panel);
+
+        const line = new THREE.Mesh(
+          new THREE.PlaneGeometry(3.2, 0.32),
+          new THREE.MeshBasicMaterial({
+            color: index % 2 === 0 ? '#5edfff' : '#72f1d5',
+            transparent: true,
+            opacity: this.theme === 'light' ? 0.48 : 0.74,
+          }),
+        );
+        line.rotation.x = -Math.PI / 2;
+        line.position.set(Math.cos(angle) * radius, 0.28, Math.sin(angle) * radius);
+        line.rotation.z = -angle;
+        this.scene.add(line);
+      }
     });
 
     districts.forEach((district) => {
