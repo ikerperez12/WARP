@@ -47,6 +47,8 @@ const translations = {
       experienceCtaSubtitle: 'Accede a la narrativa cinematográfica, los laboratorios interactivos y el playbook técnico en una página dedicada.',
       experienceCtaBody: 'He separado las escenas de motion, los paneles y los comparadores para que la home cargue más rápido sin perder el bloque visual.',
       experienceCtaButton: 'Ver experiencia visual',
+      engineeringTitle: 'Foco Ingeniería',
+      engineeringSubtitle: 'Estructura clara de prioridades técnicas: backend, seguridad, cloud y delivery con mentalidad de producto.',
       showcaseTitle: 'Cinematic Composition',
       showcaseSubtitle: 'Dirección visual y ritmo de movimiento sincronizados al scroll para presentar producto con lectura editorial.',
       reelTitle: 'Casos Reales en Movimiento',
@@ -97,6 +99,38 @@ const translations = {
       ],
       stripLabel: 'Stack visual',
       stripTags: ['Three.js', 'Anime.js', 'Motion tokens', 'Scroll staging', 'Color grading'],
+    },
+    engineeringFocus: {
+      cards: [
+        {
+          tag: 'Backend Systems',
+          title: 'Arquitectura distribuida',
+          text: 'Servicios modulares, contratos estables y observabilidad desde el primer release.',
+          metrics: ['APIs', 'Reliability', 'Latency'],
+        },
+        {
+          tag: 'Security',
+          title: 'Secure by design',
+          text: 'Hardening de superficie, validación estricta y reducción de riesgo en producción.',
+          metrics: ['Threats', 'Validation', 'Audit'],
+        },
+        {
+          tag: 'Cloud',
+          title: 'Delivery en la nube',
+          text: 'Pipeline CI/CD, despliegues trazables y escalado con costes controlados.',
+          metrics: ['CI/CD', 'Infra', 'Cost'],
+        },
+        {
+          tag: 'AI / Data',
+          title: 'Prototipos útiles',
+          text: 'Validación rápida de hipótesis con modelos y datos antes de escalar roadmap.',
+          metrics: ['LLMs', 'Discovery', 'Ops'],
+        },
+      ],
+      calloutKicker: 'Capas prioritarias',
+      calloutTitle: 'Perfil técnico orientado a estabilidad y resultados',
+      calloutText: 'Trabajo desde el core técnico hacia la experiencia, priorizando fiabilidad y claridad en cada entrega.',
+      pills: ['Arquitectura', 'Seguridad', 'Producto', 'Escala'],
     },
     contact: {
       cards: ['Email', 'GitHub', 'LinkedIn', 'Ubicación'],
@@ -167,6 +201,8 @@ const translations = {
       experienceCtaSubtitle: 'Access the cinematic narrative, interactive labs, and technical playbook on a dedicated page.',
       experienceCtaBody: 'I separated motion scenes, panels, and comparators so the home loads faster without losing the visual block.',
       experienceCtaButton: 'Open visual experience',
+      engineeringTitle: 'Engineering Focus',
+      engineeringSubtitle: 'Clear technical priorities: backend, security, cloud, and delivery with product mindset.',
       showcaseTitle: 'Cinematic Composition',
       showcaseSubtitle: 'Visual direction and motion rhythm synchronized to scroll to present product with editorial clarity.',
       reelTitle: 'Real Cases in Motion',
@@ -217,6 +253,38 @@ const translations = {
       ],
       stripLabel: 'Visual stack',
       stripTags: ['Three.js', 'Anime.js', 'Motion tokens', 'Scroll staging', 'Color grading'],
+    },
+    engineeringFocus: {
+      cards: [
+        {
+          tag: 'Backend Systems',
+          title: 'Distributed architecture',
+          text: 'Modular services, stable contracts, and observability from the first release.',
+          metrics: ['APIs', 'Reliability', 'Latency'],
+        },
+        {
+          tag: 'Security',
+          title: 'Secure by design',
+          text: 'Surface hardening, strict validation, and risk reduction in production.',
+          metrics: ['Threats', 'Validation', 'Audit'],
+        },
+        {
+          tag: 'Cloud',
+          title: 'Cloud delivery',
+          text: 'CI/CD pipeline, traceable deployments, and controlled scaling costs.',
+          metrics: ['CI/CD', 'Infra', 'Cost'],
+        },
+        {
+          tag: 'AI / Data',
+          title: 'Useful prototypes',
+          text: 'Fast hypothesis validation with models and data before scaling the roadmap.',
+          metrics: ['LLMs', 'Discovery', 'Ops'],
+        },
+      ],
+      calloutKicker: 'Priority layers',
+      calloutTitle: 'Technical profile oriented to stability and results',
+      calloutText: 'I work from the technical core toward experience, prioritizing reliability and clarity in every delivery.',
+      pills: ['Architecture', 'Security', 'Product', 'Scale'],
     },
     contact: {
       cards: ['Email', 'GitHub', 'LinkedIn', 'Location'],
@@ -422,6 +490,27 @@ function applyLanguage() {
     setText('#visual-dna .visual-dna-label', copy.visualDna.stripLabel);
     document.querySelectorAll('#visual-dna .visual-dna-tags span').forEach((tag, index) => {
       setNodeText(tag, copy.visualDna.stripTags?.[index]);
+    });
+  }
+
+  setSectionTitle('engineering-focus', copy.sections.engineeringTitle);
+  setSectionSubtitle('engineering-focus', copy.sections.engineeringSubtitle);
+  if (copy.engineeringFocus) {
+    const cards = Array.from(document.querySelectorAll('#engineering-focus [data-engineering-card]'));
+    cards.forEach((card, index) => {
+      const cardCopy = copy.engineeringFocus.cards?.[index];
+      if (!cardCopy) return;
+      setNodeText(card.querySelector('.engineering-tag'), cardCopy.tag);
+      setNodeText(card.querySelector('h3'), cardCopy.title);
+      setNodeText(card.querySelector('p'), cardCopy.text);
+      const metrics = Array.from(card.querySelectorAll('.engineering-metrics span'));
+      metrics.forEach((metric, metricIndex) => setNodeText(metric, cardCopy.metrics?.[metricIndex]));
+    });
+    setText('#engineering-focus .engineering-callout-kicker', copy.engineeringFocus.calloutKicker);
+    setText('#engineering-focus .engineering-callout h3', copy.engineeringFocus.calloutTitle);
+    setText('#engineering-focus .engineering-callout p', copy.engineeringFocus.calloutText);
+    document.querySelectorAll('#engineering-focus .engineering-pill-row span').forEach((pill, index) => {
+      setNodeText(pill, copy.engineeringFocus.pills?.[index]);
     });
   }
 

@@ -104,6 +104,7 @@ function updateActiveSection(y) {
     'showcase',
     'motion-reel',
     'neo-lab',
+    'engineering-focus',
     'anime-lab',
     'interaction-deck',
     'google-services-section',

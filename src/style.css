@@ -2987,6 +2987,85 @@ body[data-cursor='off'] .custom-cursor-dot {
 }
 
 /* ========================================
+   Experience Rail
+   ======================================== */
+.experience-rail {
+  position: fixed;
+  top: calc(var(--nav-height) + 18px);
+  right: clamp(16px, 3vw, 36px);
+  width: min(220px, 26vw);
+  z-index: 80;
+  padding: 16px 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(140, 195, 255, 0.18);
+  background: rgba(8, 14, 24, 0.76);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 18px 40px rgba(2, 6, 12, 0.4);
+}
+
+.experience-rail-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.experience-rail-title {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: rgba(173, 214, 255, 0.88);
+}
+
+.experience-rail-count {
+  font-size: 0.72rem;
+  color: rgba(210, 224, 249, 0.78);
+}
+
+.experience-rail-nav {
+  display: grid;
+  gap: 8px;
+  max-height: min(68vh, 520px);
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.experience-rail-nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.78rem;
+  color: rgba(220, 232, 255, 0.72);
+  text-decoration: none;
+  padding: 6px 8px;
+  border-radius: 999px;
+  transition: background var(--motion-base) var(--ease-premium), color var(--motion-base) var(--ease-premium);
+}
+
+.experience-rail-nav a::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(140, 195, 255, 0.5);
+  box-shadow: 0 0 10px rgba(100, 180, 255, 0.4);
+  transition: transform var(--motion-base) var(--ease-premium), background var(--motion-base) var(--ease-premium);
+}
+
+.experience-rail-nav a.is-active,
+.experience-rail-nav a:hover {
+  color: rgba(255, 255, 255, 0.96);
+  background: rgba(120, 175, 255, 0.18);
+}
+
+.experience-rail-nav a.is-active::before {
+  background: #8cc3ff;
+  transform: scale(1.2);
+}
+
+/* ========================================
    Visual DNA
    ======================================== */
 .visual-dna-section {
@@ -3080,6 +3159,116 @@ body[data-cursor='off'] .custom-cursor-dot {
   padding: 6px 12px;
   border-radius: 999px;
   border: 1px solid rgba(140, 195, 255, 0.24);
+}
+
+/* ========================================
+   Engineering Focus
+   ======================================== */
+.engineering-focus-section {
+  position: relative;
+  padding: var(--section-padding) 0;
+  background:
+    radial-gradient(760px 420px at 80% 18%, rgba(120, 170, 255, 0.16), transparent 60%),
+    radial-gradient(600px 380px at 12% 80%, rgba(120, 255, 204, 0.12), transparent 58%),
+    linear-gradient(180deg, rgba(8, 12, 20, 0.98), rgba(7, 11, 18, 0.98));
+}
+
+.engineering-focus-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(16px, 2.6vw, 28px);
+}
+
+.engineering-card {
+  padding: clamp(18px, 2.4vw, 26px);
+  border-radius: 20px;
+  border: 1px solid rgba(146, 198, 255, 0.18);
+  background:
+    linear-gradient(140deg, rgba(20, 30, 48, 0.96), rgba(9, 14, 22, 0.98));
+  box-shadow: 0 22px 50px rgba(2, 6, 12, 0.5);
+  display: grid;
+  gap: 12px;
+}
+
+.engineering-tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.32px;
+  text-transform: uppercase;
+  color: rgba(155, 210, 255, 0.9);
+}
+
+.engineering-card h3 {
+  font-size: clamp(1.08rem, 2vw, 1.38rem);
+  margin: 0;
+}
+
+.engineering-card p {
+  margin: 0;
+  color: rgba(210, 224, 248, 0.9);
+  line-height: 1.6;
+}
+
+.engineering-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.engineering-metrics span {
+  font-size: 0.72rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(140, 195, 255, 0.22);
+  color: rgba(220, 234, 255, 0.9);
+  background: rgba(10, 16, 26, 0.7);
+}
+
+.engineering-callout {
+  margin-top: clamp(24px, 3vw, 36px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: clamp(16px, 2.4vw, 26px);
+  padding: clamp(18px, 2.6vw, 28px);
+  border-radius: 22px;
+  border: 1px solid rgba(140, 195, 255, 0.2);
+  background: rgba(10, 16, 26, 0.75);
+}
+
+.engineering-callout-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: rgba(173, 214, 255, 0.84);
+}
+
+.engineering-callout h3 {
+  margin: 8px 0 10px;
+  font-size: clamp(1.16rem, 2vw, 1.5rem);
+}
+
+.engineering-callout p {
+  color: rgba(214, 228, 250, 0.88);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.engineering-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.engineering-pill-row span {
+  font-size: 0.78rem;
+  color: rgba(230, 240, 255, 0.9);
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(140, 195, 255, 0.26);
+  background: rgba(12, 20, 32, 0.7);
 }
 
 /* ========================================
@@ -4442,6 +4631,18 @@ body[data-cursor='off'] .custom-cursor-dot {
     grid-template-columns: 1fr;
   }
 
+  .engineering-focus-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .engineering-callout {
+    grid-template-columns: 1fr;
+  }
+
+  .experience-rail {
+    display: none;
+  }
+
   .flow-track {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -5045,6 +5246,12 @@ textarea:focus-visible {
 /* ========================================
    Light Theme Overrides
    ======================================== */
+
+body[data-theme='light'] {
+  --bg-primary: #f5f7fb;
+  --text-primary: #0f172a;
+  --text-secondary: #415069;
+}
 body[data-theme='light'] .navbar.scrolled {
   background: rgba(237, 243, 255, 0.92);
   border-bottom: 1px solid rgba(15, 23, 40, 0.08);
@@ -5073,9 +5280,18 @@ body[data-theme='light'] .section {
   background: var(--bg-primary);
 }
 
+body[data-theme='light'] .section-title {
+  color: var(--text-primary);
+}
+
+body[data-theme='light'] .section-subtitle {
+  color: var(--text-secondary);
+}
+
 body[data-theme='light'] .showcase-section,
 body[data-theme='light'] .reel-section,
 body[data-theme='light'] .visual-dna-section,
+body[data-theme='light'] .engineering-focus-section,
 body[data-theme='light'] .neo-lab-section,
 body[data-theme='light'] .anime-lab-section,
 body[data-theme='light'] .interaction-deck-section,
@@ -5086,15 +5302,18 @@ body[data-theme='light'] .split-reveal-section,
 body[data-theme='light'] .elite-cases-section,
 body[data-theme='light'] .tech-playbook-section {
   background:
-    radial-gradient(900px 520px at 80% 10%, rgba(72, 130, 200, 0.12), transparent 60%),
-    radial-gradient(700px 520px at 15% 85%, rgba(235, 120, 170, 0.12), transparent 60%),
-    linear-gradient(180deg, #eef3ff, #f7faff);
+    radial-gradient(900px 500px at 80% 12%, rgba(140, 180, 255, 0.25), transparent 55%),
+    radial-gradient(700px 420px at 12% 88%, rgba(255, 170, 200, 0.18), transparent 55%),
+    linear-gradient(180deg, #eef2fb, #f9fbff);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
 }
 
 body[data-theme='light'] .showcase-script,
 body[data-theme='light'] .reel-viewport,
 body[data-theme='light'] .visual-dna-card,
 body[data-theme='light'] .visual-dna-strip,
+body[data-theme='light'] .engineering-card,
+body[data-theme='light'] .engineering-callout,
 body[data-theme='light'] .neo-console,
 body[data-theme='light'] .neo-preview-card,
 body[data-theme='light'] .pad-panel,
@@ -5113,6 +5332,31 @@ body[data-theme='light'] .contact-card {
   background: rgba(255, 255, 255, 0.92);
   border-color: rgba(15, 23, 40, 0.12);
   box-shadow: 0 18px 44px rgba(15, 23, 40, 0.12);
+}
+
+body[data-theme='light'] .experience-rail {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(15, 23, 40, 0.12);
+  box-shadow: 0 18px 40px rgba(15, 23, 40, 0.12);
+}
+
+body[data-theme='light'] .experience-rail::after {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 40, 0.04);
+  pointer-events: none;
+}
+
+body[data-theme='light'] .experience-rail-nav a {
+  color: rgba(30, 41, 59, 0.72);
+}
+
+body[data-theme='light'] .experience-rail-nav a.is-active,
+body[data-theme='light'] .experience-rail-nav a:hover {
+  color: rgba(15, 23, 40, 0.96);
+  background: rgba(90, 130, 200, 0.16);
 }
 
 body[data-theme='light'] .showcase-overlay,

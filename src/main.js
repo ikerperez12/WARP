@@ -45,6 +45,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { initPortfolioPlus } = await import('./features/portfolio-plus.js');
     initPortfolioPlus();
   }, { rootMargin: '16% 0px 16% 0px' });
+
+  queueVisibilityInit('#experience-rail', async () => {
+    const { initExperienceRail } = await import('./features/experience-rail.js');
+    initExperienceRail();
+  }, { rootMargin: '0px' });
 });
 
 function queueVisibilityInit(selector, loader, options = {}) {
