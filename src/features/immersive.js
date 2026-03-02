@@ -79,7 +79,7 @@ function initNeumorphismLab() {
   if (!neoLayout || !neoConsole || !switches.length || !slider || !depthValue || !profileValue) return;
 
   const profileNames = {
-    es: { focus: 'Calidad', cinematic: 'Presentaci�n', delivery: 'Entrega' },
+    es: { focus: 'Calidad', cinematic: 'Presentación', delivery: 'Entrega' },
     en: { focus: 'Quality', cinematic: 'Presentation', delivery: 'Delivery' },
   };
 
@@ -147,7 +147,7 @@ function initAnimeMotionLab() {
     const isEn = document.documentElement.lang === 'en';
     const map = {
       idle: isEn ? 'Flow idle' : 'Flujo en espera',
-      running: isEn ? 'Flow running' : 'Flujo en ejecuci�n',
+      running: isEn ? 'Flow running' : 'Flujo en ejecución',
       reduced: isEn ? 'Reduced motion active' : 'Motion reducido activo',
       done: isEn ? 'Flow complete' : 'Flujo completado',
     };

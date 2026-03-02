@@ -1,10 +1,20 @@
-export function mountCards(container) {
-  const cards = [
-    { title: "Intro timeline", body: "Secuencia de entrada (3D + UI) sincronizada.", chip: "TL" },
-    { title: "Loop 3D", body: "Rotacion + respiracion + shimmer particulas.", chip: "3D" },
-    { title: "Pointer parallax", body: "Respuesta suave a mouse/touch.", chip: "UX" },
-    { title: "Scroll-driven", body: "Scroll controla intensidad y animaciones.", chip: "SCR" },
-  ];
+const CARD_COPY = {
+  es: [
+    { title: "Timeline de entrada", body: "Secuencia de entrada sincronizada entre 3D y UI.", chip: "TL" },
+    { title: "Loop 3D", body: "Rotación, respiración y shimmer de partículas.", chip: "3D" },
+    { title: "Parallax por puntero", body: "Respuesta suave a ratón y touch.", chip: "UX" },
+    { title: "Scroll-driven", body: "El scroll controla intensidad y animaciones.", chip: "SCR" },
+  ],
+  en: [
+    { title: "Intro timeline", body: "Synchronized intro sequence across 3D and UI.", chip: "TL" },
+    { title: "3D loop", body: "Rotation, breathing and particle shimmer.", chip: "3D" },
+    { title: "Pointer parallax", body: "Smooth response to mouse and touch.", chip: "UX" },
+    { title: "Scroll-driven", body: "Scroll controls intensity and animations.", chip: "SCR" },
+  ],
+};
+
+export function mountCards(container, lang = "es") {
+  const cards = CARD_COPY[lang === "en" ? "en" : "es"];
 
   container.replaceChildren();
   const fragment = document.createDocumentFragment();

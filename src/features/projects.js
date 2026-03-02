@@ -8,8 +8,8 @@ const FALLBACK_PROJECTS = [
     id: 'warp-portfolio-3d',
     repoName: 'WARP',
     name: 'WARP Portfolio 3D',
-    description: 'Portfolio inmersivo con render 3D, motion design y una presentacion tecnica mas visual.',
-    impact: 'Unifica identidad, narrativa y demostracion tecnica en una sola experiencia.',
+    description: 'Portfolio inmersivo con render 3D, motion design y una presentación técnica más visual.',
+    impact: 'Unifica identidad, narrativa y demostración técnica en una sola experiencia.',
     language: 'JavaScript',
     stack: ['Vite', 'Three.js', 'Anime.js', 'Vercel'],
     domain: 'web frontend ux production core',
@@ -26,8 +26,8 @@ const FALLBACK_PROJECTS = [
     id: 'auditoria-pqc',
     repoName: '1.2-AuditoriaPQC',
     name: 'Auditoria PQC',
-    description: 'Analisis aplicado de protocolos post-cuanticos y capturas de red en laboratorio.',
-    impact: 'Refuerza criterio tecnico en criptografia, auditoria y validacion de seguridad.',
+    description: 'Análisis aplicado de protocolos post-cuánticos y capturas de red en laboratorio.',
+    impact: 'Refuerza criterio técnico en criptografía, auditoría y validación de seguridad.',
     language: 'Python',
     stack: ['Python', 'PQC', 'Wireshark', 'Auditing'],
     domain: 'security backend data production core',
@@ -48,11 +48,11 @@ let projectRegistry = FALLBACK_PROJECTS.slice();
 const projectMap = new Map();
 const PROJECT_COPY = {
   es: {
-    allCategories: 'todas las categorias',
+    allCategories: 'todas las categorías',
     showing: (shown, total, label) => `Mostrando ${shown} de ${total} proyectos (${label})`,
     updated: 'Actualizado',
     updatedToday: 'Actualizado hoy',
-    agoDays: (days) => `Hace ${days} dias`,
+    agoDays: (days) => `Hace ${days} días`,
     topPick: 'Top pick',
     github: 'GitHub',
     impact: 'Impacto:',
@@ -98,7 +98,7 @@ function initFilters() {
   document.querySelectorAll('.service-chip').forEach((button) => {
     button.addEventListener('click', () => {
       applyServiceFilter(button.dataset.serviceFilter || 'all');
-      announce(`Categoria de servicio: ${button.dataset.serviceFilter || 'all'}`);
+      announce(`Categoría de servicio: ${button.dataset.serviceFilter || 'all'}`);
     });
   });
 }
@@ -196,8 +196,8 @@ function normalizeProject(item, index) {
     id,
     repoName: toText(item?.repoName, item?.name || id),
     name: toText(item?.name, 'Proyecto'),
-    description: toText(item?.description, 'Proyecto tecnico con ejecucion real y enfoque en producto.'),
-    impact: toText(item?.impact, 'Aporta evidencia practica del stack, criterio tecnico y capacidad de entrega.'),
+    description: toText(item?.description, 'Proyecto técnico con ejecución real y enfoque en producto.'),
+    impact: toText(item?.impact, 'Aporta evidencia práctica del stack, criterio técnico y capacidad de entrega.'),
     language: toText(item?.language, 'Code'),
     stack: stack.length ? stack : [toText(item?.language, 'Code')],
     domain: toText(item?.domain, 'core production'),

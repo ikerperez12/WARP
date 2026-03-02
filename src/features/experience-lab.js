@@ -111,7 +111,7 @@ function initTopologyLab() {
   const descriptions = {
     es: {
       all: 'Cluster activo: sistema completo',
-      cloud: 'Cluster activo: ejecuci�n cloud',
+      cloud: 'Cluster activo: ejecución cloud',
       security: 'Cluster activo: capa de seguridad',
       ai: 'Cluster activo: inferencia IA',
       data: 'Cluster activo: capa de datos',
@@ -187,9 +187,9 @@ function initSplitReveal() {
     handle.style.left = `${progress.toFixed(2)}%`;
 
     const isEn = document.documentElement.lang === 'en';
-    let state = isEn ? 'Balanced transition' : 'Transici�n balanceada';
+    let state = isEn ? 'Balanced transition' : 'Transición balanceada';
     if (progress < 45) state = isEn ? 'Base state' : 'Estado base';
-    else if (progress > 55) state = isEn ? 'Optimized version' : 'Versi�n optimizada';
+    else if (progress > 55) state = isEn ? 'Optimized version' : 'Versión optimizada';
     caption.textContent = isEn ? `${state} | ${Math.round(progress)}% optimized` : `${state} | ${Math.round(progress)}% optimizado`;
   };
 

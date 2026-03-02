@@ -90,12 +90,12 @@ async function onLogin(event) {
   const payload = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    setStatus(els.loginStatus, payload?.error || 'No se pudo iniciar sesion.', true);
+    setStatus(els.loginStatus, payload?.error || 'No se pudo iniciar sesión.', true);
     return;
   }
 
   event.currentTarget.reset();
-  setStatus(els.loginStatus, 'Sesion iniciada.', false, true);
+  setStatus(els.loginStatus, 'Sesión iniciada.', false, true);
   renderAuth(true);
   await Promise.all([loadContent(), loadProjects()]);
   reloadPreview();
@@ -134,7 +134,7 @@ async function onPasskeyLogin() {
     await Promise.all([loadContent(), loadProjects()]);
     reloadPreview();
   } catch (error) {
-    setStatus(els.loginStatus, error?.message || 'El acceso por passkey fue cancelado o fallo.', true);
+    setStatus(els.loginStatus, error?.message || 'El acceso por passkey fue cancelado o falló.', true);
   }
 }
 
@@ -168,14 +168,14 @@ async function onRegisterPasskey() {
 
     setStatus(els.passkeyStatus, 'Passkey registrada en este dispositivo.', false, true);
   } catch (error) {
-    setStatus(els.passkeyStatus, error?.message || 'El registro de passkey fue cancelado o fallo.', true);
+    setStatus(els.passkeyStatus, error?.message || 'El registro de passkey fue cancelado o falló.', true);
   }
 }
 
 async function onLogout() {
   await fetch('/api/admin-logout', { method: 'POST', credentials: 'same-origin' });
   renderAuth(false);
-  setStatus(els.loginStatus, 'Sesion cerrada.', false, true);
+  setStatus(els.loginStatus, 'Sesión cerrada.', false, true);
 }
 
 async function loadContent() {
@@ -207,7 +207,7 @@ async function onSaveJson(event, config) {
   try {
     parsed = JSON.parse(config.editor.value);
   } catch (error) {
-    setStatus(config.status, `JSON invalido: ${error.message}`, true);
+    setStatus(config.status, `JSON inválido: ${error.message}`, true);
     return;
   }
 

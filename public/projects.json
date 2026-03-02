@@ -27,7 +27,7 @@
     "id": "auditoria-pqc",
     "repoName": "1.2-AuditoriaPQC",
     "name": "Auditoria PQC",
-    "description": "Análisis aplicado de protocolos criptográficos post-cuanticos, trazas de red y validación de seguridad en laboratorio.",
+    "description": "Análisis aplicado de protocolos criptográficos post-cuánticos, trazas de red y validación de seguridad en laboratorio.",
     "impact": "Refuerza criterio técnico en criptografía, auditoría y evaluación de riesgo.",
     "language": "Python",
     "stack": [
@@ -74,7 +74,7 @@
     "id": "internet-y-sistemas-distribuidos",
     "repoName": "ISD",
     "name": "Internet y Sistemas Distribuidos",
-    "description": "Repositorio de prácticas y entregables sobre APIs, servicios distribuidos, despliegue y comunicacion entre componentes.",
+    "description": "Repositorio de prácticas y entregables sobre APIs, servicios distribuidos, despliegue y comunicación entre componentes.",
     "impact": "Muestra base solida en arquitectura distribuida y servicios backend.",
     "language": "Java",
     "stack": [
@@ -98,7 +98,7 @@
     "id": "shell-y-sistemas-operativos",
     "repoName": "SO-SHELL-p2",
     "name": "Shell y Sistemas Operativos",
-    "description": "Implementación academica centrada en shell, procesos, concurrencia y fundamentos de sistemas.",
+    "description": "Implementación académica centrada en shell, procesos, concurrencia y fundamentos de sistemas.",
     "impact": "Aporta profundidad en sistemas, bajo nivel y diagnóstico de comportamiento.",
     "language": "C",
     "stack": [
@@ -122,7 +122,7 @@
     "id": "sistemas-operativos-23-24",
     "repoName": "SO-2324",
     "name": "Sistemas Operativos 23/24",
-    "description": "Coleccion de prácticas y ejercicios sobre gestion de procesos, memoria y herramientas de sistemas.",
+    "description": "Colección de prácticas y ejercicios sobre gestión de procesos, memoria y herramientas de sistemas.",
     "impact": "Consolida fundamentos para software robusto y cercano a infraestructura.",
     "language": "C",
     "stack": [
@@ -145,7 +145,7 @@
     "id": "software-design",
     "repoName": "Software-Design",
     "name": "Software Design",
-    "description": "Trabajo orientado a modelado de software, estructura de dominio y patrones de diseno aplicados.",
+    "description": "Trabajo orientado a modelado de software, estructura de dominio y patrones de diseño aplicados.",
     "impact": "Refuerza base de análisis, modelado y mantenimiento de sistemas complejos.",
     "language": "Java",
     "stack": [
@@ -169,7 +169,7 @@
     "repoName": "Basketball-API",
     "name": "Basketball API",
     "description": "Backend con API REST y capa web para exponer datos y flujos funcionales sobre dominio deportivo.",
-    "impact": "Demuestra integracion de backend, routing y presentacion sobre una misma base de código.",
+    "impact": "Demuestra integración de backend, routing y presentación sobre una misma base de código.",
     "language": "Python",
     "stack": [
       "Python",

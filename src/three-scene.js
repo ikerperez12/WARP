@@ -11,6 +11,11 @@ export { createLaptopModel };
 export function initThreeScene() {
   const canvas = document.getElementById('three-canvas');
   if (!canvas) return () => {};
+  const getThemePreference = (incomingTheme) => {
+    if (incomingTheme === 'light' || incomingTheme === 'dark') return incomingTheme;
+    return document.body?.dataset.theme === 'light' ? 'light' : 'dark';
+  };
+  let currentTheme = getThemePreference();
 
   const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   const coarsePointerQuery = window.matchMedia('(hover: none), (pointer: coarse)');
@@ -94,6 +99,7 @@ export function initThreeScene() {
 
   const starTexture = createStarTexture();
   const glowTexture = createSoftCircleTexture('rgba(255,255,255,0.95)', 'rgba(255,255,255,0)', 512);
+  const shadowTexture = createSoftCircleTexture('rgba(15,23,42,0.62)', 'rgba(15,23,42,0)', 512);
   const screenDisplay = createScreenTexture();
 
   const laptop = createLaptopModel({
@@ -106,6 +112,20 @@ export function initThreeScene() {
 
   const baseX = isMobile ? SCENE_TUNING.laptopBaseXMobile : SCENE_TUNING.laptopBaseXDesktop;
   laptop.root.position.set(baseX, SCENE_TUNING.laptopBaseY, SCENE_TUNING.laptopBaseZ);
+
+  const shadowGeometry = new THREE.PlaneGeometry(4.6, 3.2);
+  const shadowMaterial = new THREE.MeshBasicMaterial({
+    map: shadowTexture,
+    transparent: true,
+    opacity: 0.08,
+    depthWrite: false,
+    color: 0x10233d,
+    blending: THREE.NormalBlending,
+  });
+  const shadowPlane = new THREE.Mesh(shadowGeometry, shadowMaterial);
+  shadowPlane.rotation.x = -Math.PI * 0.5;
+  shadowPlane.position.set(baseX + 0.06, -0.05, -0.12);
+  scene.add(shadowPlane);
 
   const layerConfig = prefersReducedMotion
     ? [
@@ -120,6 +140,66 @@ export function initThreeScene() {
 
   const starLayers = layerConfig.map((cfg) => createStarLayer(cfg, starTexture));
   starLayers.forEach((layer) => scene.add(layer.points));
+
+  function applySceneTheme(theme) {
+    currentTheme = theme === 'light' ? 'light' : 'dark';
+    const isLightTheme = currentTheme === 'light';
+
+    renderer.toneMappingExposure = isLightTheme ? 1.16 : 1.07;
+    scene.fog.color.set(isLightTheme ? 0xe7eefb : 0x090b13);
+    scene.fog.near = isLightTheme ? 10 : 9;
+    scene.fog.far = isLightTheme ? 30 : 26;
+
+    hemi.color.set(isLightTheme ? 0xf7fbff : 0xc5dcff);
+    hemi.groundColor.set(isLightTheme ? 0xdbe5f5 : 0x070a12);
+    hemi.intensity = isLightTheme ? 0.66 : 0.46;
+
+    key.color.set(isLightTheme ? 0xfffcf6 : 0xfff2e5);
+    key.intensity = isLightTheme ? 1.42 : 1.26;
+
+    fill.color.set(isLightTheme ? 0x8eaef4 : 0x8ebcff);
+    fill.intensity = isLightTheme ? 0.74 : 0.54;
+
+    rim.color.set(isLightTheme ? 0x6ca8ff : 0x74dcff);
+    rim.intensity = isLightTheme ? 0.72 : 1.04;
+
+    bounce.color.set(isLightTheme ? 0xb9ceff : 0xb9c8ff);
+    bounce.intensity = isLightTheme ? 0.58 : 0.42;
+
+    topAccent.color.set(isLightTheme ? 0xb7d4ff : 0xc3e2ff);
+    topAccent.intensity = isLightTheme ? 0.48 : 0.32;
+
+    laptop.bodyMat.color.set(isLightTheme ? 0x405a83 : 0x182845);
+    laptop.shellMat.color.set(isLightTheme ? 0x7f9bc0 : 0x324d73);
+    laptop.darkMat.color.set(isLightTheme ? 0x0e1622 : 0x060913);
+    laptop.portMat.color.set(isLightTheme ? 0x142132 : 0x0b1120);
+    laptop.detailMat.color.set(isLightTheme ? 0x6f89af : 0x5f779f);
+    laptop.rubberMat.color.set(isLightTheme ? 0x111827 : 0x080b12);
+    laptop.bezelMat.color.set(isLightTheme ? 0x0b101a : 0x05070d);
+    laptop.glassMat.color.set(isLightTheme ? 0xf7fbff : 0xd4e2ff);
+    laptop.glassMat.opacity = isLightTheme ? 0.19 : 0.13;
+    laptop.trackpadMat.color.set(isLightTheme ? 0x8ca5ca : 0x3d5783);
+    laptop.logoMat.color.set(isLightTheme ? 0xebf2ff : 0xcad9ff);
+    laptop.accentStripMat.color.set(isLightTheme ? 0x82b6ff : 0xb8deff);
+    laptop.accentStripMat.emissive.set(isLightTheme ? 0x2b78ff : 0x2c8eff);
+    laptop.palmSheenMat.color.set(isLightTheme ? 0xe5efff : 0x9cb7e4);
+    laptop.palmSheenMat.opacity = isLightTheme ? 0.18 : 0.13;
+    laptop.keyboardMat.color.set(isLightTheme ? 0xfcfdff : 0xf0f5ff);
+    laptop.keyboardMat.emissive.set(isLightTheme ? 0x173668 : 0x1f3b6f);
+    laptop.panelMat.emissive.set(isLightTheme ? 0x5d8dff : 0x7ea8ff);
+    laptop.underGlowMat.color.set(isLightTheme ? 0x5e95ff : 0x79c5ff);
+
+    shadowMaterial.color.set(isLightTheme ? 0x17304c : 0x10233d);
+    shadowMaterial.opacity = isLightTheme ? 0.28 : 0.06;
+
+    starLayers.forEach((layer, index) => {
+      const lightOpacity = [0.045, 0.032, 0.022][index] ?? 0.02;
+      const darkOpacity = [0.15, 0.12, 0.095][index] ?? layer.baseOpacity;
+      layer.baseOpacity = isLightTheme ? lightOpacity : darkOpacity;
+      layer.material.color.set(isLightTheme ? 0x90b3ff : 0xffffff);
+    });
+  }
+  applySceneTheme(currentTheme);
 
   const state = {
     pointerTargetX: 0,
@@ -255,6 +335,10 @@ export function initThreeScene() {
     prefersReducedMotion = reducedMotionQuery.matches || manualReducedMotion;
   }
 
+  function onPrefsChange(event) {
+    applySceneTheme(getThemePreference(event?.detail?.prefs?.theme));
+  }
+
   function onProjectRegistry(event) {
     const incoming = event?.detail?.projects;
     screenDisplay.setProjects(incoming);
@@ -294,6 +378,7 @@ export function initThreeScene() {
   window.addEventListener('resize', onResize);
   window.addEventListener('keydown', onKeyDown);
   window.addEventListener('warp:motion-mode', onMotionModeChange);
+  window.addEventListener('warp:prefs-changed', onPrefsChange);
   window.addEventListener('warp:project-registry', onProjectRegistry);
   window.addEventListener('warp:terminal-run-project', onTerminalRunProject);
   window.addEventListener('warp:terminal-focus', onTerminalFocus);
@@ -377,10 +462,20 @@ export function initThreeScene() {
     laptop.lidPivot.rotation.x = damp(laptop.lidPivot.rotation.x, openAngle, 5, dt);
 
     const pulse = 0.58 + Math.sin(t * 1.55) * 0.11 + state.scroll * 0.2 + Math.min(Math.abs(state.scrollVelocity), 0.6) * 0.05;
-    laptop.keyboardMat.emissiveIntensity = (prefersReducedMotion ? 0.36 : 0.4) + pulse * (prefersReducedMotion ? 0.14 : 0.22);
-    laptop.panelMat.emissiveIntensity = 0.42 + pulse * 0.2;
-    laptop.ledMat.emissiveIntensity = 0.62 + pulse * 0.38;
-    laptop.underGlowMat.opacity = 0.09 + pulse * 0.11;
+    const lightThemeFactor = currentTheme === 'light' ? 0.82 : 1;
+    laptop.keyboardMat.emissiveIntensity =
+      ((prefersReducedMotion ? 0.36 : 0.4) + pulse * (prefersReducedMotion ? 0.14 : 0.22)) * lightThemeFactor;
+    laptop.panelMat.emissiveIntensity = (currentTheme === 'light' ? 0.32 : 0.42) + pulse * (currentTheme === 'light' ? 0.14 : 0.2);
+    laptop.ledMat.emissiveIntensity = (currentTheme === 'light' ? 0.46 : 0.62) + pulse * (currentTheme === 'light' ? 0.24 : 0.38);
+    laptop.underGlowMat.opacity = (currentTheme === 'light' ? 0.035 : 0.09) + pulse * (currentTheme === 'light' ? 0.05 : 0.11);
+
+    const shadowLift = currentTheme === 'light' ? 0.055 : 0.04;
+    const shadowSpread = (currentTheme === 'light' ? 1.02 : 0.94) + state.scroll * (currentTheme === 'light' ? 0.16 : 0.07);
+    shadowPlane.position.set(laptop.root.position.x + 0.08, laptop.root.position.y - shadowLift, laptop.root.position.z + 0.16);
+    shadowPlane.scale.set(shadowSpread, shadowSpread * 0.92, 1);
+    shadowMaterial.opacity = currentTheme === 'light'
+      ? 0.16 + state.scroll * 0.08 + Math.min(Math.abs(state.scrollVelocity), 0.5) * 0.1
+      : 0.03 + pulse * 0.02;
 
     const ledHue = 0.68 + Math.sin(t * 0.38 + state.scroll * 1.8) * 0.035;
     frontLedColor.setHSL(ledHue, 0.66, 0.64);
@@ -473,6 +568,7 @@ export function initThreeScene() {
     window.removeEventListener('resize', onResize);
     window.removeEventListener('keydown', onKeyDown);
     window.removeEventListener('warp:motion-mode', onMotionModeChange);
+    window.removeEventListener('warp:prefs-changed', onPrefsChange);
     window.removeEventListener('warp:project-registry', onProjectRegistry);
     window.removeEventListener('warp:terminal-run-project', onTerminalRunProject);
     window.removeEventListener('warp:terminal-focus', onTerminalFocus);
@@ -493,6 +589,9 @@ export function initThreeScene() {
 
     starTexture.dispose();
     glowTexture.dispose();
+    shadowTexture.dispose();
+    shadowGeometry.dispose();
+    shadowMaterial.dispose();
     screenDisplay.texture.dispose();
 
     if (envRT) envRT.dispose();

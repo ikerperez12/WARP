@@ -5,17 +5,22 @@ const translations = {
     nav: ['Sobre mí', 'Skills', 'Servicios', 'Proyectos', 'Método', 'Trayectoria', 'Visual', 'Contacto'],
     editor: 'Editor',
     heroBadge: 'Disponible para prácticas y proyectos tech de alto impacto',
+    floatingBadge: 'Ingeniería de software - Ciberseguridad - IA - Cloud',
     heroLines: ['Iker Pérez García', 'Software & Security', 'Product Engineer'],
     heroDescription: 'Ingeniero de Software especializado en crear sistemas distribuidos, seguros y de alto rendimiento. Enfoque integral en arquitectura backend, hardening de sistemas y experiencias de usuario inmersivas. Especial interés en',
     heroHighlights: ['SICUE en UPM - enfoque empresarial', 'ES / GL nativo + Inglés B2', 'Cloud, redes y automatización', 'IA aplicada y ciberseguridad'],
-    ctas: ['Ver proyectos', 'Contactar'],
+    ctas: ['Ver proyectos', 'Minijuego 3D', 'Contactar'],
     stats: ['Año de carrera', 'Proyectos y prácticas', 'Cursos y certificaciones'],
+    serviceFilters: ['Todo', 'Base técnica', 'Producción', 'I+D exploratoria'],
+    projectFilters: ['Todos', 'Core', 'Producción', 'Exploración', 'Frontend', 'Backend', 'Cloud', 'Seguridad', 'IA/Datos', 'Sistemas'],
+    projectDataStrip: ['Repos actualizados desde GitHub', 'Portadas con preview visual', 'Curación editable en public/projects.json'],
     ui: ['Grano', 'Cursor', 'Motion'],
     misc: {
       skip: 'Saltar al contenido principal',
       backTop: 'Volver arriba',
       threeCanvas: 'Escena 3D interactiva de portátil en movimiento',
       threeDesc: 'Fondo 3D decorativo de un portátil que responde al puntero y al scroll.',
+      gamingNav: 'Gaming',
       uiToggle: 'Visual',
       mobileTheme: { dark: 'Oscuro', light: 'Claro' },
       themeAria: 'Cambiar tema',
@@ -159,17 +164,22 @@ const translations = {
     nav: ['About', 'Skills', 'Services', 'Projects', 'Method', 'Journey', 'Visual', 'Contact'],
     editor: 'Editor',
     heroBadge: 'Available for internships and high-impact tech projects',
+    floatingBadge: 'Software engineering - Cybersecurity - AI - Cloud',
     heroLines: ['Iker Pérez García', 'Software & Security', 'Product Engineer'],
     heroDescription: 'Software Engineer focused on building distributed, secure and high-performance systems. End-to-end approach across backend architecture, system hardening and immersive product experiences. Special interest in',
     heroHighlights: ['SICUE at UPM - business-oriented perspective', 'Native ES / GL + English B2', 'Cloud, networking and automation', 'Applied AI and cybersecurity'],
-    ctas: ['View projects', 'Contact'],
+    ctas: ['View projects', '3D minigame', 'Contact'],
     stats: ['Years of degree', 'Projects and internships', 'Courses and certifications'],
+    serviceFilters: ['All', 'Core Skills', 'Production Ready', 'Exploratory R&D'],
+    projectFilters: ['All', 'Core', 'Production', 'Exploratory', 'Frontend', 'Backend', 'Cloud', 'Security', 'AI/Data', 'Systems'],
+    projectDataStrip: ['Repos synced from GitHub', 'Cards with visual preview', 'Editable curation in public/projects.json'],
     ui: ['Grain', 'Cursor', 'Motion'],
     misc: {
       skip: 'Skip to main content',
       backTop: 'Back to top',
       threeCanvas: 'Interactive 3D moving laptop scene',
       threeDesc: 'Decorative 3D laptop background reacting to pointer and scroll.',
+      gamingNav: 'Gaming',
       uiToggle: 'Visual',
       mobileTheme: { dark: 'Dark', light: 'Light' },
       themeAria: 'Toggle theme',
@@ -400,8 +410,8 @@ function syncControls() {
 function applyLanguage() {
   const copy = getLangCopy();
 
-  document.querySelectorAll('.nav-links .nav-link').forEach((node, index) => setNodeText(node, copy.nav[index]));
-  document.querySelectorAll('.mobile-menu .mobile-link').forEach((node, index) => setNodeText(node, copy.nav[index]));
+  applyNavCopy('.nav-links .nav-link', copy.nav, copy.misc.gamingNav);
+  applyNavCopy('.mobile-menu .mobile-link', copy.nav, copy.misc.gamingNav);
   document.querySelectorAll('.footer-nav a').forEach((node, index) => setNodeText(node, copy.footer.nav[index]));
   document.querySelectorAll('.ticker-item').forEach((node, index) => setNodeText(node, copy.ticker[index]));
 
@@ -424,12 +434,16 @@ function applyLanguage() {
   });
 
   setText('.hero-badge-text', copy.heroBadge);
+  setText('.floating-badge', copy.floatingBadge);
   document.querySelectorAll('.hero-title .hero-line').forEach((node, index) => setNodeText(node, copy.heroLines[index]));
   setText('.hero-description-text', copy.heroDescription);
   document.querySelectorAll('.hero-value-pill').forEach((node, index) => setNodeText(node, copy.heroHighlights[index]));
   document.querySelectorAll('.hero-cta .btn span').forEach((node, index) => setNodeText(node, copy.ctas[index]));
   document.querySelectorAll('.stat-label').forEach((node, index) => setNodeText(node, copy.stats[index]));
   document.querySelectorAll('.ui-option > span:first-child').forEach((node, index) => setNodeText(node, copy.ui[index]));
+  document.querySelectorAll('.service-chip').forEach((node, index) => setNodeText(node, copy.serviceFilters[index]));
+  document.querySelectorAll('.project-filter').forEach((node, index) => setNodeText(node, copy.projectFilters[index]));
+  document.querySelectorAll('.project-data-pill').forEach((node, index) => setNodeText(node, copy.projectDataStrip[index]));
 
   setSectionTitle('about', copy.sections.aboutTitle);
   setSectionTitle('skills', copy.sections.skillsTitle);
@@ -580,5 +594,19 @@ function setAria(selector, value) {
 
 function setNodeText(node, value) {
   if (node && typeof value === 'string') node.textContent = value;
+}
+
+function applyNavCopy(selector, labels, gamingLabel) {
+  let navIndex = 0;
+  document.querySelectorAll(selector).forEach((node) => {
+    const href = node.getAttribute('href') || '';
+    const isGaming = href.includes('/gaming.html') || href.endsWith('gaming.html');
+    if (isGaming) {
+      setNodeText(node, gamingLabel);
+      return;
+    }
+    setNodeText(node, labels?.[navIndex]);
+    navIndex += 1;
+  });
 }
 

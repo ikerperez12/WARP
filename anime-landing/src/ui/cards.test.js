@@ -86,10 +86,10 @@ describe('mountCards', () => {
     mountCards(container);
 
     const expectedContent = [
-      { title: "Intro timeline", body: "Secuencia de entrada (3D + UI) sincronizada.", chip: "TL" },
-      { title: "Loop 3D", body: "Rotacion + respiracion + shimmer particulas.", chip: "3D" },
-      { title: "Pointer parallax", body: "Respuesta suave a mouse/touch.", chip: "UX" },
-      { title: "Scroll-driven", body: "Scroll controla intensidad y animaciones.", chip: "SCR" },
+      { title: "Timeline de entrada", body: "Secuencia de entrada sincronizada entre 3D y UI.", chip: "TL" },
+      { title: "Loop 3D", body: "Rotación, respiración y shimmer de partículas.", chip: "3D" },
+      { title: "Parallax por puntero", body: "Respuesta suave a ratón y touch.", chip: "UX" },
+      { title: "Scroll-driven", body: "El scroll controla intensidad y animaciones.", chip: "SCR" },
     ];
 
     container.children.forEach((card, index) => {

@@ -62,7 +62,7 @@ export function createScreenTexture() {
     {
       id: 'scene_laptop_render',
       name: 'Laptop Scene Render',
-      description: 'Pipeline visual del portatil 3D con materiales y luces.',
+      description: 'Pipeline visual del portátil 3D con materiales y luces.',
       language: 'JavaScript',
       stack: ['Three.js', 'PBR'],
     },
@@ -384,7 +384,7 @@ export function createScreenTexture() {
       { t: 1.74, text: 'Enlazando I/O y runtime bridge...', type: 'ok' },
       { t: 2.0, text: `Entorno listo. Ejecutando proyecto '${project.name}'`, type: 'ok' },
       { t: 2.2, text: `stack: ${(project.stack || []).join(' + ') || 'n/a'}`, type: 'hint' },
-      { t: 2.4, text: project.description || 'Proyecto en ejecucion.', type: 'hint' },
+      { t: 2.4, text: project.description || 'Proyecto en ejecución.', type: 'hint' },
       ...profile.boot.map((line, index) => ({
         t: 2.65 + index * 0.22,
         text: line,

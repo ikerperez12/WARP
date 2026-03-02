@@ -20,15 +20,15 @@ export function initContactForm() {
   const messages = {
     es: {
       idle: 'Enviar mensaje',
-      missing: 'Completa categoria, nombre, email y mensaje.',
-      invalidEmail: 'El email no es valido.',
+      missing: 'Completa categoría, nombre, email y mensaje.',
+      invalidEmail: 'El email no es válido.',
       sending: 'Enviando mensaje de forma segura...',
-      fallbackSent: 'Mensaje enviado por plataforma de respaldo. Te respondere pronto.',
-      fallbackOpened: 'Se abrio tu cliente de correo como respaldo final.',
-      sent: 'Mensaje enviado. Te respondere pronto.',
+      fallbackSent: 'Mensaje enviado por plataforma de respaldo. Te responderé pronto.',
+      fallbackOpened: 'Se abrió tu cliente de correo como respaldo final.',
+      sent: 'Mensaje enviado. Te responderé pronto.',
       failed: 'No se pudo enviar el mensaje.',
       noFallback: 'No hay correo de destino configurado para el respaldo.',
-      formSubmitActivation: 'FormSubmit requiere activar el receptor. Abre el correo de activacion y confirma el formulario.',
+      formSubmitActivation: 'FormSubmit requiere activar el receptor. Abre el correo de activación y confirma el formulario.',
     },
     en: {
       idle: 'Send message',
@@ -87,12 +87,12 @@ export function initContactForm() {
       if (response.status === 403 && (normalized.includes('activate') || normalized.includes('activation'))) {
         throw new Error(getCopy().formSubmitActivation);
       }
-      throw new Error(`FormSubmit fallo: ${detail}`);
+      throw new Error(`FormSubmit falló: ${detail}`);
     }
 
     const successFlag = String(payload?.success ?? '').toLowerCase();
     if (successFlag === 'false') {
-      throw new Error(toText(payload?.message, 'FormSubmit reporto un fallo de entrega.'));
+      throw new Error(toText(payload?.message, 'FormSubmit reportó un fallo de entrega.'));
     }
   };
 
@@ -100,7 +100,7 @@ export function initContactForm() {
     if (!fallbackRecipient) return false;
     const subject = encodeURIComponent(`Portfolio contact [${topic}] - ${name}`);
     const body = encodeURIComponent([
-      `Categoria: ${topic}`,
+      `Categoría: ${topic}`,
       `Nombre: ${name}`,
       `Email: ${email}`,
       '',
