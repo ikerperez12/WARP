@@ -147,8 +147,8 @@ function createRenderer(canvas, compatibility = false) {
         canvas: activeCanvas,
         context,
       });
-      renderer.userData.contextName = contextName;
-      renderer.userData.rendererProfile = attempt.label;
+      renderer.__warpContextName = contextName;
+      renderer.__warpRendererProfile = attempt.label;
       return { renderer, canvas: activeCanvas };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
