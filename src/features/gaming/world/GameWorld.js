@@ -589,13 +589,17 @@ export class GameWorld {
   }
 
   createBackdropDistrict({
-    position,
+    position = null,
+    x = 0,
+    y = 0,
+    z = 0,
     rotationY = 0,
     accent = '#85dbff',
     glow = '#c7f3ff',
   }) {
     const group = new THREE.Group();
     const profile = this.worldProfile;
+    const resolvedPosition = position ?? { x, y, z };
 
     this.addImportedInstance(group, 'mountainLandscape', {
       height: 32,
@@ -651,7 +655,7 @@ export class GameWorld {
       });
     }
 
-    group.position.set(position.x, position.y ?? 0, position.z);
+    group.position.set(resolvedPosition.x ?? 0, resolvedPosition.y ?? 0, resolvedPosition.z ?? 0);
     group.rotation.y = rotationY;
     this.scene.add(group);
   }
