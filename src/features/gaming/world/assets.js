@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
 
-const MODEL_MANIFEST = {
+const REQUIRED_MODEL_MANIFEST = {
   cybertruckChassis: '/gaming-assets/folio2019/vehicles/cybertruck/chassis.glb',
   cybertruckWheel: '/gaming-assets/folio2019/vehicles/cybertruck/wheel.glb',
   cybertruckAntenna: '/gaming-assets/folio2019/vehicles/cybertruck/antena.glb',
@@ -37,6 +37,9 @@ const MODEL_MANIFEST = {
   distinctionAwardC: '/gaming-assets/folio2019/props/distinctions/fwa.glb',
   arrowKey: '/gaming-assets/folio2019/ui/arrow-key.glb',
   controlLabels: '/gaming-assets/folio2019/ui/control-labels.glb',
+};
+
+const OPTIONAL_MODEL_MANIFEST = {
   robotExpressive: '/gaming-assets/open/robot/RobotExpressive.glb',
   kenneyFlower: '/gaming-assets/open/nature/Flower.glb',
   cityBlock: '/gaming-assets/open/city-block/scene.gltf',
@@ -53,6 +56,35 @@ const TEXTURE_MANIFEST = {
 
 let assetPromise;
 let assetCache = null;
+
+function withTimeout(promise, label, timeoutMs) {
+  let timer = null;
+  return Promise.race([
+    promise.finally(() => {
+      if (timer) window.clearTimeout(timer);
+    }),
+    new Promise((_, reject) => {
+      timer = window.setTimeout(() => {
+        reject(new Error(`Timed out loading ${label} after ${timeoutMs}ms`));
+      }, timeoutMs);
+    }),
+  ]);
+}
+
+async function loadManifestEntries(entries, loader, timeoutMs) {
+  return Promise.allSettled(entries.map(async ([key, path]) => {
+    const asset = await withTimeout(loader(path), path, timeoutMs);
+    return [key, asset];
+  }));
+}
+
+function collectFulfilledEntries(results) {
+  return results.flatMap((result) => {
+    if (result.status === 'fulfilled') return [result.value];
+    console.warn('[gaming-assets] Failed to load asset', result.reason);
+    return [];
+  });
+}
 
 function cloneMaterial(material) {
   if (!material) return material;
@@ -159,7 +191,7 @@ export async function loadGameAssets({ onProgress } = {}) {
 
   if (!assetPromise) {
     assetPromise = (async () => {
-      const totalAssets = Object.keys(MODEL_MANIFEST).length + Object.keys(TEXTURE_MANIFEST).length;
+      const totalAssets = Object.keys(REQUIRED_MODEL_MANIFEST).length + Object.keys(TEXTURE_MANIFEST).length;
       const dracoLoader = new DRACOLoader();
       dracoLoader.setDecoderPath('/gaming-assets/draco/gltf/');
       dracoLoader.setDecoderConfig({ type: 'js' });
@@ -174,13 +206,13 @@ export async function loadGameAssets({ onProgress } = {}) {
       gltfLoader.setDRACOLoader(dracoLoader);
       const textureLoader = new THREE.TextureLoader(loadingManager);
 
-      const results = await Promise.allSettled([
-        ...Object.entries(MODEL_MANIFEST).map(async ([key, path]) => {
-          const asset = await gltfLoader.loadAsync(path);
+      const requiredResults = await Promise.allSettled([
+        ...Object.entries(REQUIRED_MODEL_MANIFEST).map(async ([key, path]) => {
+          const asset = await withTimeout(gltfLoader.loadAsync(path), path, 12000);
           return [key, asset];
         }),
         ...Object.entries(TEXTURE_MANIFEST).map(async ([key, path]) => {
-          const texture = await textureLoader.loadAsync(path);
+          const texture = await withTimeout(textureLoader.loadAsync(path), path, 8000);
           texture.colorSpace = THREE.SRGBColorSpace;
           texture.wrapS = THREE.ClampToEdgeWrapping;
           texture.wrapT = THREE.ClampToEdgeWrapping;
@@ -189,13 +221,21 @@ export async function loadGameAssets({ onProgress } = {}) {
         }),
       ]);
 
-      const entries = results.flatMap((result) => {
-        if (result.status === 'fulfilled') return [result.value];
-        console.warn('[gaming-assets] Failed to load asset', result.reason);
-        return [];
-      });
-
-      assetCache = Object.fromEntries(entries);
+      assetCache = Object.fromEntries(collectFulfilledEntries(requiredResults));
+      window.setTimeout(async () => {
+        try {
+          const optionalLoader = new GLTFLoader();
+          optionalLoader.setDRACOLoader(dracoLoader);
+          const optionalResults = await loadManifestEntries(
+            Object.entries(OPTIONAL_MODEL_MANIFEST),
+            (path) => optionalLoader.loadAsync(path),
+            4000,
+          );
+          Object.assign(assetCache, Object.fromEntries(collectFulfilledEntries(optionalResults)));
+        } catch (error) {
+          console.warn('[gaming-assets] Optional asset warmup failed', error);
+        }
+      }, 0);
       onProgress?.(1);
       return assetCache;
     })();
