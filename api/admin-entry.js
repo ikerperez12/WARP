@@ -1,6 +1,11 @@
-﻿import { canAccessAdminEntry, requireAdminSession, sendJson, setApiSecurityHeaders } from '../lib/admin.js';
+﻿import { canAccessAdminEntry, requireAdminSession, sendJson, setApiSecurityHeaders, getClientIp } from '../lib/admin.js';
 
 export default async function handler(req, res) {
+  // --- TEMPORARY DEBUG ---
+  const clientIp = getClientIp(req);
+  console.log(`[ADMIN DEBUG] Client IP detected: ${clientIp}`);
+  // --- END TEMPORARY DEBUG ---
+
   setApiSecurityHeaders(res);
   if (req.method !== 'GET') return sendJson(res, 405, { ok: false, error: 'Method not allowed.' });
 

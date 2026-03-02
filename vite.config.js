@@ -7,6 +7,7 @@ export default defineConfig({
         main: 'index.html',
         experience: 'experience.html',
         admin: 'admin.html',
+        gaming: 'gaming.html',
       },
     },
   },

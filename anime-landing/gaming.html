@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1" />
+    <title>WARP // Gaming Experience</title>
+    <!-- We will inject base styles here or import them -->
+</head>
+
+<body class="gaming-mode">
+    <div class="grain-overlay"></div>
+    <div class="vignette"></div>
+    <canvas id="game-canvas"></canvas>
+
+    <div class="hud">
+        <header class="hud-top">
+            <a href="/index.html" class="btn-back">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span class="hud-text">Exit Protocol</span>
+            </a>
+            <div class="brand glow-text">WARP_GAMING</div>
+            <div class="hud-stats">
+                <div class="stat"><span id="speed">0</span> KM/H</div>
+                <div class="stat"><span id="fps">60</span> FPS</div>
+            </div>
+        </header>
+
+        <div class="hud-center">
+            <div class="crosshair"></div>
+        </div>
+
+        <footer class="hud-bottom">
+            <div class="instructions">
+                [W][A][S][D] / Arrows to navigate <br>
+                [SPACE] to boost <br>
+                [R] to reset
+            </div>
+        </footer>
+    </div>
+    <div id="loading" class="loading-screen">
+        <div class="loader-text pulse">INITIALIZING NEURAL PHYSICS... <span id="loading-progress">0%</span></div>
+    </div>
+
+    <!-- The game script using module type -->
+    <script type="module" src="/src/gaming/main.js"></script>
+</body>
+
+</html>

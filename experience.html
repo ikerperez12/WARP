@@ -1,26 +1,30 @@
 ﻿<!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <meta
-    http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https:; media-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
-  />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https:; media-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests" />
   <title>Experiencia visual | Iker Pérez</title>
-  <meta name="description" content="Experiencia visual de Iker Pérez: narrativa cinematográfica, motion y paneles interactivos enfocados en producto." />
+  <meta name="description"
+    content="Experiencia visual de Iker Pérez: narrativa cinematográfica, motion y paneles interactivos enfocados en producto." />
   <link rel="canonical" href="https://portfolio-iker-perez.vercel.app/experience.html" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://portfolio-iker-perez.vercel.app/experience.html" />
   <meta property="og:title" content="Experiencia visual | Iker Pérez" />
-  <meta property="og:description" content="Narrativa visual y motion de Iker Pérez: escenas, paneles interactivos y storytelling técnico." />
+  <meta property="og:description"
+    content="Narrativa visual y motion de Iker Pérez: escenas, paneles interactivos y storytelling técnico." />
   <meta name="theme-color" content="#0a0a0f" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="/src/style.css" />
 </head>
+
 <body>
   <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
   <!-- Preloader -->
@@ -45,15 +49,14 @@
 
   <!-- Back to Top -->
   <button class="back-to-top" id="back-to-top" aria-label="Volver arriba">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M18 15l-6-6-6 6" />
+    </svg>
   </button>
 
   <!-- Three.js Canvas (background) -->
-  <canvas
-    id="three-canvas"
-    aria-label="Escena 3D interactiva de portátil en movimiento"
-    aria-describedby="three-scene-desc"
-  ></canvas>
+  <canvas id="three-canvas" aria-label="Escena 3D interactiva de portátil en movimiento"
+    aria-describedby="three-scene-desc"></canvas>
   <p id="three-scene-desc" class="sr-only">
     Fondo 3D decorativo de un portátil que responde al puntero y al scroll.
   </p>
@@ -75,6 +78,7 @@
         <a href="/#process" class="nav-link" data-section="process">Método</a>
         <a href="/#experience" class="nav-link" data-section="experience">Trayectoria</a>
         <a href="#showcase" class="nav-link" data-section="showcase">Visual</a>
+        <a href="/gaming.html" class="nav-link" style="color: #00ff41; font-weight: 700;">Gaming</a>
         <a href="/#contact" class="nav-link" data-section="contact">Contacto</a>
       </div>
       <div class="nav-tools">
@@ -109,20 +113,10 @@
           <span class="admin-entry-text">Editor</span>
         </button>
       </div>
-      <button
-        class="ui-toggle"
-        id="ui-toggle"
-        aria-label="Abrir ajustes visuales"
-        aria-controls="ui-panel"
-        aria-expanded="false"
-      >Visual</button>
-      <button
-        class="nav-toggle"
-        id="nav-toggle"
-        aria-label="Abrir menú de navegación"
-        aria-controls="mobile-menu"
-        aria-expanded="false"
-      >
+      <button class="ui-toggle" id="ui-toggle" aria-label="Abrir ajustes visuales" aria-controls="ui-panel"
+        aria-expanded="false">Visual</button>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú de navegación" aria-controls="mobile-menu"
+        aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -170,7 +164,9 @@
         </div>
         <div class="not-admin-loader">
           <span><span></span><span></span><span></span><span></span></span>
-          <div class="not-admin-base"><span></span><div class="not-admin-face"></div></div>
+          <div class="not-admin-base"><span></span>
+            <div class="not-admin-face"></div>
+          </div>
         </div>
       </div>
       <div class="admin-denied-pet" aria-hidden="true">
@@ -218,7 +214,8 @@
         <div class="section-header">
           <span class="section-tag anim-reveal">Visual</span>
           <h1 class="section-title anim-reveal">Experiencia <span class="gradient-text">Cinematográfica</span></h1>
-          <p class="section-subtitle anim-reveal">Scroll-driven visuals, paneles interactivos y storytelling técnico concentrados en una página para explorarlos sin fricciones.</p>
+          <p class="section-subtitle anim-reveal">Scroll-driven visuals, paneles interactivos y storytelling técnico
+            concentrados en una página para explorarlos sin fricciones.</p>
         </div>
         <div class="experience-hero-actions anim-reveal">
           <a class="btn btn-primary btn-magnetic" href="/#projects">Volver al portfolio</a>
@@ -226,53 +223,70 @@
         </div>
       </div>
     </section>
-<!-- SHOWCASE SECTION -->
+    <!-- SHOWCASE SECTION -->
     <section id="showcase" class="section showcase-section">
       <div class="section-container">
         <div class="section-header">
           <span class="section-tag anim-reveal">08</span>
           <h2 class="section-title anim-reveal">Cinematic <span class="gradient-text">Composition</span></h2>
-          <p class="section-subtitle anim-reveal">Dirección visual y ritmo de movimiento sincronizados al scroll para presentar producto con lectura editorial.</p>
+          <p class="section-subtitle anim-reveal">Dirección visual y ritmo de movimiento sincronizados al scroll para
+            presentar producto con lectura editorial.</p>
         </div>
 
         <div class="showcase-cinematic anim-reveal" id="showcase-scroll">
           <div class="showcase-stage-wrap">
-            <div
-              class="showcase-stage"
-              id="showcase-stage"
-              role="img"
-              aria-label="Secuencia cinematográfica de escenas de tecnología y producto construida con imágenes de stock sincronizadas al scroll"
-            >
+            <div class="showcase-stage" id="showcase-stage" role="img"
+              aria-label="Secuencia cinematográfica de escenas de tecnología y producto construida con imágenes de stock sincronizadas al scroll">
               <div class="showcase-frame-stack" aria-hidden="true">
                 <figure class="showcase-frame is-active" data-showcase-frame="0">
-                  <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2000&q=80" alt="" loading="lazy" decoding="async" />
+                  <img
+                    src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2000&q=80"
+                    alt="" loading="lazy" decoding="async" />
                 </figure>
                 <figure class="showcase-frame" data-showcase-frame="1">
-                  <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=2000&q=80" alt="" loading="lazy" decoding="async" />
+                  <img
+                    src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=2000&q=80"
+                    alt="" loading="lazy" decoding="async" />
                 </figure>
                 <figure class="showcase-frame" data-showcase-frame="2">
-                  <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=2000&q=80" alt="" loading="lazy" decoding="async" />
+                  <img
+                    src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=2000&q=80"
+                    alt="" loading="lazy" decoding="async" />
                 </figure>
                 <figure class="showcase-frame" data-showcase-frame="3">
-                  <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=2000&q=80" alt="" loading="lazy" decoding="async" />
+                  <img
+                    src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=2000&q=80"
+                    alt="" loading="lazy" decoding="async" />
                 </figure>
                 <figure class="showcase-frame" data-showcase-frame="4">
-                  <img src="https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=2000&q=80" alt="" loading="lazy" decoding="async" />
+                  <img
+                    src="https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=2000&q=80"
+                    alt="" loading="lazy" decoding="async" />
                 </figure>
                 <figure class="showcase-frame" data-showcase-frame="5">
-                  <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=2000&q=80" alt="" loading="lazy" decoding="async" />
+                  <img
+                    src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=2000&q=80"
+                    alt="" loading="lazy" decoding="async" />
                 </figure>
                 <figure class="showcase-frame" data-showcase-frame="6">
-                  <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=2000&q=80" alt="" loading="lazy" decoding="async" />
+                  <img
+                    src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=2000&q=80"
+                    alt="" loading="lazy" decoding="async" />
                 </figure>
                 <figure class="showcase-frame" data-showcase-frame="7">
-                  <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=2000&q=80" alt="" loading="lazy" decoding="async" />
+                  <img
+                    src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=2000&q=80"
+                    alt="" loading="lazy" decoding="async" />
                 </figure>
                 <figure class="showcase-frame" data-showcase-frame="8">
-                  <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=2000&q=80" alt="" loading="lazy" decoding="async" />
+                  <img
+                    src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=2000&q=80"
+                    alt="" loading="lazy" decoding="async" />
                 </figure>
                 <figure class="showcase-frame" data-showcase-frame="9">
-                  <img src="https://images.unsplash.com/photo-1473091534298-04dcbce3278c?auto=format&fit=crop&w=2000&q=80" alt="" loading="lazy" decoding="async" />
+                  <img
+                    src="https://images.unsplash.com/photo-1473091534298-04dcbce3278c?auto=format&fit=crop&w=2000&q=80"
+                    alt="" loading="lazy" decoding="async" />
                 </figure>
                 <div class="showcase-vignette"></div>
                 <div class="showcase-film-grain"></div>
@@ -281,7 +295,8 @@
               <div class="showcase-overlay">
                 <span class="showcase-kicker">Narrativa visual</span>
                 <h3>Cada plano responde al anterior para guiar foco, tensión y contexto de producto.</h3>
-                <p>La secuencia combina apertura atmosférica, detalle técnico y cierre orientado a resultado para que el mensaje sea legible en segundos.</p>
+                <p>La secuencia combina apertura atmosférica, detalle técnico y cierre orientado a resultado para que el
+                  mensaje sea legible en segundos.</p>
                 <div class="showcase-progress-track" aria-hidden="true">
                   <span class="showcase-progress-bar" id="showcase-progress-bar"></span>
                 </div>
@@ -294,7 +309,8 @@
             <div class="showcase-script-head">
               <span class="showcase-kicker">Motion language</span>
               <h3>Crossfade, parallax y ritmo de scroll para una experiencia cinematográfica profesional.</h3>
-              <p>La timeline funciona como guion: cada tramo activa un beat visual y mantiene continuidad entre storytelling y acción.</p>
+              <p>La timeline funciona como guion: cada tramo activa un beat visual y mantiene continuidad entre
+                storytelling y acción.</p>
             </div>
             <ol class="showcase-steps" id="showcase-steps">
               <li class="showcase-step is-active" data-showcase-step="0">
@@ -359,36 +375,59 @@
         <div class="section-header">
           <span class="section-tag anim-reveal">09</span>
           <h2 class="section-title anim-reveal">Casos Reales en <span class="gradient-text">Movimiento</span></h2>
-          <p class="section-subtitle anim-reveal">Narrativa visual de proyectos con enfoque en impacto, ejecución técnica y resultado en producto.</p>
+          <p class="section-subtitle anim-reveal">Narrativa visual de proyectos con enfoque en impacto, ejecución
+            técnica y resultado en producto.</p>
         </div>
 
         <div class="reel-experience anim-reveal" id="reel-experience">
           <div class="reel-sticky">
-            <div
-              class="reel-viewport"
-              id="reel-viewport"
-              role="img"
-              aria-label="Secuencia de fotogramas con desplazamiento continuo que simula una toma de vídeo cinematográfica"
-            >
+            <div class="reel-viewport" id="reel-viewport" role="img"
+              aria-label="Secuencia de fotogramas con desplazamiento continuo que simula una toma de vídeo cinematográfica">
               <div class="reel-track" id="reel-track" aria-hidden="true">
-                <figure class="reel-frame is-active" data-reel-frame="0"><img src="https://images.unsplash.com/photo-1518773553398-650c184e0bb3?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
-                <figure class="reel-frame" data-reel-frame="1"><img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
-                <figure class="reel-frame" data-reel-frame="2"><img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
-                <figure class="reel-frame" data-reel-frame="3"><img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
-                <figure class="reel-frame" data-reel-frame="4"><img src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
-                <figure class="reel-frame" data-reel-frame="5"><img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
-                <figure class="reel-frame" data-reel-frame="6"><img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
-                <figure class="reel-frame" data-reel-frame="7"><img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
-                <figure class="reel-frame" data-reel-frame="8"><img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
-                <figure class="reel-frame" data-reel-frame="9"><img src="https://images.unsplash.com/photo-1484417894907-623942c8ee29?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
-                <figure class="reel-frame" data-reel-frame="10"><img src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
-                <figure class="reel-frame" data-reel-frame="11"><img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1400&q=80" alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame is-active" data-reel-frame="0"><img
+                    src="https://images.unsplash.com/photo-1518773553398-650c184e0bb3?auto=format&fit=crop&w=1400&q=80"
+                    alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="1"><img
+                    src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1400&q=80"
+                    alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="2"><img
+                    src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1400&q=80"
+                    alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="3"><img
+                    src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1400&q=80"
+                    alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="4"><img
+                    src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1400&q=80"
+                    alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="5"><img
+                    src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1400&q=80"
+                    alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="6"><img
+                    src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1400&q=80"
+                    alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="7"><img
+                    src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1400&q=80"
+                    alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="8"><img
+                    src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1400&q=80"
+                    alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="9"><img
+                    src="https://images.unsplash.com/photo-1484417894907-623942c8ee29?auto=format&fit=crop&w=1400&q=80"
+                    alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="10"><img
+                    src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1400&q=80"
+                    alt="" loading="lazy" decoding="async" /></figure>
+                <figure class="reel-frame" data-reel-frame="11"><img
+                    src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1400&q=80"
+                    alt="" loading="lazy" decoding="async" /></figure>
               </div>
 
               <div class="reel-overlay">
                 <span class="showcase-kicker">Project storytelling</span>
-                <h3>Cada tramo del scroll muestra una fase real: discovery, build, seguridad, despliegue y escalado.</h3>
-                <p>Este bloque traduce experiencia técnica a una lectura clara para reclutadores y equipos de producto.</p>
+                <h3>Cada tramo del scroll muestra una fase real: discovery, build, seguridad, despliegue y escalado.
+                </h3>
+                <p>Este bloque traduce experiencia técnica a una lectura clara para reclutadores y equipos de producto.
+                </p>
                 <div class="reel-progress-track" aria-hidden="true">
                   <span class="reel-progress-bar" id="reel-progress-bar"></span>
                 </div>
@@ -406,7 +445,8 @@
         <div class="section-header">
           <span class="section-tag anim-reveal">II</span>
           <h2 class="section-title anim-reveal">Arquitectura <span class="gradient-text">Visual</span></h2>
-          <p class="section-subtitle anim-reveal">Segunda capa de la experiencia: sistema visual, ritmo editorial y decisiones de composición documentadas.</p>
+          <p class="section-subtitle anim-reveal">Segunda capa de la experiencia: sistema visual, ritmo editorial y
+            decisiones de composición documentadas.</p>
         </div>
 
         <div class="visual-dna-grid anim-reveal">
@@ -471,7 +511,8 @@
         <div class="section-header">
           <span class="section-tag anim-reveal">20</span>
           <h2 class="section-title anim-reveal">Foco <span class="gradient-text">Ingeniería</span></h2>
-          <p class="section-subtitle anim-reveal">Estructura clara de prioridades técnicas: backend, seguridad, cloud y delivery con mentalidad de producto.</p>
+          <p class="section-subtitle anim-reveal">Estructura clara de prioridades técnicas: backend, seguridad, cloud y
+            delivery con mentalidad de producto.</p>
         </div>
 
         <div class="engineering-focus-grid anim-reveal">
@@ -521,7 +562,8 @@
           <div>
             <span class="engineering-callout-kicker">Capas prioritarias</span>
             <h3>Perfil técnico orientado a estabilidad y resultados</h3>
-            <p>Trabajo desde el core técnico hacia la experiencia, priorizando fiabilidad y claridad en cada entrega.</p>
+            <p>Trabajo desde el core técnico hacia la experiencia, priorizando fiabilidad y claridad en cada entrega.
+            </p>
           </div>
           <div class="engineering-pill-row">
             <span>Arquitectura</span>
@@ -539,7 +581,8 @@
         <div class="section-header">
           <span class="section-tag anim-reveal">10</span>
           <h2 class="section-title anim-reveal">Panel de Decisión <span class="gradient-text">Técnica</span></h2>
-          <p class="section-subtitle anim-reveal">Simulación de priorización para elegir foco de sprint en proyectos reales: calidad, velocidad y seguridad.</p>
+          <p class="section-subtitle anim-reveal">Simulación de priorización para elegir foco de sprint en proyectos
+            reales: calidad, velocidad y seguridad.</p>
         </div>
 
         <div class="neo-lab-layout anim-reveal" id="neo-layout">
@@ -593,7 +636,8 @@
         <div class="section-header">
           <span class="section-tag anim-reveal">11</span>
           <h2 class="section-title anim-reveal">Cadencia de <span class="gradient-text">Entrega</span></h2>
-          <p class="section-subtitle anim-reveal">Bloques que muestran el flujo de trabajo real en un proyecto: entrada, transformación, release y aprendizaje.</p>
+          <p class="section-subtitle anim-reveal">Bloques que muestran el flujo de trabajo real en un proyecto: entrada,
+            transformación, release y aprendizaje.</p>
         </div>
 
         <div class="anime-lab-head anim-reveal">
@@ -642,7 +686,8 @@
         <div class="section-header">
           <span class="section-tag anim-reveal">12</span>
           <h2 class="section-title anim-reveal">Matriz de <span class="gradient-text">Prioridades</span></h2>
-          <p class="section-subtitle anim-reveal">Mapa interactivo para decidir que atacar primero en un proyecto: fiabilidad, experiencia, seguridad o velocidad.</p>
+          <p class="section-subtitle anim-reveal">Mapa interactivo para decidir que atacar primero en un proyecto:
+            fiabilidad, experiencia, seguridad o velocidad.</p>
         </div>
 
         <div class="interaction-deck-layout anim-reveal">
@@ -691,7 +736,8 @@
         <div class="section-header">
           <span class="section-tag anim-reveal">13</span>
           <h2 class="section-title anim-reveal">Stack Cloud Aplicado a <span class="gradient-text">Proyectos</span></h2>
-          <p class="section-subtitle anim-reveal">No es una lista de herramientas: son escenarios de portfolio donde cloud e IA aportan valor real.</p>
+          <p class="section-subtitle anim-reveal">No es una lista de herramientas: son escenarios de portfolio donde
+            cloud e IA aportan valor real.</p>
         </div>
 
         <div class="google-toolbar anim-reveal">
@@ -713,68 +759,84 @@
         </div>
 
         <div class="google-services-grid anim-reveal">
-          <article class="google-service-card" data-type="cloud" data-service="deploy portfolio api cloud run cloud build backend release">
+          <article class="google-service-card" data-type="cloud"
+            data-service="deploy portfolio api cloud run cloud build backend release">
             <h3>Entrega continua del portfolio</h3>
             <p>Automatización de build y despliegue para iterar rápido en cambios de frontend y backend.</p>
             <div class="google-card-actions">
               <a href="https://cloud.google.com/run" target="_blank" rel="noopener noreferrer">Referencia</a>
-              <button type="button" class="google-service-copy" data-copy="Cloud Run + Cloud Build para release continuo">Copiar stack</button>
+              <button type="button" class="google-service-copy"
+                data-copy="Cloud Run + Cloud Build para release continuo">Copiar stack</button>
             </div>
           </article>
-          <article class="google-service-card" data-type="cloud" data-service="cloud build ci cd quality gates pipeline portfolio devops">
+          <article class="google-service-card" data-type="cloud"
+            data-service="cloud build ci cd quality gates pipeline portfolio devops">
             <h3>Pipeline con quality gates</h3>
             <p>Checks técnicos y de seguridad antes de publicar para bajar riesgo de regresiones.</p>
             <div class="google-card-actions">
               <a href="https://cloud.google.com/build" target="_blank" rel="noopener noreferrer">Referencia</a>
-              <button type="button" class="google-service-copy" data-copy="Cloud Build + tests + controles de release">Copiar stack</button>
+              <button type="button" class="google-service-copy"
+                data-copy="Cloud Build + tests + controles de release">Copiar stack</button>
             </div>
           </article>
-          <article class="google-service-card" data-type="ai" data-service="vertex ai prototypes recommendation assistant mlops portfolio projects">
+          <article class="google-service-card" data-type="ai"
+            data-service="vertex ai prototypes recommendation assistant mlops portfolio projects">
             <h3>Prototipo IA para decisión rapida</h3>
             <p>Uso de modelos para validar hipótesis de producto antes de una implementación completa.</p>
             <div class="google-card-actions">
               <a href="https://cloud.google.com/vertex-ai" target="_blank" rel="noopener noreferrer">Referencia</a>
-              <button type="button" class="google-service-copy" data-copy="Vertex AI para prototipado y validación de ideas">Copiar stack</button>
+              <button type="button" class="google-service-copy"
+                data-copy="Vertex AI para prototipado y validación de ideas">Copiar stack</button>
             </div>
           </article>
-          <article class="google-service-card" data-type="analytics" data-service="bigquery sql analytics product metrics performance monitoring">
+          <article class="google-service-card" data-type="analytics"
+            data-service="bigquery sql analytics product metrics performance monitoring">
             <h3>Métricas de producto y rendimiento</h3>
             <p>Analítica para detectar cuellos de botella y priorizar mejoras con datos objetivos.</p>
             <div class="google-card-actions">
               <a href="https://cloud.google.com/bigquery" target="_blank" rel="noopener noreferrer">Referencia</a>
-              <button type="button" class="google-service-copy" data-copy="BigQuery para telemetría y analítica técnica">Copiar stack</button>
+              <button type="button" class="google-service-copy"
+                data-copy="BigQuery para telemetría y analítica técnica">Copiar stack</button>
             </div>
           </article>
-          <article class="google-service-card" data-type="analytics" data-service="looker studio reporting dashboards stakeholders communication">
+          <article class="google-service-card" data-type="analytics"
+            data-service="looker studio reporting dashboards stakeholders communication">
             <h3>Dashboard para stakeholders</h3>
             <p>Visualización clara de progreso técnico para comunicar estado e impacto de cada release.</p>
             <div class="google-card-actions">
               <a href="https://lookerstudio.google.com" target="_blank" rel="noopener noreferrer">Referencia</a>
-              <button type="button" class="google-service-copy" data-copy="Looker Studio para reporting técnico y de producto">Copiar stack</button>
+              <button type="button" class="google-service-copy"
+                data-copy="Looker Studio para reporting técnico y de producto">Copiar stack</button>
             </div>
           </article>
-          <article class="google-service-card" data-type="ops" data-service="firebase auth hosting rapid prototype web apps operations">
+          <article class="google-service-card" data-type="ops"
+            data-service="firebase auth hosting rapid prototype web apps operations">
             <h3>MVP con backend integrado</h3>
             <p>Base para sacar prototipos funcionales con autenticación, hosting y telemetría en poco tiempo.</p>
             <div class="google-card-actions">
               <a href="https://firebase.google.com" target="_blank" rel="noopener noreferrer">Referencia</a>
-              <button type="button" class="google-service-copy" data-copy="Firebase para MVP de frontend + auth + hosting">Copiar stack</button>
+              <button type="button" class="google-service-copy"
+                data-copy="Firebase para MVP de frontend + auth + hosting">Copiar stack</button>
             </div>
           </article>
-          <article class="google-service-card" data-type="ops" data-service="maps platform geolocation routing context aware product features">
+          <article class="google-service-card" data-type="ops"
+            data-service="maps platform geolocation routing context aware product features">
             <h3>Features contextuales por ubicación</h3>
             <p>Integración de geolocalización y rutas para productos con componente espacial.</p>
             <div class="google-card-actions">
               <a href="https://mapsplatform.google.com" target="_blank" rel="noopener noreferrer">Referencia</a>
-              <button type="button" class="google-service-copy" data-copy="Maps Platform para geocoding y rutas en producto">Copiar stack</button>
+              <button type="button" class="google-service-copy"
+                data-copy="Maps Platform para geocoding y rutas en producto">Copiar stack</button>
             </div>
           </article>
-          <article class="google-service-card" data-type="ai" data-service="gemini api assistant automation summarization coding productivity">
+          <article class="google-service-card" data-type="ai"
+            data-service="gemini api assistant automation summarization coding productivity">
             <h3>Asistente de productividad técnica</h3>
             <p>Automatización de tareas repetitivas y soporte contextual para acelerar desarrollo.</p>
             <div class="google-card-actions">
               <a href="https://ai.google.dev" target="_blank" rel="noopener noreferrer">Referencia</a>
-              <button type="button" class="google-service-copy" data-copy="Gemini API para asistencia técnica y automatización">Copiar stack</button>
+              <button type="button" class="google-service-copy"
+                data-copy="Gemini API para asistencia técnica y automatización">Copiar stack</button>
             </div>
           </article>
         </div>
@@ -786,8 +848,10 @@
       <div class="section-container">
         <div class="section-header">
           <span class="section-tag anim-reveal">14</span>
-          <h2 class="section-title anim-reveal">Roadmap de Ejecución en <span class="gradient-text">Proyectos</span></h2>
-          <p class="section-subtitle anim-reveal">Panel interactivo para explicar cómo paso de discovery a release estable con decisiones técnicas trazables.</p>
+          <h2 class="section-title anim-reveal">Roadmap de Ejecución en <span class="gradient-text">Proyectos</span>
+          </h2>
+          <p class="section-subtitle anim-reveal">Panel interactivo para explicar cómo paso de discovery a release
+            estable con decisiones técnicas trazables.</p>
         </div>
 
         <div class="flow-shell anim-reveal">
@@ -800,7 +864,7 @@
           </div>
 
           <div class="flow-controls">
-              <label for="flow-progress">Progreso del roadmap</label>
+            <label for="flow-progress">Progreso del roadmap</label>
             <input id="flow-progress" type="range" min="0" max="100" value="22" />
           </div>
 
@@ -845,8 +909,10 @@
       <div class="section-container">
         <div class="section-header">
           <span class="section-tag anim-reveal">15</span>
-          <h2 class="section-title anim-reveal">Arquitectura de Proyecto en <span class="gradient-text">Producción</span></h2>
-          <p class="section-subtitle anim-reveal">Mapa interactivo para explicar cómo conecto cloud, seguridad, IA y datos en casos reales.</p>
+          <h2 class="section-title anim-reveal">Arquitectura de Proyecto en <span
+              class="gradient-text">Producción</span></h2>
+          <p class="section-subtitle anim-reveal">Mapa interactivo para explicar cómo conecto cloud, seguridad, IA y
+            datos en casos reales.</p>
         </div>
 
         <div class="topology-layout anim-reveal">
@@ -854,16 +920,19 @@
             <span class="showcase-kicker">Cluster selector</span>
             <h3>Filtra capas de plataforma en tiempo real</h3>
             <div class="topology-filter-group" role="group" aria-label="Filtro de clusters">
-              <button type="button" class="topology-filter is-active" data-topology="all" aria-pressed="true">Todos</button>
+              <button type="button" class="topology-filter is-active" data-topology="all"
+                aria-pressed="true">Todos</button>
               <button type="button" class="topology-filter" data-topology="cloud" aria-pressed="false">Entrega</button>
-              <button type="button" class="topology-filter" data-topology="security" aria-pressed="false">Seguridad</button>
+              <button type="button" class="topology-filter" data-topology="security"
+                aria-pressed="false">Seguridad</button>
               <button type="button" class="topology-filter" data-topology="ai" aria-pressed="false">IA</button>
               <button type="button" class="topology-filter" data-topology="data" aria-pressed="false">Datos</button>
             </div>
             <p class="topology-status" id="topology-status" aria-live="polite">Cluster activo: sistema completo</p>
           </aside>
 
-          <div class="topology-stage" id="topology-stage" role="img" aria-label="Topologia interactiva de servicios conectados para plataforma software">
+          <div class="topology-stage" id="topology-stage" role="img"
+            aria-label="Topologia interactiva de servicios conectados para plataforma software">
             <div class="topology-ring" id="topology-ring">
               <button type="button" class="topology-node node-core" data-cluster="cloud">Core API</button>
               <button type="button" class="topology-node node-cloud-a" data-cluster="cloud">Cloud Run</button>
@@ -886,17 +955,22 @@
         <div class="section-header">
           <span class="section-tag anim-reveal">16</span>
           <h2 class="section-title anim-reveal">Evolución Visual de <span class="gradient-text">Proyecto</span></h2>
-          <p class="section-subtitle anim-reveal">Comparador para mostrar el salto desde una versión base hasta una entrega optimizada y lista para escalar.</p>
+          <p class="section-subtitle anim-reveal">Comparador para mostrar el salto desde una versión base hasta una
+            entrega optimizada y lista para escalar.</p>
         </div>
 
         <div class="split-shell anim-reveal">
           <div class="split-stage" id="split-stage">
             <figure class="split-image split-before">
-              <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1800&q=80" alt="Setup de desarrollo base con pantallas de código y entorno inicial" loading="lazy" decoding="async" />
+              <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1800&q=80"
+                alt="Setup de desarrollo base con pantallas de código y entorno inicial" loading="lazy"
+                decoding="async" />
               <figcaption>Base</figcaption>
             </figure>
             <figure class="split-image split-after" id="split-after">
-              <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1800&q=80" alt="Setup optimizado con colaboración en tiempo real y visualización profesional" loading="lazy" decoding="async" />
+              <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1800&q=80"
+                alt="Setup optimizado con colaboración en tiempo real y visualización profesional" loading="lazy"
+                decoding="async" />
               <figcaption>Optimizado</figcaption>
             </figure>
             <span class="split-handle" id="split-handle" aria-hidden="true"></span>
@@ -916,13 +990,16 @@
         <div class="section-header">
           <span class="section-tag anim-reveal">17</span>
           <h2 class="section-title anim-reveal">Casos de Portfolio <span class="gradient-text">High Impact</span></h2>
-          <p class="section-subtitle anim-reveal">Ejemplos tipo producción con métricas de impacto y stack moderno para backend, seguridad, cloud e IA.</p>
+          <p class="section-subtitle anim-reveal">Ejemplos tipo producción con métricas de impacto y stack moderno para
+            backend, seguridad, cloud e IA.</p>
         </div>
 
         <div class="elite-controls anim-reveal" role="group" aria-label="Filtro de casos">
-          <button type="button" class="elite-filter is-active" data-elite-filter="all" aria-pressed="true">Todos</button>
+          <button type="button" class="elite-filter is-active" data-elite-filter="all"
+            aria-pressed="true">Todos</button>
           <button type="button" class="elite-filter" data-elite-filter="backend" aria-pressed="false">Backend</button>
-          <button type="button" class="elite-filter" data-elite-filter="security" aria-pressed="false">Seguridad</button>
+          <button type="button" class="elite-filter" data-elite-filter="security"
+            aria-pressed="false">Seguridad</button>
           <button type="button" class="elite-filter" data-elite-filter="ai" aria-pressed="false">IA</button>
           <button type="button" class="elite-filter" data-elite-filter="cloud" aria-pressed="false">Cloud</button>
         </div>
@@ -939,7 +1016,8 @@
               <li><strong data-count-target="32">0</strong><span>% menos incidencias manuales</span></li>
             </ul>
             <div class="elite-tech">
-              <span>Node.js</span><span>Docker</span><span>Cloud Build</span><span>Cloud Run</span><span>PostgreSQL</span>
+              <span>Node.js</span><span>Docker</span><span>Cloud Build</span><span>Cloud
+                Run</span><span>PostgreSQL</span>
             </div>
           </article>
 
@@ -969,7 +1047,8 @@
               <li><strong data-count-target="58">0</strong><span>% más velocidad de validación</span></li>
             </ul>
             <div class="elite-tech">
-              <span>Vertex AI</span><span>Gemini API</span><span>Python</span><span>Streamlit</span><span>BigQuery</span>
+              <span>Vertex AI</span><span>Gemini
+                API</span><span>Python</span><span>Streamlit</span><span>BigQuery</span>
             </div>
           </article>
         </div>
@@ -982,20 +1061,25 @@
         <div class="section-header">
           <span class="section-tag anim-reveal">18</span>
           <h2 class="section-title anim-reveal">Playbook Técnico <span class="gradient-text">Interactivo</span></h2>
-          <p class="section-subtitle anim-reveal">Escenarios reales para enseñar cómo aterrizo arquitectura, seguridad y observabilidad según objetivo de negocio.</p>
+          <p class="section-subtitle anim-reveal">Escenarios reales para enseñar cómo aterrizo arquitectura, seguridad y
+            observabilidad según objetivo de negocio.</p>
         </div>
 
         <div class="playbook-layout anim-reveal">
           <aside class="playbook-controls" role="group" aria-label="Seleccionar escenario">
-            <button type="button" class="playbook-btn is-active" data-playbook="launch" aria-pressed="true">Lanzamiento MVP</button>
-            <button type="button" class="playbook-btn" data-playbook="scale" aria-pressed="false">Escalado estable</button>
-            <button type="button" class="playbook-btn" data-playbook="secure" aria-pressed="false">Fortificación seguridad</button>
+            <button type="button" class="playbook-btn is-active" data-playbook="launch" aria-pressed="true">Lanzamiento
+              MVP</button>
+            <button type="button" class="playbook-btn" data-playbook="scale" aria-pressed="false">Escalado
+              estable</button>
+            <button type="button" class="playbook-btn" data-playbook="secure" aria-pressed="false">Fortificación
+              seguridad</button>
           </aside>
 
           <article class="playbook-panel" id="playbook-panel">
             <span class="showcase-kicker">Escenario activo</span>
             <h3 id="playbook-title">Lanzamiento MVP con stack cloud modular</h3>
-            <p id="playbook-description">Salida rápida con base sólida para evolucionar producto sin rehacer arquitectura en la siguiente fase.</p>
+            <p id="playbook-description">Salida rápida con base sólida para evolucionar producto sin rehacer
+              arquitectura en la siguiente fase.</p>
             <div class="playbook-tags" id="playbook-tags">
               <span>Vite</span><span>Node.js</span><span>Docker</span><span>Cloud Run</span><span>PostgreSQL</span>
             </div>
@@ -1041,13 +1125,5 @@
 
   <script type="module" src="/src/main.js"></script>
 </body>
+
 </html>
-
-
-
-
-
-
-
-
-
