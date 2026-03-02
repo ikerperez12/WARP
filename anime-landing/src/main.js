@@ -114,7 +114,6 @@ function syncThemeLabels() {
   document.body.dataset.theme = prefs.theme;
 }
 
-// 1. Smooth Scroll (Lenis)
 const lenis = new Lenis();
 function raf(time) {
   lenis.raf(time);
@@ -122,7 +121,6 @@ function raf(time) {
 }
 requestAnimationFrame(raf);
 
-// 2. Scene Setup
 const canvas = document.querySelector("#bg");
 const { renderer, scene, camera, composer } = createScene(canvas);
 bindResize(renderer, camera, composer);
@@ -161,8 +159,8 @@ bindScrollEffects({
   orb,
   ui,
   state,
-  onScrollProgress: (p) => {
-    ui.statScroll.textContent = `${Math.round(p * 100)}%`;
+  onScrollProgress: (progress) => {
+    ui.statScroll.textContent = `${Math.round(progress * 100)}%`;
   },
 });
 

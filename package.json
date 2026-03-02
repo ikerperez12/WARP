@@ -11,6 +11,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "node --test \"src/features/gaming/**/*.test.js\"",
     "export:original-glb": "node scripts/export-original-glb.mjs",
     "sync:projects": "node scripts/sync-github-projects.mjs"
   },
@@ -22,6 +23,7 @@
     "@simplewebauthn/server": "^13.2.3",
     "@vercel/kv": "^3.0.0",
     "animejs": "^3.2.2",
+    "cannon-es": "^0.20.0",
     "three": "^0.182.0"
   },
   "overrides": {

@@ -63,8 +63,13 @@
   <!-- Navigation -->
   <nav id="navbar" class="navbar">
     <div class="nav-container">
-      <div class="nav-brand">
-        <span class="nav-topline">Disponible para prácticas y proyectos tech de alto impacto</span>
+      <div class="nav-brand" style="flex-direction: row; align-items: center; gap: 16px;">
+        <!-- Topline removed -->
+        <div class="hero-badge"
+          style="margin-bottom: 0; padding: 6px 14px; font-size: 0.75rem; border-color: rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.03); color: var(--text-secondary); white-space: nowrap; flex-shrink: 0; display: inline-flex;">
+          <span class="badge-dot"></span>
+          <span class="hero-badge-text">Disponible para prácticas, proyectos y contrataciones</span>
+        </div>
         <a href="#hero" class="nav-logo">
           <span class="logo-bracket">&lt;</span>IP<span class="logo-bracket">/&gt;</span>
         </a>
@@ -195,10 +200,7 @@
         <div class="floating-badge">Software Engineering - Cybersecurity - AI - Cloud</div>
       </div>
       <div class="hero-content">
-        <div class="hero-badge anim-fade-up">
-          <span class="badge-dot"></span>
-          <span class="hero-badge-text">Disponible para prácticas y proyectos tech de alto impacto</span>
-        </div>
+        <!-- Hero badge removed -->
         <h1 class="hero-title">
           <span class="hero-line anim-fade-up delay-100">Iker Pérez García</span>
           <span class="hero-line anim-fade-up gradient-text delay-200">Software & Security</span>
@@ -603,13 +605,18 @@
         <div class="process-proof anim-reveal" style="text-align: center; border-color: rgba(0,255,65,0.2);">
           <p style="margin-bottom: 24px;">Demostración interactiva de renderizado de alta fidelidad, cálculo de
             colisiones en tiempo real y post-procesamiento cinemático en el navegador.</p>
-          <a href="/gaming.html" class="btn btn-primary btn-magnetic"
-            style="background: rgba(0, 59, 0, 0.6); border: 1px solid #00ff41; color: #00ff41;">
-            <span>INICIAR SISTEMA DE JUEGO</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </a>
+          <div class="anime-lab-actions" style="justify-content: center;">
+            <a href="/gaming.html" class="btn btn-primary btn-magnetic"
+              style="background: rgba(0, 59, 0, 0.6); border: 1px solid #00ff41; color: #00ff41;">
+              <span>INICIAR SISTEMA DE JUEGO</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </a>
+            <a href="/anime-landing.html" class="btn btn-secondary anime-landing-link">
+              <span>Abrir anime landing</span>
+            </a>
+          </div>
         </div>
       </div>
     </section>

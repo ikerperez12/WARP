@@ -64,8 +64,13 @@
   <!-- Navigation -->
   <nav id="navbar" class="navbar">
     <div class="nav-container">
-      <div class="nav-brand">
-        <span class="nav-topline">Disponible para prácticas y proyectos tech de alto impacto</span>
+      <div class="nav-brand" style="flex-direction: row; align-items: center; gap: 16px;">
+        <!-- Topline removed -->
+        <div class="hero-badge"
+          style="margin-bottom: 0; padding: 6px 14px; font-size: 0.75rem; border-color: rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.03); color: var(--text-secondary); white-space: nowrap; flex-shrink: 0; display: inline-flex;">
+          <span class="badge-dot"></span>
+          <span class="hero-badge-text">Disponible para prácticas, proyectos y contrataciones</span>
+        </div>
         <a href="/" class="nav-logo">
           <span class="logo-bracket">&lt;</span>IP<span class="logo-bracket">/&gt;</span>
         </a>
@@ -642,7 +647,10 @@
         </div>
 
         <div class="anime-lab-head anim-reveal">
-          <button type="button" class="btn btn-primary" id="anime-replay-btn">Reproducir flujo</button>
+          <div class="anime-lab-actions">
+            <button type="button" class="btn btn-primary" id="anime-replay-btn">Reproducir flujo</button>
+            <a href="/anime-landing.html" class="btn btn-secondary anime-landing-link">Abrir anime landing</a>
+          </div>
           <p class="anime-phase" id="anime-phase" aria-live="polite">Flujo en espera</p>
         </div>
 

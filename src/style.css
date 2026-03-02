@@ -3461,6 +3461,13 @@ body[data-cursor='off'] .custom-cursor-dot {
   margin-bottom: 18px;
 }
 
+.anime-lab-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .anime-phase {
   font-family: var(--font-mono);
   font-size: 0.8rem;

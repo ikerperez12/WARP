@@ -52,6 +52,7 @@ const translations = {
       experienceCtaSubtitle: 'Accede a la narrativa cinematográfica, los laboratorios interactivos y el playbook técnico en una página dedicada.',
       experienceCtaBody: 'He separado las escenas de motion, los paneles y los comparadores para que la home cargue más rápido sin perder el bloque visual.',
       experienceCtaButton: 'Ver experiencia visual',
+      animeCtaButton: 'Abrir anime landing',
       engineeringTitle: 'Foco Ingeniería',
       engineeringSubtitle: 'Estructura clara de prioridades técnicas: backend, seguridad, cloud y delivery con mentalidad de producto.',
       showcaseTitle: 'Cinematic Composition',
@@ -211,6 +212,7 @@ const translations = {
       experienceCtaSubtitle: 'Access the cinematic narrative, interactive labs, and technical playbook on a dedicated page.',
       experienceCtaBody: 'I separated motion scenes, panels, and comparators so the home loads faster without losing the visual block.',
       experienceCtaButton: 'Open visual experience',
+      animeCtaButton: 'Open anime landing',
       engineeringTitle: 'Engineering Focus',
       engineeringSubtitle: 'Clear technical priorities: backend, security, cloud, and delivery with product mindset.',
       showcaseTitle: 'Cinematic Composition',
@@ -474,6 +476,7 @@ function applyLanguage() {
   setSectionSubtitle('neo-lab', copy.sections.neoSubtitle);
   setSectionTitle('anime-lab', copy.sections.animeTitle);
   setSectionSubtitle('anime-lab', copy.sections.animeSubtitle);
+  setTextAll('.anime-landing-link', copy.sections.animeCtaButton);
   setSectionTitle('interaction-deck', copy.sections.deckTitle);
   setSectionSubtitle('interaction-deck', copy.sections.deckSubtitle);
   setSectionTitle('google-services-section', copy.sections.cloudTitle);
@@ -585,6 +588,10 @@ function setTextarea(selector, labelSelector, placeholder, label) {
 function setText(selector, value) {
   const node = document.querySelector(selector);
   setNodeText(node, value);
+}
+
+function setTextAll(selector, value) {
+  document.querySelectorAll(selector).forEach((node) => setNodeText(node, value));
 }
 
 function setAria(selector, value) {
