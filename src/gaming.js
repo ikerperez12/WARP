@@ -41,7 +41,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     await app.init();
   } catch (error) {
     console.error('Unable to initialize Red Cyber Ops', error);
-    app.showFallback();
+    const message = error?.message
+      ? `No se pudo iniciar el distrito 3D (${error.message})`
+      : null;
+    app.showFallback(message);
     return;
   }
 

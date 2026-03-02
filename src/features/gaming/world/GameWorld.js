@@ -10,15 +10,163 @@ const labelTextureCache = new Map();
 
 function nextFrame() {
   return new Promise((resolve) => {
-    window.requestAnimationFrame(() => resolve());
+    const schedule = globalThis.requestAnimationFrame
+      ? globalThis.requestAnimationFrame.bind(globalThis)
+      : (callback) => globalThis.setTimeout(callback, 16);
+    schedule(() => resolve());
   });
+}
+
+function getViewportMetrics(env = globalThis, canvas = null) {
+  return {
+    width: env.innerWidth || canvas?.clientWidth || 1280,
+    height: env.innerHeight || canvas?.clientHeight || 720,
+    dpr: env.devicePixelRatio || 1,
+  };
+}
+
+function replaceCanvasNode(canvas) {
+  const parent = canvas?.parentNode;
+  if (!canvas || !parent) return canvas;
+  const replacement = canvas.cloneNode(false);
+  replacement.width = canvas.width;
+  replacement.height = canvas.height;
+  parent.replaceChild(replacement, canvas);
+  return replacement;
+}
+
+function getRendererAttemptPlan(compatibility = false) {
+  const richProfile = {
+    label: 'rich',
+    contextNames: ['webgl2', 'webgl'],
+    contextAttributes: {
+      alpha: false,
+      antialias: true,
+      depth: true,
+      failIfMajorPerformanceCaveat: false,
+      powerPreference: 'high-performance',
+      premultipliedAlpha: false,
+      preserveDrawingBuffer: false,
+      stencil: false,
+    },
+    rendererOptions: {
+      alpha: false,
+      antialias: true,
+      depth: true,
+      powerPreference: 'high-performance',
+      premultipliedAlpha: false,
+      precision: 'highp',
+      preserveDrawingBuffer: false,
+      stencil: false,
+    },
+  };
+
+  const compatibilityProfile = {
+    label: 'compatibility',
+    contextNames: ['webgl', 'experimental-webgl', 'webgl2'],
+    contextAttributes: {
+      alpha: false,
+      antialias: false,
+      depth: true,
+      failIfMajorPerformanceCaveat: false,
+      powerPreference: 'default',
+      premultipliedAlpha: false,
+      preserveDrawingBuffer: false,
+      stencil: false,
+    },
+    rendererOptions: {
+      alpha: false,
+      antialias: false,
+      depth: true,
+      powerPreference: 'default',
+      premultipliedAlpha: false,
+      precision: 'mediump',
+      preserveDrawingBuffer: false,
+      stencil: false,
+    },
+  };
+
+  const legacyProfile = {
+    label: 'legacy',
+    contextNames: ['experimental-webgl', 'webgl'],
+    contextAttributes: {
+      alpha: false,
+      antialias: false,
+      depth: true,
+      failIfMajorPerformanceCaveat: false,
+      premultipliedAlpha: false,
+      preserveDrawingBuffer: false,
+      stencil: false,
+    },
+    rendererOptions: {
+      alpha: false,
+      antialias: false,
+      depth: true,
+      powerPreference: 'low-power',
+      premultipliedAlpha: false,
+      precision: 'mediump',
+      preserveDrawingBuffer: false,
+      stencil: false,
+    },
+  };
+
+  return compatibility
+    ? [compatibilityProfile, legacyProfile]
+    : [richProfile, compatibilityProfile, legacyProfile];
+}
+
+function createRenderer(canvas, compatibility = false) {
+  let activeCanvas = canvas;
+  const failures = [];
+  const attempts = getRendererAttemptPlan(compatibility);
+
+  for (const [index, attempt] of attempts.entries()) {
+    try {
+      let context = null;
+      let contextName = null;
+
+      for (const candidate of attempt.contextNames) {
+        try {
+          const resolved = activeCanvas.getContext(candidate, attempt.contextAttributes);
+          if (!resolved) continue;
+          context = resolved;
+          contextName = candidate;
+          break;
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          failures.push(`[${attempt.label}:${candidate}] ${message}`);
+        }
+      }
+
+      if (!context || !contextName) {
+        throw new Error(`No se pudo adquirir contexto ${attempt.contextNames.join('/')}`);
+      }
+
+      const renderer = new THREE.WebGLRenderer({
+        ...attempt.rendererOptions,
+        canvas: activeCanvas,
+        context,
+      });
+      renderer.userData.contextName = contextName;
+      renderer.userData.rendererProfile = attempt.label;
+      return { renderer, canvas: activeCanvas };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      failures.push(`[${attempt.label}] ${message}`);
+      if (index < attempts.length - 1) {
+        activeCanvas = replaceCanvasNode(activeCanvas);
+      }
+    }
+  }
+
+  throw new Error(failures.join(' | ') || 'No se pudo crear el renderer WebGL');
 }
 
 export function createWorldProfile(env = globalThis) {
   const nav = env.navigator ?? {};
   const view = env.window ?? env;
-  const coarsePointer = Boolean(view.matchMedia?.('(pointer: coarse)').matches);
-  const reducedMotion = Boolean(view.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+  const coarsePointer = Boolean(view.matchMedia?.('(pointer: coarse)')?.matches);
+  const reducedMotion = Boolean(view.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches);
   const cores = nav.hardwareConcurrency ?? 8;
   const memory = nav.deviceMemory ?? 8;
   const low = reducedMotion || coarsePointer || cores <= 4 || memory <= 4;
@@ -165,9 +313,11 @@ function createDistrictSign(text, accent, width = 15.5, height = 3.9) {
 }
 
 export class GameWorld {
-  constructor({ canvas, theme = 'dark' }) {
+  constructor({ canvas, theme = 'dark', compatibility = false }) {
     this.canvas = canvas;
     this.theme = theme;
+    this.compatibility = compatibility;
+    this.assetFallback = false;
     this.worldProfile = createWorldProfile();
     this.materials = createMaterialLibrary(theme);
     this.assets = null;
@@ -188,20 +338,27 @@ export class GameWorld {
 
   async init({ onProgress } = {}) {
     const setProgress = (value) => onProgress?.(Math.max(0, Math.min(1, value)));
-    this.renderer = new THREE.WebGLRenderer({
-      canvas: this.canvas,
-      antialias: true,
-      powerPreference: 'high-performance',
-    });
+    const rendererState = createRenderer(this.canvas, this.compatibility);
+    this.canvas = rendererState.canvas;
+    this.renderer = rendererState.renderer;
+    const viewport = getViewportMetrics(globalThis, this.canvas);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-    this.renderer.setSize(window.innerWidth, window.innerHeight, false);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    this.renderer.setSize(viewport.width, viewport.height, false);
+    this.renderer.setPixelRatio(Math.min(viewport.dpr, this.compatibility ? 1.25 : 1.5));
     setProgress(0.02);
-    this.assets = await loadGameAssets({
-      onProgress: (value) => setProgress(value * 0.72),
-    });
+
+    try {
+      this.assets = await loadGameAssets({
+        onProgress: (value) => setProgress(value * 0.72),
+      });
+    } catch (error) {
+      console.warn('[gaming] Asset preload failed, continuing with scenic fallback', error);
+      this.assetFallback = true;
+      this.assets = {};
+      setProgress(0.72);
+    }
 
     this.applyTheme(this.theme);
     this.buildLights();
@@ -218,12 +375,67 @@ export class GameWorld {
     await this.buildInteractables({
       onProgress: (value) => setProgress(0.89 + value * 0.05),
     });
-    await this.buildScenery({
-      onProgress: (value) => setProgress(0.94 + value * 0.05),
-    });
+    if (!this.assetFallback) {
+      await this.buildScenery({
+        onProgress: (value) => setProgress(0.94 + value * 0.05),
+      });
+    } else {
+      this.buildCompatibilityScenery();
+      setProgress(0.99);
+      await nextFrame();
+    }
     this.buildFocusHelpers();
     setProgress(1);
     await nextFrame();
+  }
+
+  buildCompatibilityScenery() {
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(142, 156, 72),
+      new THREE.MeshBasicMaterial({
+        color: this.theme === 'light' ? '#9db5db' : '#16304d',
+        transparent: true,
+        opacity: this.theme === 'light' ? 0.12 : 0.2,
+        side: THREE.DoubleSide,
+      }),
+    );
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.y = 0.08;
+    this.scene.add(ring);
+
+    [-140, 140].forEach((x) => {
+      const wall = new THREE.Mesh(
+        new THREE.BoxGeometry(8, 22, 180),
+        this.materials.border,
+      );
+      wall.position.set(x, 11, 0);
+      wall.castShadow = true;
+      wall.receiveShadow = true;
+      this.scene.add(wall);
+    });
+
+    [-150, 150].forEach((z) => {
+      const wall = new THREE.Mesh(
+        new THREE.BoxGeometry(180, 18, 8),
+        this.materials.border,
+      );
+      wall.position.set(0, 9, z);
+      wall.castShadow = true;
+      wall.receiveShadow = true;
+      this.scene.add(wall);
+    });
+
+    for (let index = 0; index < 10; index += 1) {
+      const angle = (Math.PI * 2 * index) / 10;
+      const radius = 124 + (index % 2) * 10;
+      const node = new THREE.Mesh(
+        new THREE.OctahedronGeometry(1.1, 0),
+        this.materials.emissive(index % 2 === 0 ? '#5edfff' : '#9d6dff', 0.72),
+      );
+      node.position.set(Math.cos(angle) * radius, 5 + (index % 3) * 1.2, Math.sin(angle) * radius);
+      this.orbiters.push({ object: node, radius, speed: 0.14 + (index % 4) * 0.04, angle });
+      this.scene.add(node);
+    }
   }
 
   addImportedInstance(parent, key, options = {}) {
@@ -1378,7 +1590,8 @@ export class GameWorld {
   }
 
   resize() {
-    this.renderer?.setSize(window.innerWidth, window.innerHeight, false);
+    const viewport = getViewportMetrics(globalThis, this.canvas);
+    this.renderer?.setSize(viewport.width, viewport.height, false);
   }
 
   update(dt, elapsed = 0) {

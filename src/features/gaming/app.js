@@ -37,14 +37,6 @@ const MISSION_OBJECTS = {
   'system-reboot': ['core-dock', 'core-pylon-a', 'core-pylon-b', 'core-pylon-c', 'core-console'],
 };
 
-function supportsWebGL(canvas) {
-  try {
-    return Boolean(canvas.getContext('webgl2') || canvas.getContext('webgl'));
-  } catch {
-    return false;
-  }
-}
-
 function mergeInput(keyboard, touch) {
   return {
     moveX: touch.moveX !== 0 ? touch.moveX : keyboard.moveX,
@@ -96,70 +88,100 @@ export class GameApp {
       label: document.getElementById('loading-progress-label'),
     };
     this.handleResize = this.handleResize.bind(this);
+    this.compatibilityMode = false;
+  }
+
+  hasCoarsePointer() {
+    return Boolean(window.matchMedia?.('(pointer: coarse)')?.matches || navigator.maxTouchPoints > 0);
   }
 
   async init() {
-    if (!supportsWebGL(this.canvas)) {
-      this.showFallback();
+    if (!this.canvas) {
+      this.showFallback(this.copy?.fallback?.lead, this.copy?.fallback?.title);
       return;
     }
 
+    const saved = loadSave();
+    this.state = saved ? hydrateGameState(saved, this.initialPrefs) : createInitialState({
+      settings: {
+        theme: this.initialPrefs.theme,
+        lang: this.initialPrefs.lang,
+        quality: 'auto',
+      },
+    });
+    this.state.bestScores = saved?.bestScores || { security: 0, routing: 0, inference: 0 };
+    this.copy = getCopy(this.state.settings.lang);
+    window.dispatchEvent(new CustomEvent('game:load', { detail: { missionId: this.state.currentMission } }));
+    this.overlays.show('game-loading-overlay');
+    this.updateLoadingState(0, this.copy.loading.assets);
+
     try {
-      const saved = loadSave();
-      this.state = saved ? hydrateGameState(saved, this.initialPrefs) : createInitialState({
-        settings: {
-          theme: this.initialPrefs.theme,
-          lang: this.initialPrefs.lang,
-          quality: 'auto',
-        },
-      });
-      this.state.bestScores = saved?.bestScores || { security: 0, routing: 0, inference: 0 };
-      this.copy = getCopy(this.state.settings.lang);
-      window.dispatchEvent(new CustomEvent('game:load', { detail: { missionId: this.state.currentMission } }));
-
-      this.world = new GameWorld({
-        canvas: this.canvas,
-        theme: this.state.settings.theme,
-      });
-      this.overlays.show('game-loading-overlay');
-      this.updateLoadingState(0, this.copy.loading.assets);
-      await this.world.init({
-        onProgress: (value) => this.updateLoadingState(value, this.copy.loading.assets),
-      });
-      this.performance = new PerformanceManager(this.world.renderer);
-      const quality = this.state.settings.quality === 'auto' ? this.performance.autoDetect() : this.state.settings.quality;
-      this.state.settings.quality = quality;
-      const preset = this.performance.setQuality(quality);
-      this.postFX = new PostFXSystem(this.world.renderer, this.world.scene, this.cameraSystem.camera);
-      this.postFX.applyTheme(this.state.settings.theme, preset);
-      this.postFX.resize(window.innerWidth, window.innerHeight);
-
-      this.vehicle = new VehicleEntity(this.world.materials, this.world.assets);
-      this.avatar = new AvatarEntity(this.world.materials, this.world.assets);
-      this.avatar.setVisible(false);
-      this.vehicle.setPosition(0, 0, 0);
-      this.avatar.setPosition(0, 0, 0);
-      this.world.addEntity(this.vehicle.group);
-      this.world.addEntity(this.avatar.group);
-
-      this.panelController.bindQuality((name) => this.setQuality(name));
-      this.panelController.setActiveQuality(this.state.settings.quality);
-
-      this.applyCopy();
-      this.syncPrefs(this.state.settings);
-      this.resetMissionCheckpoint(this.state.currentMission, true);
-      this.applyWorldProgress();
-      this.dispatchMissionChange();
-      this.updateHud(this.copy.hud.promptIdle);
-      this.postFX.render(this.world.scene, this.cameraSystem.camera);
-      this.touchControls.setVisible(window.matchMedia?.('(pointer: coarse)').matches || navigator.maxTouchPoints > 0);
-      window.addEventListener('resize', this.handleResize);
-      this.updateLoadingState(1, this.copy.loading.ready);
-      this.overlays.hide('game-loading-overlay');
+      await this.bootRuntime({ compatibility: false });
     } catch (error) {
       console.error('[gaming] Initialization failed', error);
-      this.showFallback(this.copy?.fallback?.loadFailed);
+      try {
+        await this.bootRuntime({ compatibility: true, previousError: error });
+      } catch (compatibilityError) {
+        console.error('[gaming] Compatibility initialization failed', compatibilityError);
+        const suffix = compatibilityError?.message ? ` (${compatibilityError.message})` : '';
+        this.showFallback(`${this.copy?.fallback?.loadFailed || 'Initialization failed'}${suffix}`);
+      }
     }
+  }
+
+  async bootRuntime({ compatibility = false, previousError = null } = {}) {
+    this.compatibilityMode = compatibility;
+    this.world?.renderer?.dispose?.();
+    this.canvas = document.getElementById('game-canvas') || this.canvas;
+
+    if (compatibility) {
+      console.warn('[gaming] Retrying in compatibility mode', previousError);
+      this.updateLoadingState(0.08, this.copy.loading.compatibility || this.copy.loading.assets);
+    }
+
+    this.world = new GameWorld({
+      canvas: this.canvas,
+      theme: this.state.settings.theme,
+      compatibility,
+    });
+    await this.world.init({
+      onProgress: (value) => this.updateLoadingState(value, compatibility ? (this.copy.loading.compatibility || this.copy.loading.assets) : this.copy.loading.assets),
+    });
+    this.canvas = this.world.canvas || this.canvas;
+
+    this.performance = new PerformanceManager(this.world.renderer);
+    const requestedQuality = this.state.settings.quality === 'auto'
+      ? this.performance.autoDetect()
+      : this.state.settings.quality;
+    this.state.settings.quality = requestedQuality;
+    const preset = this.performance.setQuality(requestedQuality);
+
+    this.postFX = new PostFXSystem(this.world.renderer, this.world.scene, this.cameraSystem.camera);
+    this.postFX.applyTheme(this.state.settings.theme, preset);
+    this.postFX.resize(window.innerWidth, window.innerHeight);
+
+    this.vehicle = new VehicleEntity(this.world.materials, this.world.assets);
+    this.avatar = new AvatarEntity(this.world.materials, this.world.assets);
+    this.avatar.setVisible(false);
+    this.vehicle.setPosition(0, 0, 0);
+    this.avatar.setPosition(0, 0, 0);
+    this.world.addEntity(this.vehicle.group);
+    this.world.addEntity(this.avatar.group);
+
+    this.panelController.bindQuality((name) => this.setQuality(name));
+    this.panelController.setActiveQuality(this.state.settings.quality);
+
+    this.applyCopy();
+    this.syncPrefs(this.state.settings);
+    this.resetMissionCheckpoint(this.state.currentMission, true);
+    this.applyWorldProgress();
+    this.dispatchMissionChange();
+    this.updateHud(this.compatibilityMode ? (this.copy.hud.promptCompatibility || this.copy.hud.promptIdle) : this.copy.hud.promptIdle);
+    this.postFX.render(this.world.scene, this.cameraSystem.camera);
+    this.touchControls.setVisible(this.hasCoarsePointer());
+    window.addEventListener('resize', this.handleResize);
+    this.updateLoadingState(1, compatibility ? (this.copy.loading.compatibilityReady || this.copy.loading.ready) : this.copy.loading.ready);
+    this.overlays.hide('game-loading-overlay');
   }
 
   createRuntime() {
@@ -186,9 +208,11 @@ export class GameApp {
     return this.paused;
   }
 
-  showFallback(message = null) {
+  showFallback(message = null, title = null) {
     this.overlays.hideAll();
+    const fallbackTitle = document.querySelector('#game-fallback-overlay [data-copy="fallback.title"]');
     const fallbackLead = document.querySelector('#game-fallback-overlay .panel-lead');
+    if (fallbackTitle && title) fallbackTitle.textContent = title;
     if (fallbackLead && message) fallbackLead.textContent = message;
     this.overlays.show('game-fallback-overlay');
   }
@@ -856,7 +880,7 @@ export class GameApp {
   }
 
   syncTouchVisibility() {
-    const coarse = window.matchMedia?.('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+    const coarse = this.hasCoarsePointer();
     this.touchControls.setVisible(Boolean(coarse && this.started && !this.paused));
   }
 

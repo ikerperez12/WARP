@@ -28,7 +28,7 @@ export class PerformanceManager {
       width: window.innerWidth,
       height: window.innerHeight,
       dpr: window.devicePixelRatio || 1,
-      touch: window.matchMedia?.('(pointer: coarse)').matches,
+      touch: Boolean(window.matchMedia?.('(pointer: coarse)')?.matches),
       fps: 60,
     });
   }

@@ -208,11 +208,11 @@ export async function loadGameAssets({ onProgress } = {}) {
 
       const requiredResults = await Promise.allSettled([
         ...Object.entries(REQUIRED_MODEL_MANIFEST).map(async ([key, path]) => {
-          const asset = await withTimeout(gltfLoader.loadAsync(path), path, 12000);
+          const asset = await withTimeout(gltfLoader.loadAsync(path), path, 20000);
           return [key, asset];
         }),
         ...Object.entries(TEXTURE_MANIFEST).map(async ([key, path]) => {
-          const texture = await withTimeout(textureLoader.loadAsync(path), path, 8000);
+          const texture = await withTimeout(textureLoader.loadAsync(path), path, 12000);
           texture.colorSpace = THREE.SRGBColorSpace;
           texture.wrapS = THREE.ClampToEdgeWrapping;
           texture.wrapT = THREE.ClampToEdgeWrapping;
@@ -229,7 +229,7 @@ export async function loadGameAssets({ onProgress } = {}) {
           const optionalResults = await loadManifestEntries(
             Object.entries(OPTIONAL_MODEL_MANIFEST),
             (path) => optionalLoader.loadAsync(path),
-            4000,
+            8000,
           );
           Object.assign(assetCache, Object.fromEntries(collectFulfilledEntries(optionalResults)));
         } catch (error) {
