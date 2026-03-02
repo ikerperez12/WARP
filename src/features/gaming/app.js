@@ -104,57 +104,62 @@ export class GameApp {
       return;
     }
 
-    const saved = loadSave();
-    this.state = saved ? hydrateGameState(saved, this.initialPrefs) : createInitialState({
-      settings: {
-        theme: this.initialPrefs.theme,
-        lang: this.initialPrefs.lang,
-        quality: 'auto',
-      },
-    });
-    this.state.bestScores = saved?.bestScores || { security: 0, routing: 0, inference: 0 };
-    this.copy = getCopy(this.state.settings.lang);
-    window.dispatchEvent(new CustomEvent('game:load', { detail: { missionId: this.state.currentMission } }));
+    try {
+      const saved = loadSave();
+      this.state = saved ? hydrateGameState(saved, this.initialPrefs) : createInitialState({
+        settings: {
+          theme: this.initialPrefs.theme,
+          lang: this.initialPrefs.lang,
+          quality: 'auto',
+        },
+      });
+      this.state.bestScores = saved?.bestScores || { security: 0, routing: 0, inference: 0 };
+      this.copy = getCopy(this.state.settings.lang);
+      window.dispatchEvent(new CustomEvent('game:load', { detail: { missionId: this.state.currentMission } }));
 
-    this.world = new GameWorld({
-      canvas: this.canvas,
-      theme: this.state.settings.theme,
-    });
-    this.overlays.show('game-loading-overlay');
-    this.updateLoadingState(0, this.copy.loading.assets);
-    await this.world.init({
-      onProgress: (value) => this.updateLoadingState(value, this.copy.loading.assets),
-    });
-    this.performance = new PerformanceManager(this.world.renderer);
-    const quality = this.state.settings.quality === 'auto' ? this.performance.autoDetect() : this.state.settings.quality;
-    this.state.settings.quality = quality;
-    const preset = this.performance.setQuality(quality);
-    this.postFX = new PostFXSystem(this.world.renderer, this.world.scene, this.cameraSystem.camera);
-    this.postFX.applyTheme(this.state.settings.theme, preset);
-    this.postFX.resize(window.innerWidth, window.innerHeight);
+      this.world = new GameWorld({
+        canvas: this.canvas,
+        theme: this.state.settings.theme,
+      });
+      this.overlays.show('game-loading-overlay');
+      this.updateLoadingState(0, this.copy.loading.assets);
+      await this.world.init({
+        onProgress: (value) => this.updateLoadingState(value, this.copy.loading.assets),
+      });
+      this.performance = new PerformanceManager(this.world.renderer);
+      const quality = this.state.settings.quality === 'auto' ? this.performance.autoDetect() : this.state.settings.quality;
+      this.state.settings.quality = quality;
+      const preset = this.performance.setQuality(quality);
+      this.postFX = new PostFXSystem(this.world.renderer, this.world.scene, this.cameraSystem.camera);
+      this.postFX.applyTheme(this.state.settings.theme, preset);
+      this.postFX.resize(window.innerWidth, window.innerHeight);
 
-    this.vehicle = new VehicleEntity(this.world.materials, this.world.assets);
-    this.avatar = new AvatarEntity(this.world.materials, this.world.assets);
-    this.avatar.setVisible(false);
-    this.vehicle.setPosition(0, 0, 0);
-    this.avatar.setPosition(0, 0, 0);
-    this.world.addEntity(this.vehicle.group);
-    this.world.addEntity(this.avatar.group);
+      this.vehicle = new VehicleEntity(this.world.materials, this.world.assets);
+      this.avatar = new AvatarEntity(this.world.materials, this.world.assets);
+      this.avatar.setVisible(false);
+      this.vehicle.setPosition(0, 0, 0);
+      this.avatar.setPosition(0, 0, 0);
+      this.world.addEntity(this.vehicle.group);
+      this.world.addEntity(this.avatar.group);
 
-    this.panelController.bindQuality((name) => this.setQuality(name));
-    this.panelController.setActiveQuality(this.state.settings.quality);
+      this.panelController.bindQuality((name) => this.setQuality(name));
+      this.panelController.setActiveQuality(this.state.settings.quality);
 
-    this.applyCopy();
-    this.syncPrefs(this.state.settings);
-    this.resetMissionCheckpoint(this.state.currentMission, true);
-    this.applyWorldProgress();
-    this.dispatchMissionChange();
-    this.updateHud(this.copy.hud.promptIdle);
-    this.postFX.render(this.world.scene, this.cameraSystem.camera);
-    this.touchControls.setVisible(window.matchMedia?.('(pointer: coarse)').matches || navigator.maxTouchPoints > 0);
-    window.addEventListener('resize', this.handleResize);
-    this.updateLoadingState(1, this.copy.loading.ready);
-    this.overlays.hide('game-loading-overlay');
+      this.applyCopy();
+      this.syncPrefs(this.state.settings);
+      this.resetMissionCheckpoint(this.state.currentMission, true);
+      this.applyWorldProgress();
+      this.dispatchMissionChange();
+      this.updateHud(this.copy.hud.promptIdle);
+      this.postFX.render(this.world.scene, this.cameraSystem.camera);
+      this.touchControls.setVisible(window.matchMedia?.('(pointer: coarse)').matches || navigator.maxTouchPoints > 0);
+      window.addEventListener('resize', this.handleResize);
+      this.updateLoadingState(1, this.copy.loading.ready);
+      this.overlays.hide('game-loading-overlay');
+    } catch (error) {
+      console.error('[gaming] Initialization failed', error);
+      this.showFallback(this.copy?.fallback?.loadFailed);
+    }
   }
 
   createRuntime() {
@@ -181,8 +186,10 @@ export class GameApp {
     return this.paused;
   }
 
-  showFallback() {
+  showFallback(message = null) {
     this.overlays.hideAll();
+    const fallbackLead = document.querySelector('#game-fallback-overlay .panel-lead');
+    if (fallbackLead && message) fallbackLead.textContent = message;
     this.overlays.show('game-fallback-overlay');
   }
 

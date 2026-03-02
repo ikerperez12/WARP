@@ -114,6 +114,7 @@ const copy = {
       tag: 'Compatibilidad',
       title: 'WebGL no disponible',
       lead: 'Tu navegador o GPU no exponen el contexto gr\u00e1fico necesario para cargar Red Cyber Ops.',
+      loadFailed: 'No se pudo terminar de montar el distrito 3D. Recarga la pagina e intentalo de nuevo.',
     },
     settings: {
       quality: 'Calidad',
@@ -299,6 +300,7 @@ const copy = {
       tag: 'Fallback',
       title: 'WebGL unavailable',
       lead: 'Your browser or GPU does not expose the graphics context required to render Red Cyber Ops.',
+      loadFailed: 'The 3D district could not finish initializing. Reload the page and try again.',
     },
     settings: {
       quality: 'Quality',

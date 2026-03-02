@@ -8,6 +8,35 @@ import { instantiateAsset, loadGameAssets, tintImportedModel } from './assets.js
 let shadowTexture;
 const labelTextureCache = new Map();
 
+function nextFrame() {
+  return new Promise((resolve) => {
+    window.requestAnimationFrame(() => resolve());
+  });
+}
+
+export function createWorldProfile(env = globalThis) {
+  const nav = env.navigator ?? {};
+  const view = env.window ?? env;
+  const coarsePointer = Boolean(view.matchMedia?.('(pointer: coarse)').matches);
+  const reducedMotion = Boolean(view.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+  const cores = nav.hardwareConcurrency ?? 8;
+  const memory = nav.deviceMemory ?? 8;
+  const low = reducedMotion || coarsePointer || cores <= 4 || memory <= 4;
+  const medium = low || cores <= 6 || memory <= 6;
+
+  return {
+    low,
+    medium,
+    perimeterStep: low ? 2 : 1,
+    parkedCars: low ? 4 : 6,
+    flowerCount: low ? 4 : medium ? 5 : 6,
+    backdropDistricts: low ? 2 : medium ? 3 : 4,
+    backdropBlocks: low ? 1 : medium ? 2 : 3,
+    backdropRobot: !low,
+    ambientSparks: low ? 8 : medium ? 12 : 20,
+  };
+}
+
 function tintObject(object, color, intensity = 1.1) {
   object.traverse((child) => {
     const material = child.material;
@@ -139,6 +168,7 @@ export class GameWorld {
   constructor({ canvas, theme = 'dark' }) {
     this.canvas = canvas;
     this.theme = theme;
+    this.worldProfile = createWorldProfile();
     this.materials = createMaterialLibrary(theme);
     this.assets = null;
     this.renderer = null;
@@ -157,6 +187,7 @@ export class GameWorld {
   }
 
   async init({ onProgress } = {}) {
+    const setProgress = (value) => onProgress?.(Math.max(0, Math.min(1, value)));
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       antialias: true,
@@ -167,16 +198,32 @@ export class GameWorld {
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.setSize(window.innerWidth, window.innerHeight, false);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-    this.assets = await loadGameAssets({ onProgress });
+    setProgress(0.02);
+    this.assets = await loadGameAssets({
+      onProgress: (value) => setProgress(value * 0.72),
+    });
 
     this.applyTheme(this.theme);
     this.buildLights();
     this.buildGround();
-    this.buildSectors();
-    this.buildCorridors();
-    this.buildInteractables();
-    this.buildScenery();
+    setProgress(0.76);
+    await nextFrame();
+
+    await this.buildSectors({
+      onProgress: (value) => setProgress(0.76 + value * 0.08),
+    });
+    await this.buildCorridors({
+      onProgress: (value) => setProgress(0.84 + value * 0.05),
+    });
+    await this.buildInteractables({
+      onProgress: (value) => setProgress(0.89 + value * 0.05),
+    });
+    await this.buildScenery({
+      onProgress: (value) => setProgress(0.94 + value * 0.05),
+    });
     this.buildFocusHelpers();
+    setProgress(1);
+    await nextFrame();
   }
 
   addImportedInstance(parent, key, options = {}) {
@@ -305,7 +352,8 @@ export class GameWorld {
 
   createFlowerPatch(center, count = 6, tint = '#9aefff') {
     if (!this.assets?.kenneyFlower) return;
-    for (let index = 0; index < count; index += 1) {
+    const flowerCount = Math.max(3, Math.min(count, this.worldProfile.flowerCount));
+    for (let index = 0; index < flowerCount; index += 1) {
       const angle = (Math.PI * 2 * index) / count;
       const radius = 2.4 + (index % 3) * 1.1;
       this.addImportedInstance(this.scene, 'kenneyFlower', {
@@ -335,6 +383,7 @@ export class GameWorld {
     glow = '#c7f3ff',
   }) {
     const group = new THREE.Group();
+    const profile = this.worldProfile;
 
     this.addImportedInstance(group, 'mountainLandscape', {
       height: 32,
@@ -349,7 +398,7 @@ export class GameWorld {
       { x: -24, z: 12, height: 20, rot: Math.PI * 0.08, tint: accent },
       { x: 0, z: -2, height: 24, rot: Math.PI * 0.22, tint: glow },
       { x: 25, z: 11, height: 18, rot: -Math.PI * 0.12, tint: accent },
-    ].forEach((block) => {
+    ].slice(0, profile.backdropBlocks).forEach((block) => {
       this.addImportedInstance(group, 'cityBlock', {
         height: block.height,
         position: { x: block.x, y: 0.1, z: block.z },
@@ -379,14 +428,16 @@ export class GameWorld {
       this.orbiters.push({ object: cap, radius: 0, speed: 0.16 + index * 0.03 });
     });
 
-    this.addImportedInstance(group, 'robotExpressive', {
-      height: 4.8,
-      position: { x: 0, y: 0.02, z: 18 },
-      rotationY: Math.PI,
-      tint: glow,
-      tintStrength: 0.06,
-      emissiveBoost: 0.03,
-    });
+    if (profile.backdropRobot) {
+      this.addImportedInstance(group, 'robotExpressive', {
+        height: 4.8,
+        position: { x: 0, y: 0.02, z: 18 },
+        rotationY: Math.PI,
+        tint: glow,
+        tintStrength: 0.06,
+        emissiveBoost: 0.03,
+      });
+    }
 
     group.position.set(position.x, position.y ?? 0, position.z);
     group.rotation.y = rotationY;
@@ -565,8 +616,8 @@ export class GameWorld {
     return group;
   }
 
-  buildSectors() {
-    for (const sector of SECTORS) {
+  async buildSectors({ onProgress } = {}) {
+    for (const [index, sector] of SECTORS.entries()) {
       const group = this.buildSectorPlaza(sector);
 
       if (sector.id === 'boot-relay') {
@@ -890,10 +941,12 @@ export class GameWorld {
 
       this.sectorMeshes.set(sector.id, group);
       this.scene.add(group);
+      onProgress?.((index + 1) / SECTORS.length);
+      await nextFrame();
     }
   }
 
-  buildCorridors() {
+  async buildCorridors({ onProgress } = {}) {
     const corridors = [
       { x: -39, z: -6, width: 34, depth: 10, rotation: 0.1, tile: 'tileD' },
       { x: 42, z: -5, width: 34, depth: 10, rotation: -0.1, tile: 'tileD' },
@@ -901,7 +954,7 @@ export class GameWorld {
       { x: 0, z: -48, width: 10, depth: 44, rotation: 0, tile: 'tileE' },
     ];
 
-    corridors.forEach((corridor) => {
+    for (const [index, corridor] of corridors.entries()) {
       const mesh = createBridge(this.materials.border, corridor.width, corridor.depth);
       mesh.position.set(corridor.x, 0.9, corridor.z);
       mesh.rotation.y = corridor.rotation;
@@ -956,10 +1009,12 @@ export class GameWorld {
           emissiveBoost: 0.04,
         });
       }
-    });
+      onProgress?.((index + 1) / corridors.length);
+      await nextFrame();
+    }
   }
 
-  buildInteractables() {
+  async buildInteractables({ onProgress } = {}) {
     const addDock = (id, position, sectorId) => {
       const dock = createPad(this.materials.platform, this.materials.emissive('#46e0ff', 1.14), 4.2);
       const shadow = createGroundShadow(6.8, 6.8, this.theme === 'light' ? 0.1 : 0.18);
@@ -1034,87 +1089,55 @@ export class GameWorld {
       this.registerInteractable({ ...item, type, sectorId, position: { x: item.x, z: item.z }, object, tint: color });
     };
 
-    addBeacon({ id: 'boot-beacon', ...WORLD_LAYOUT.boot.bootBeacon }, 'boot-beacon', 'boot-relay', '#3cf5d2');
-    addDock('boot-dock', WORLD_LAYOUT.boot.dock, 'boot-relay');
-
-    addDock('firewall-dock', WORLD_LAYOUT.firewall.dock, 'firewall-sector');
-    WORLD_LAYOUT.firewall.beacons.forEach((item) => addBeacon(item, 'security-beacon', 'firewall-sector', '#ff764a'));
-    WORLD_LAYOUT.firewall.shards.forEach((item) => addBeacon(item, 'security-shard', 'firewall-sector', '#ffb703'));
-    WORLD_LAYOUT.firewall.nodes.forEach((item) => addPanel(item, 'security-node', 'firewall-sector', '#ff4d6d'));
-
-    addDock('routing-dock', WORLD_LAYOUT.routing.dock, 'routing-array');
-    WORLD_LAYOUT.routing.towers.forEach((item) => addBeacon(item, 'routing-tower', 'routing-array', '#39a7ff'));
-    WORLD_LAYOUT.routing.switches.forEach((item) => addPanel(item, 'routing-switch', 'routing-array', '#9ad7ff'));
-
-    addDock('inference-dock', WORLD_LAYOUT.inference.dock, 'inference-core');
-    WORLD_LAYOUT.inference.seeds.forEach((item) => addBeacon(item, 'inference-seed', 'inference-core', '#b06cff'));
-    WORLD_LAYOUT.inference.terminals.forEach((item) => addPanel(item, 'inference-terminal', 'inference-core', '#d3adff'));
-
-    addDock('core-dock', WORLD_LAYOUT.core.dock, 'core-chamber');
-    WORLD_LAYOUT.core.pylons.forEach((item) => addBeacon(item, 'core-pylon', 'core-chamber', '#ffd166'));
-    addPanel(WORLD_LAYOUT.core.console, 'core-console', 'core-chamber', '#ffe28f');
-
-    WORLD_LAYOUT.firewall.lasers.forEach((laser) => {
-      const mesh = new THREE.Mesh(
-        new THREE.BoxGeometry(laser.axis === 'x' ? 18 : 1, 1, laser.axis === 'z' ? 18 : 1),
-        this.materials.emissive('#ff385c', 1.22),
-      );
-      mesh.position.set(laser.anchor.x, 0.9, laser.anchor.z);
-      this.hazards.push({ ...laser, object: mesh, position: { x: laser.anchor.x, z: laser.anchor.z } });
-      this.scene.add(mesh);
-    });
-  }
-
-  buildScenery() {
-    this.addImportedInstance(this.scene, 'mountainLandscape', {
-      height: 42,
-      rotationY: Math.PI * 0.12,
-      position: { x: 0, y: 0.08, z: 168 },
-      tint: this.theme === 'light' ? '#98b7dd' : '#243e63',
-      tintStrength: this.theme === 'light' ? 0.18 : 0.28,
-      emissiveBoost: 0.02,
-      shadow: { width: 110, depth: 42, opacity: this.theme === 'light' ? 0.05 : 0.12 },
-    });
-
-    this.addImportedInstance(this.scene, 'cityBlock', {
-      height: 34,
-      rotationY: Math.PI * 1.02,
-      position: { x: 132, y: 0.08, z: -110 },
-      tint: this.theme === 'light' ? '#9bb7de' : '#27486d',
-      tintStrength: this.theme === 'light' ? 0.18 : 0.24,
-      emissiveBoost: 0.04,
-      shadow: { width: 68, depth: 44, opacity: this.theme === 'light' ? 0.05 : 0.12 },
-    });
-
-    this.addImportedInstance(this.scene, 'cityBlock', {
-      height: 31,
-      rotationY: Math.PI * 0.18,
-      position: { x: -138, y: 0.08, z: -96 },
-      tint: this.theme === 'light' ? '#a1bee2' : '#223f61',
-      tintStrength: this.theme === 'light' ? 0.16 : 0.24,
-      emissiveBoost: 0.03,
-      shadow: { width: 62, depth: 40, opacity: this.theme === 'light' ? 0.05 : 0.1 },
-    });
-
-    const perimeter = [
-      [-124, -50], [-118, 14], [-108, 58], [-80, 102], [-20, 128], [36, 126], [104, 98], [122, 38], [118, -34], [84, -112], [22, -126], [-34, -122], [-108, -92],
+    const phases = [
+      () => {
+        addBeacon({ id: 'boot-beacon', ...WORLD_LAYOUT.boot.bootBeacon }, 'boot-beacon', 'boot-relay', '#3cf5d2');
+        addDock('boot-dock', WORLD_LAYOUT.boot.dock, 'boot-relay');
+      },
+      () => {
+        addDock('firewall-dock', WORLD_LAYOUT.firewall.dock, 'firewall-sector');
+        WORLD_LAYOUT.firewall.beacons.forEach((item) => addBeacon(item, 'security-beacon', 'firewall-sector', '#ff764a'));
+        WORLD_LAYOUT.firewall.shards.forEach((item) => addBeacon(item, 'security-shard', 'firewall-sector', '#ffb703'));
+        WORLD_LAYOUT.firewall.nodes.forEach((item) => addPanel(item, 'security-node', 'firewall-sector', '#ff4d6d'));
+      },
+      () => {
+        addDock('routing-dock', WORLD_LAYOUT.routing.dock, 'routing-array');
+        WORLD_LAYOUT.routing.towers.forEach((item) => addBeacon(item, 'routing-tower', 'routing-array', '#39a7ff'));
+        WORLD_LAYOUT.routing.switches.forEach((item) => addPanel(item, 'routing-switch', 'routing-array', '#9ad7ff'));
+      },
+      () => {
+        addDock('inference-dock', WORLD_LAYOUT.inference.dock, 'inference-core');
+        WORLD_LAYOUT.inference.seeds.forEach((item) => addBeacon(item, 'inference-seed', 'inference-core', '#b06cff'));
+        WORLD_LAYOUT.inference.terminals.forEach((item) => addPanel(item, 'inference-terminal', 'inference-core', '#d3adff'));
+      },
+      () => {
+        addDock('core-dock', WORLD_LAYOUT.core.dock, 'core-chamber');
+        WORLD_LAYOUT.core.pylons.forEach((item) => addBeacon(item, 'core-pylon', 'core-chamber', '#ffd166'));
+        addPanel(WORLD_LAYOUT.core.console, 'core-console', 'core-chamber', '#ffe28f');
+        WORLD_LAYOUT.firewall.lasers.forEach((laser) => {
+          const mesh = new THREE.Mesh(
+            new THREE.BoxGeometry(laser.axis === 'x' ? 18 : 1, 1, laser.axis === 'z' ? 18 : 1),
+            this.materials.emissive('#ff385c', 1.22),
+          );
+          mesh.position.set(laser.anchor.x, 0.9, laser.anchor.z);
+          this.hazards.push({ ...laser, object: mesh, position: { x: laser.anchor.x, z: laser.anchor.z } });
+          this.scene.add(mesh);
+        });
+      },
     ];
 
-    perimeter.forEach(([x, z], index) => {
-      const height = 8 + (index % 5) * 2.4;
-      const tower = createColumn(this.materials.border, height, 0.9 + (index % 3) * 0.18);
-      tower.position.set(x, height / 2, z);
-      this.scene.add(tower);
+    for (const [index, phase] of phases.entries()) {
+      phase();
+      onProgress?.((index + 1) / phases.length);
+      await nextFrame();
+    }
+  }
 
-      const top = new THREE.Mesh(
-        new THREE.IcosahedronGeometry(1 + (index % 2) * 0.3),
-        this.materials.emissive(index % 2 === 0 ? '#5edfff' : '#9b8cff', 0.78),
-      );
-      top.position.set(x, height + 0.6, z);
-      this.scene.add(top);
-      this.orbiters.push({ object: top, radius: 0, speed: 0.2 + (index % 4) * 0.05 });
-    });
-
+  async buildScenery({ onProgress } = {}) {
+    const profile = this.worldProfile;
+    const perimeter = [
+      [-124, -50], [-118, 14], [-108, 58], [-80, 102], [-20, 128], [36, 126], [104, 98], [122, 38], [118, -34], [84, -112], [22, -126], [-34, -122], [-108, -92],
+    ].filter((_, index) => index % profile.perimeterStep === 0);
     const parkedCars = [
       { x: -104, z: -52, r: -0.8, tint: '#67c9ff' },
       { x: -92, z: 48, r: -0.24, tint: '#7ef8bb' },
@@ -1122,46 +1145,113 @@ export class GameWorld {
       { x: 108, z: -34, r: 0.68, tint: '#ff8e71' },
       { x: 18, z: 110, r: 1.6, tint: '#bb87ff' },
       { x: -18, z: -116, r: Math.PI, tint: '#ffd166' },
-    ];
-    parkedCars.forEach((car, index) => {
-      this.createParkedCar({
-        position: { x: car.x, z: car.z },
-        rotationY: car.r,
-        tint: car.tint,
-        bunny: index % 3 === 0,
-      });
-    });
-
-    [
+    ].slice(0, profile.parkedCars);
+    const flowerPatches = [
       { x: -95, z: -32, tint: '#ff9a8b' },
       { x: -78, z: 22, tint: '#ffc167' },
       { x: 92, z: 22, tint: '#85dbff' },
       { x: 110, z: -30, tint: '#82dcff' },
       { x: 14, z: 100, tint: '#d6aaff' },
       { x: -16, z: -106, tint: '#ffe490' },
-    ].forEach((patch) => {
-      this.createFlowerPatch({ x: patch.x, z: patch.z }, 6, patch.tint);
-    });
-
-    [
+    ].slice(0, Math.max(4, profile.parkedCars));
+    const districts = [
       { x: -154, z: -6, rotationY: Math.PI * 0.5, accent: '#69d2ff', glow: '#d5f2ff' },
       { x: 154, z: 8, rotationY: -Math.PI * 0.5, accent: '#ff9968', glow: '#ffe1ba' },
       { x: -18, z: 154, rotationY: Math.PI, accent: '#b891ff', glow: '#e2d4ff' },
       { x: 8, z: -156, rotationY: 0, accent: '#72f1d5', glow: '#d9fff2' },
-    ].forEach((district) => {
-      this.createBackdropDistrict(district);
+    ].slice(0, profile.backdropDistricts);
+    const sceneryPhases = [];
+
+    sceneryPhases.push(() => {
+      this.addImportedInstance(this.scene, 'mountainLandscape', {
+        height: 42,
+        rotationY: Math.PI * 0.12,
+        position: { x: 0, y: 0.08, z: 168 },
+        tint: this.theme === 'light' ? '#98b7dd' : '#243e63',
+        tintStrength: this.theme === 'light' ? 0.18 : 0.28,
+        emissiveBoost: 0.02,
+        shadow: { width: 110, depth: 42, opacity: this.theme === 'light' ? 0.05 : 0.12 },
+      });
+
+      this.addImportedInstance(this.scene, 'cityBlock', {
+        height: 34,
+        rotationY: Math.PI * 1.02,
+        position: { x: 132, y: 0.08, z: -110 },
+        tint: this.theme === 'light' ? '#9bb7de' : '#27486d',
+        tintStrength: this.theme === 'light' ? 0.18 : 0.24,
+        emissiveBoost: 0.04,
+        shadow: { width: 68, depth: 44, opacity: this.theme === 'light' ? 0.05 : 0.12 },
+      });
+
+      this.addImportedInstance(this.scene, 'cityBlock', {
+        height: 31,
+        rotationY: Math.PI * 0.18,
+        position: { x: -138, y: 0.08, z: -96 },
+        tint: this.theme === 'light' ? '#a1bee2' : '#223f61',
+        tintStrength: this.theme === 'light' ? 0.16 : 0.24,
+        emissiveBoost: 0.03,
+        shadow: { width: 62, depth: 40, opacity: this.theme === 'light' ? 0.05 : 0.1 },
+      });
     });
 
-    for (let index = 0; index < 20; index += 1) {
-      const spark = new THREE.Mesh(
-        new THREE.IcosahedronGeometry(0.55 + (index % 2) * 0.2),
-        this.materials.emissive(index % 2 === 0 ? '#5edfff' : '#9d6dff', 0.74),
-      );
-      const angle = (Math.PI * 2 * index) / 20;
-      const radius = 46 + (index % 5) * 20;
-      spark.position.set(Math.cos(angle) * radius, 3 + (index % 4) * 3.2, Math.sin(angle) * radius);
-      this.orbiters.push({ object: spark, radius, speed: 0.15 + (index % 4) * 0.04, angle });
-      this.scene.add(spark);
+    sceneryPhases.push(() => {
+      perimeter.forEach(([x, z], index) => {
+        const height = 8 + (index % 5) * 2.4;
+        const tower = createColumn(this.materials.border, height, 0.9 + (index % 3) * 0.18);
+        tower.position.set(x, height / 2, z);
+        this.scene.add(tower);
+
+        const top = new THREE.Mesh(
+          new THREE.IcosahedronGeometry(1 + (index % 2) * 0.3),
+          this.materials.emissive(index % 2 === 0 ? '#5edfff' : '#9b8cff', 0.78),
+        );
+        top.position.set(x, height + 0.6, z);
+        this.scene.add(top);
+        this.orbiters.push({ object: top, radius: 0, speed: 0.2 + (index % 4) * 0.05 });
+      });
+    });
+
+    sceneryPhases.push(() => {
+      parkedCars.forEach((car, index) => {
+        this.createParkedCar({
+          position: { x: car.x, z: car.z },
+          rotationY: car.r,
+          tint: car.tint,
+          bunny: index % 3 === 0,
+        });
+      });
+    });
+
+    sceneryPhases.push(() => {
+      flowerPatches.forEach((patch) => {
+        this.createFlowerPatch({ x: patch.x, z: patch.z }, 6, patch.tint);
+      });
+    });
+
+    districts.forEach((district) => {
+      sceneryPhases.push(() => {
+        this.createBackdropDistrict(district);
+      });
+    });
+
+    sceneryPhases.push(() => {
+      for (let index = 0; index < profile.ambientSparks; index += 1) {
+        const spark = new THREE.Mesh(
+          new THREE.IcosahedronGeometry(0.55 + (index % 2) * 0.2),
+          this.materials.emissive(index % 2 === 0 ? '#5edfff' : '#9d6dff', 0.74),
+        );
+        const angle = (Math.PI * 2 * index) / profile.ambientSparks;
+        const radius = 46 + (index % 5) * 20;
+        spark.position.set(Math.cos(angle) * radius, 3 + (index % 4) * 3.2, Math.sin(angle) * radius);
+        this.orbiters.push({ object: spark, radius, speed: 0.15 + (index % 4) * 0.04, angle });
+        this.scene.add(spark);
+      }
+    });
+
+    for (const [index, phase] of sceneryPhases.entries()) {
+      phase();
+      onProgress?.((index + 1) / sceneryPhases.length);
+      await nextFrame();
     }
   }
 
