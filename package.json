@@ -21,9 +21,12 @@
   "dependencies": {
     "@simplewebauthn/browser": "^13.2.2",
     "@simplewebauthn/server": "^13.2.3",
+    "@studio-freight/lenis": "^1.0.42",
     "@vercel/kv": "^3.0.0",
     "animejs": "^3.2.2",
+    "animejs-v4": "npm:animejs@^4.3.5",
     "cannon-es": "^0.20.0",
+    "gsap": "^3.14.2",
     "three": "^0.182.0"
   },
   "overrides": {

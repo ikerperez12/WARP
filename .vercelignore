@@ -4,9 +4,7 @@ node_modules/
 dist/
 reports/
 agent-diseno-ia/
-anime-landing/node_modules/
-anime-landing/dist/
-anime-landing/package-lock.json
+anime-landing/
 modelos3D/
 CV.pdf
 SI.pdf

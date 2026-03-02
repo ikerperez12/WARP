@@ -1,0 +1,236 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+
+:root {
+  --hud-bg: rgba(5, 10, 12, 0.72);
+  --hud-surface: rgba(10, 18, 22, 0.84);
+  --hud-border: rgba(28, 242, 166, 0.28);
+  --hud-text: #eef9f6;
+  --hud-muted: #9cb4b0;
+  --hud-accent: #1cf2a6;
+  --hud-accent-soft: rgba(28, 242, 166, 0.14);
+  --hud-shadow: 0 18px 38px rgba(0, 0, 0, 0.28);
+}
+
+html[data-theme="light"] {
+  --hud-bg: rgba(241, 247, 248, 0.72);
+  --hud-surface: rgba(255, 255, 255, 0.84);
+  --hud-border: rgba(14, 159, 110, 0.2);
+  --hud-text: #1a2c34;
+  --hud-muted: #5f747c;
+  --hud-accent: #0e9f6e;
+  --hud-accent-soft: rgba(14, 159, 110, 0.12);
+  --hud-shadow: 0 18px 38px rgba(25, 49, 61, 0.12);
+}
+
+body.gaming-mode {
+  margin: 0;
+  overflow: hidden;
+  background: #020202;
+  color: var(--hud-text);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+#game-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
+
+.hud {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.hud-top {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 16px;
+  pointer-events: auto;
+}
+
+.btn-back,
+.hud-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--hud-accent);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--hud-bg);
+  border: 1px solid var(--hud-border);
+  padding: 10px 16px;
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--hud-shadow);
+  transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-back:hover,
+.hud-btn:hover {
+  transform: translateY(-1px);
+  background: var(--hud-accent-soft);
+}
+
+.hud-side {
+  display: grid;
+  gap: 12px;
+}
+
+.hud-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.brand.glow-text {
+  justify-self: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.15rem, 3vw, 1.6rem);
+  color: var(--hud-text);
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.18), 0 0 20px rgba(28, 242, 166, 0.28);
+  letter-spacing: 0.22em;
+}
+
+.hud-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.stat {
+  min-width: 96px;
+  background: var(--hud-bg);
+  border: 1px solid var(--hud-border);
+  padding: 8px 12px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--hud-text);
+  box-shadow: var(--hud-shadow);
+  text-align: right;
+}
+
+.stat span {
+  color: var(--hud-accent);
+}
+
+.hud-bottom {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.instructions {
+  background: var(--hud-surface);
+  border: 1px solid var(--hud-border);
+  box-shadow: var(--hud-shadow);
+  padding: 16px 24px;
+  border-radius: 18px;
+  text-align: center;
+  color: var(--hud-muted);
+  font-size: 12px;
+  line-height: 1.7;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(10px);
+}
+
+.loading-screen {
+  position: absolute;
+  inset: 0;
+  background: #020202;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.8s ease;
+}
+
+.loader-text {
+  color: var(--hud-accent);
+  font-size: 18px;
+  letter-spacing: 0.14em;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.pulse {
+  animation: pulse 1.5s infinite alternate;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.5;
+    text-shadow: 0 0 5px var(--hud-accent);
+  }
+
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 20px var(--hud-accent), 0 0 30px var(--hud-accent);
+  }
+}
+
+.crosshair {
+  width: 10px;
+  height: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 18px rgba(28, 242, 166, 0.2);
+}
+
+@media (max-width: 900px) {
+  .hud-top {
+    grid-template-columns: 1fr;
+    justify-items: stretch;
+  }
+
+  .brand.glow-text {
+    justify-self: start;
+  }
+
+  .hud-actions,
+  .hud-stats {
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .hud {
+    padding: 12px;
+  }
+
+  .hud-actions {
+    flex-direction: column;
+  }
+
+  .hud-btn,
+  .btn-back {
+    width: 100%;
+  }
+
+  .instructions {
+    width: 100%;
+    padding: 14px 16px;
+  }
+}
