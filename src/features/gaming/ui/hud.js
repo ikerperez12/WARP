@@ -7,6 +7,7 @@ export class HudController {
       energy: document.getElementById('hud-energy'),
       mode: document.getElementById('hud-mode'),
       sector: document.getElementById('hud-sector'),
+      status: document.getElementById('hud-status'),
       missionTitle: document.getElementById('hud-mission-title'),
       missionBody: document.getElementById('hud-mission'),
       prompt: document.getElementById('hud-prompt'),
@@ -24,6 +25,7 @@ export class HudController {
     if (this.nodes.energy) this.nodes.energy.textContent = `${Math.round(data.energy)}%`;
     if (this.nodes.mode) this.nodes.mode.textContent = data.mode;
     if (this.nodes.sector) this.nodes.sector.textContent = data.sector;
+    if (this.nodes.status) this.nodes.status.textContent = data.status;
     if (this.nodes.missionTitle) this.nodes.missionTitle.textContent = data.missionTitle;
     if (this.nodes.missionBody) this.nodes.missionBody.textContent = data.missionObjective;
     if (this.nodes.prompt) this.nodes.prompt.textContent = data.prompt;

@@ -90,6 +90,11 @@ export class GameApp {
       progress: document.getElementById('panel-progress'),
       bestScores: document.getElementById('panel-best-scores'),
     };
+    this.loadingNodes = {
+      progress: document.getElementById('loading-progress-bar'),
+      percent: document.getElementById('loading-progress-value'),
+      label: document.getElementById('loading-progress-label'),
+    };
     this.handleResize = this.handleResize.bind(this);
   }
 
@@ -115,16 +120,21 @@ export class GameApp {
       canvas: this.canvas,
       theme: this.state.settings.theme,
     });
-    this.world.init();
+    this.overlays.show('game-loading-overlay');
+    this.updateLoadingState(0, this.copy.loading.assets);
+    await this.world.init({
+      onProgress: (value) => this.updateLoadingState(value, this.copy.loading.assets),
+    });
     this.performance = new PerformanceManager(this.world.renderer);
     const quality = this.state.settings.quality === 'auto' ? this.performance.autoDetect() : this.state.settings.quality;
     this.state.settings.quality = quality;
     const preset = this.performance.setQuality(quality);
-    this.postFX = new PostFXSystem(this.world.renderer);
+    this.postFX = new PostFXSystem(this.world.renderer, this.world.scene, this.cameraSystem.camera);
     this.postFX.applyTheme(this.state.settings.theme, preset);
+    this.postFX.resize(window.innerWidth, window.innerHeight);
 
-    this.vehicle = new VehicleEntity(this.world.materials);
-    this.avatar = new AvatarEntity(this.world.materials);
+    this.vehicle = new VehicleEntity(this.world.materials, this.world.assets);
+    this.avatar = new AvatarEntity(this.world.materials, this.world.assets);
     this.avatar.setVisible(false);
     this.vehicle.setPosition(0, 0, 0);
     this.avatar.setPosition(0, 0, 0);
@@ -140,9 +150,11 @@ export class GameApp {
     this.applyWorldProgress();
     this.dispatchMissionChange();
     this.updateHud(this.copy.hud.promptIdle);
-    this.world.render(this.cameraSystem.camera);
+    this.postFX.render(this.world.scene, this.cameraSystem.camera);
     this.touchControls.setVisible(window.matchMedia?.('(pointer: coarse)').matches || navigator.maxTouchPoints > 0);
     window.addEventListener('resize', this.handleResize);
+    this.updateLoadingState(1, this.copy.loading.ready);
+    this.overlays.hide('game-loading-overlay');
   }
 
   createRuntime() {
@@ -327,9 +339,12 @@ export class GameApp {
     if (input.toggleMode && this.activeInteractable?.item?.type === 'dock') this.toggleMode();
 
     this.cameraSystem.setMode(this.state.activeMode === 'vehicle' ? 'vehicle' : 'foot');
-    this.cameraSystem.focus(this.getActivePosition(), { lookYOffset: this.state.activeMode === 'vehicle' ? 2.8 : 1.8 });
+    this.cameraSystem.focus(this.getActivePosition(), {
+      lookYOffset: this.state.activeMode === 'vehicle' ? 2.3 : 2.1,
+      heading: this.state.activeMode === 'vehicle' ? this.vehicle.getHeading() : this.avatar.group.rotation.y,
+    });
     this.cameraSystem.update(dt);
-    this.world.render(this.cameraSystem.camera);
+    this.postFX.render(this.world.scene, this.cameraSystem.camera);
     this.updateHud(this.activePrompt());
     this.minimap.update(this.getActivePosition(), this.state.currentSector);
   };
@@ -370,6 +385,7 @@ export class GameApp {
   updateInteractable() {
     const nearby = findNearestInteractable(this.getActivePosition(), this.world.getInteractables(), INTERACT_RANGE);
     this.activeInteractable = nearby;
+    this.world.setFocusedInteractable(nearby?.item?.id ?? null);
   }
 
   updateHazards(dt) {
@@ -610,6 +626,7 @@ export class GameApp {
     const missionCopy = getMissionCopy(this.state.settings.lang, this.state.currentMission);
     const modeLabel = this.copy.modes[this.state.activeMode];
     const sectorLabel = getSectorCopy(this.state.settings.lang, this.state.currentSector);
+    const status = this.composeStatusChip();
 
     this.hud.update({
       score: this.state.score,
@@ -621,6 +638,7 @@ export class GameApp {
       missionObjective: this.composeObjective(missionCopy.objective),
       prompt,
       quality: this.state.settings.quality,
+      status,
     });
 
     window.dispatchEvent(new CustomEvent('game:update-hud', {
@@ -656,6 +674,22 @@ export class GameApp {
       return `${baseObjective} [${this.runtime.final.pylons.size}/3 pylons]`;
     }
     return baseObjective;
+  }
+
+  composeStatusChip() {
+    if (this.state.currentMission === 'breach-firewall') {
+      return `${this.copy.hud.alarm} ${Math.round(getSecurityProgress(this.runtime.security).alarm)}%`;
+    }
+    if (this.state.currentMission === 'restore-routing') {
+      return `${this.copy.hud.overflow} ${Math.round(getRoutingProgress(this.runtime.routing).overflow)}%`;
+    }
+    if (this.state.currentMission === 'stabilize-inference') {
+      return `${this.copy.hud.overload} ${Math.round(getInferenceProgress(this.runtime.inference).overload)}%`;
+    }
+    if (this.state.currentMission === 'system-reboot') {
+      return formatCopy(this.copy.hud.pylons, { count: this.runtime.final.pylons.size, total: 3 });
+    }
+    return this.copy.hud.ready;
   }
 
   dispatchMissionChange() {
@@ -822,7 +856,8 @@ export class GameApp {
   handleResize() {
     this.world?.resize();
     this.cameraSystem?.resize();
-    this.world?.render(this.cameraSystem.camera);
+    this.postFX?.resize(window.innerWidth, window.innerHeight);
+    this.postFX?.render(this.world.scene, this.cameraSystem.camera);
   }
 
   toggleLogPanel() {
@@ -842,7 +877,23 @@ export class GameApp {
       this.panelNodes.progress.textContent = formatCopy(this.copy.panel.progressValue, { completed, total: 5 });
     }
     if (this.panelNodes.bestScores) {
-      this.panelNodes.bestScores.textContent = `SEC ${String(this.state.bestScores.security || 0).padStart(4, '0')} \u00b7 NET ${String(this.state.bestScores.routing || 0).padStart(4, '0')} \u00b7 AI ${String(this.state.bestScores.inference || 0).padStart(4, '0')}`;
+      this.panelNodes.bestScores.textContent = formatCopy(this.copy.panel.bestScoresValue, {
+        security: String(this.state.bestScores.security || 0).padStart(4, '0'),
+        routing: String(this.state.bestScores.routing || 0).padStart(4, '0'),
+        inference: String(this.state.bestScores.inference || 0).padStart(4, '0'),
+      });
+    }
+  }
+
+  updateLoadingState(progress = 0, label = '') {
+    if (this.loadingNodes.progress) {
+      this.loadingNodes.progress.style.setProperty('--loading-progress', `${Math.round(progress * 100)}%`);
+    }
+    if (this.loadingNodes.percent) {
+      this.loadingNodes.percent.textContent = `${String(Math.round(progress * 100)).padStart(2, '0')}%`;
+    }
+    if (this.loadingNodes.label && label) {
+      this.loadingNodes.label.textContent = label;
     }
   }
 }

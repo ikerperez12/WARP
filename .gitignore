@@ -10,6 +10,13 @@ dist/
 agent-diseno-ia/
 .pr-integrate/
 agent-handoff/
+folio-2019/
+tmp/
+webgl-black-hole/
+
+# PERSONAL FILES
+.personal/
+/personal/
 
 # Reports and audits
 reports/

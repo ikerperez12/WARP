@@ -12,6 +12,7 @@ export class PanelController {
   setActiveQuality(name) {
     this.qualityButtons.forEach((button) => {
       button.classList.toggle('is-active', button.dataset.quality === name);
+      button.setAttribute('aria-pressed', button.dataset.quality === name ? 'true' : 'false');
     });
   }
 }

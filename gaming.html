@@ -11,7 +11,7 @@
   <title>WARP Red Cyber Ops</title>
   <meta
     name="description"
-    content="WARP Red Cyber Ops: juego standalone de exploraci&oacute;n tecnol&oacute;gica con mundo 3D, misiones, subminijuegos y progresi&oacute;n local."
+    content="WARP Red Cyber Ops: juego standalone de exploracion tecnologica con mundo 3D, misiones, subminijuegos y progresion local."
   />
   <meta name="theme-color" content="#0a0a0f" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -36,13 +36,13 @@
       <div class="hud-topbar">
         <div class="hud-brand">
           <span class="hud-brand-mark">WARP</span>
-          <div>
+          <div class="hud-brand-copy">
             <p class="hud-kicker" data-copy="hud.system">Red Cyber Ops</p>
             <p class="hud-title" id="hud-mission-title">Boot sequence</p>
           </div>
         </div>
         <div class="hud-actions">
-          <button id="btn-pause-game" class="hud-icon-btn" type="button" aria-label="Pausar">
+          <button id="btn-pause-game" class="hud-icon-btn" type="button" aria-label="Abrir menu de pausa" title="Abrir menu de pausa">
             <span></span><span></span>
           </button>
           <a id="btn-exit-portfolio" class="hud-link-btn" href="/experience.html" data-copy="buttons.back">Volver</a>
@@ -50,91 +50,174 @@
       </div>
 
       <div class="hud-grid">
-        <article class="hud-card">
+        <article class="hud-card hud-card-stat">
           <span class="hud-label" data-copy="hud.score">Score</span>
           <strong class="hud-value" id="hud-score">000000</strong>
         </article>
-        <article class="hud-card">
+        <article class="hud-card hud-card-stat">
           <span class="hud-label" data-copy="hud.integrity">Integrity</span>
           <strong class="hud-value" id="hud-integrity">100%</strong>
         </article>
-        <article class="hud-card">
+        <article class="hud-card hud-card-stat">
           <span class="hud-label" data-copy="hud.energy">Energy</span>
           <strong class="hud-value" id="hud-energy">100%</strong>
         </article>
-        <article class="hud-card">
-          <span class="hud-label" data-copy="hud.mode">Mode</span>
-          <strong class="hud-value hud-value-mode" id="hud-mode">Vehicle</strong>
+        <article class="hud-card hud-card-signal">
+          <span class="hud-label" data-copy="hud.mode">Modo</span>
+          <strong class="hud-value hud-value-mode" id="hud-mode">Vehiculo</strong>
         </article>
-        <article class="hud-card hud-card-wide">
+        <article class="hud-card hud-card-wide hud-card-signal">
           <span class="hud-label" data-copy="hud.sector">Sector</span>
           <strong class="hud-value hud-value-sector" id="hud-sector">Boot Relay</strong>
+        </article>
+        <article class="hud-card hud-card-wide hud-card-status">
+          <span class="hud-label" data-copy="hud.status">Estado</span>
+          <strong class="hud-value hud-value-status" id="hud-status">Sistema estable</strong>
         </article>
       </div>
 
       <div class="hud-objective">
-        <p class="hud-objective-kicker" data-copy="hud.objective">Objective</p>
-        <p class="hud-objective-text" id="hud-mission">Alinea el enlace de arranque y aprende a alternar entre veh&iacute;culo y avatar.</p>
+        <div class="hud-objective-head">
+          <p class="hud-objective-kicker" data-copy="hud.objective">Objetivo</p>
+          <span class="hud-objective-chip" data-copy="panel.title">Briefing tactico</span>
+        </div>
+        <p class="hud-objective-text" id="hud-mission">Alinea el enlace de arranque y aprende a alternar entre vehiculo y avatar.</p>
         <p class="hud-prompt" id="hud-prompt">Pulsa E sobre la baliza de inicio.</p>
       </div>
 
       <aside class="hud-minimap-shell">
         <div class="hud-minimap-header">
-          <span data-copy="hud.minimap">Map</span>
+          <span data-copy="hud.minimap">Mapa</span>
           <span id="hud-quality-badge" class="hud-quality-badge">AUTO</span>
         </div>
-        <div id="hud-minimap" class="hud-minimap" aria-label="Minimapa">
-          <span id="minimap-player" class="minimap-player"></span>
-          <span class="minimap-sector" data-sector="boot-relay"></span>
-          <span class="minimap-sector" data-sector="firewall-sector"></span>
-          <span class="minimap-sector" data-sector="routing-array"></span>
-          <span class="minimap-sector" data-sector="inference-core"></span>
-          <span class="minimap-sector" data-sector="core-chamber"></span>
+        <div class="hud-minimap-frame">
+          <div id="hud-minimap" class="hud-minimap" aria-label="Minimapa">
+            <span id="minimap-player" class="minimap-player"></span>
+            <span class="minimap-sector" data-sector="boot-relay"></span>
+            <span class="minimap-sector" data-sector="firewall-sector"></span>
+            <span class="minimap-sector" data-sector="routing-array"></span>
+            <span class="minimap-sector" data-sector="inference-core"></span>
+            <span class="minimap-sector" data-sector="core-chamber"></span>
+          </div>
         </div>
+        <p class="hud-minimap-note" data-copy="hud.minimapHint">Radar del distrito activo</p>
       </aside>
     </header>
 
-    <section id="game-start-overlay" class="game-overlay game-overlay-intro is-active" aria-modal="true">
-      <div class="game-panel game-panel-hero">
-        <span class="panel-tag" data-copy="start.tag">Standalone game</span>
-        <h1 data-copy="start.title">WARP Red Cyber Ops</h1>
-        <p class="panel-lead" data-copy="start.lead">
-          Hub tecnol&oacute;gico explorable, conducci&oacute;n arcade, infiltraci&oacute;n a pie y tres subminijuegos conectados en una misma misi&oacute;n.
-        </p>
-        <div class="panel-grid panel-grid-intro">
-          <article>
-            <h2 data-copy="start.blockA.title">Veh&iacute;culo</h2>
-            <p data-copy="start.blockA.body">Cruza distritos, alimenta nodos y abre rutas con un control directo y r&aacute;pido.</p>
-          </article>
-          <article>
-            <h2 data-copy="start.blockB.title">A pie</h2>
-            <p data-copy="start.blockB.body">Resuelve intrusiones, routing e inferencia con timing y lectura visual.</p>
-          </article>
-          <article>
-            <h2 data-copy="start.blockC.title">Mission chain</h2>
-            <p data-copy="start.blockC.body">Cinco fases enlazadas, progreso persistente y cierre en el n&uacute;cleo central.</p>
-          </article>
+    <section id="game-loading-overlay" class="game-overlay game-overlay-loading is-active" aria-modal="true" aria-hidden="false" role="dialog">
+      <div class="game-panel game-panel-loading">
+        <div class="loading-pulse" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
-        <div class="control-pills">
-          <span>WASD / Arrows</span>
-          <span>E Interact</span>
-          <span>Shift Boost / Dash</span>
-          <span>Tab Intel</span>
-          <span>Esc Pause</span>
+        <span class="panel-tag" data-copy="loading.tag">Carga</span>
+        <h2 data-copy="loading.title">Inicializando distrito</h2>
+        <p class="panel-lead" data-copy="loading.lead">Importando mallas, materiales, senaletica y sistemas del distrito.</p>
+        <div class="loading-meter">
+          <div id="loading-progress-bar" class="loading-progress-bar"></div>
         </div>
-        <div class="panel-actions">
-          <button id="btn-start-game" class="panel-btn panel-btn-primary" type="button" data-copy="buttons.start">Iniciar sistema</button>
-          <a class="panel-btn panel-btn-secondary" href="/experience.html" data-copy="buttons.exit">Volver al portfolio</a>
+        <div class="loading-row">
+          <span id="loading-progress-label" class="hud-kicker" data-copy="loading.assets">Sincronizando escena 3D</span>
+          <strong id="loading-progress-value">00%</strong>
         </div>
       </div>
     </section>
 
-    <section id="game-pause-overlay" class="game-overlay is-hidden" aria-modal="true">
-      <div class="game-panel game-panel-compact">
+    <section id="game-start-overlay" class="game-overlay game-overlay-intro is-active" aria-modal="true" aria-hidden="false" role="dialog">
+      <div class="game-panel game-panel-hero">
+        <div class="intro-shell">
+          <div class="intro-copy">
+            <div class="intro-head">
+              <span class="panel-tag" data-copy="start.tag">Simulacion tactica</span>
+              <h1 data-copy="start.title">WARP Red Cyber Ops</h1>
+              <p class="panel-lead" data-copy="start.lead">
+                Simulacion tecnologica explorable con conduccion arcade, infiltracion a pie y tres operaciones conectadas dentro del mismo sistema.
+              </p>
+            </div>
+
+            <div class="intro-stage" aria-hidden="true">
+              <span class="intro-stage-ring intro-stage-ring-a"></span>
+              <span class="intro-stage-ring intro-stage-ring-b"></span>
+              <span class="intro-stage-dot intro-stage-dot-a"></span>
+              <span class="intro-stage-dot intro-stage-dot-b"></span>
+              <span class="intro-stage-dot intro-stage-dot-c"></span>
+            </div>
+
+            <div class="intro-metrics">
+              <article class="intro-metric">
+                <span class="hud-kicker">01</span>
+                <strong data-copy="start.metricA.title">Cinco sectores</strong>
+                <p data-copy="start.metricA.body">Boot Relay, Firewall, Routing, Inference y el core final.</p>
+              </article>
+              <article class="intro-metric">
+                <span class="hud-kicker">02</span>
+                <strong data-copy="start.metricB.title">Recorrido hibrido</strong>
+                <p data-copy="start.metricB.body">Conduce, desembarca y cambia de modo solo cuando el distrito lo permite.</p>
+              </article>
+              <article class="intro-metric">
+                <span class="hud-kicker">03</span>
+                <strong data-copy="start.metricC.title">Partida persistente</strong>
+                <p data-copy="start.metricC.body">Progreso local, score acumulado y reinicio limpio desde pausa o victoria.</p>
+              </article>
+            </div>
+
+            <div class="panel-grid panel-grid-intro">
+              <article>
+                <h2 data-copy="start.blockA.title">Vehiculo</h2>
+                <p data-copy="start.blockA.body">Cruza distritos, alimenta nodos y abre rutas con un control directo y rapido.</p>
+              </article>
+              <article>
+                <h2 data-copy="start.blockB.title">A pie</h2>
+                <p data-copy="start.blockB.body">Resuelve intrusiones, routing e inferencia con timing y lectura visual.</p>
+              </article>
+              <article>
+                <h2 data-copy="start.blockC.title">Cadena de misiones</h2>
+                <p data-copy="start.blockC.body">Cinco fases enlazadas, progreso persistente y cierre en el nucleo central.</p>
+              </article>
+            </div>
+
+            <div class="control-pills">
+              <span data-copy="start.controlA">WASD / Flechas</span>
+              <span data-copy="start.controlB">E Interactuar</span>
+              <span data-copy="start.controlC">Shift Boost / Dash</span>
+              <span data-copy="start.controlD">Tab Intel</span>
+              <span data-copy="start.controlE">Esc Pausa</span>
+            </div>
+
+            <div class="panel-actions">
+              <button id="btn-start-game" class="panel-btn panel-btn-primary" type="button" data-copy="buttons.start">Iniciar sistema</button>
+              <a class="panel-btn panel-btn-secondary" href="/experience.html" data-copy="buttons.exit">Volver al portfolio</a>
+            </div>
+          </div>
+
+          <aside class="intro-rail">
+            <article>
+              <span class="hud-kicker">01</span>
+              <strong data-copy="start.railA.title">Boot Relay</strong>
+              <p data-copy="start.railA.body">Arranca el nodo, aprende la transicion y abre el primer corredor.</p>
+            </article>
+            <article>
+              <span class="hud-kicker">02</span>
+              <strong data-copy="start.railB.title">Firewall Sector</strong>
+              <p data-copy="start.railB.body">Infiltracion roja, shards, lasers y secuencia de nodos.</p>
+            </article>
+            <article>
+              <span class="hud-kicker">03</span>
+              <strong data-copy="start.railC.title">Routing + AI</strong>
+              <p data-copy="start.railC.body">Backbone azul, nucleo violeta y reinicio final del sistema.</p>
+            </article>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="game-pause-overlay" class="game-overlay is-hidden" aria-modal="true" aria-hidden="true" role="dialog">
+      <div class="game-panel game-panel-compact game-panel-pause">
         <span class="panel-tag" data-copy="pause.tag">Pausa</span>
-        <h2 data-copy="pause.title">Operaci&oacute;n en standby</h2>
-        <p class="panel-lead" data-copy="pause.lead">Ajusta preferencias, reinicia progreso o vuelve al dashboard del portfolio.</p>
-        <div id="game-mission-panel" class="settings-grid">
+        <h2 data-copy="pause.title">Operacion en standby</h2>
+        <p class="panel-lead" data-copy="pause.lead">Ajusta preferencias, reinicia la simulacion o vuelve al dashboard del portfolio.</p>
+        <div id="game-mission-panel" class="settings-grid settings-grid-compact">
           <article>
             <span class="settings-label" data-copy="settings.quality">Calidad</span>
             <div class="quality-row">
@@ -158,23 +241,23 @@
           </article>
           <article>
             <span class="settings-label" data-copy="settings.controls">Controles</span>
-            <p class="settings-copy" data-copy="settings.controlsBody">Cambia de modo en los dock pads. En m&oacute;vil se activa joystick virtual autom&aacute;ticamente.</p>
+            <p class="settings-copy" data-copy="settings.controlsBody">Cambia de modo en los dock pads. En movil se activa joystick virtual automaticamente.</p>
           </article>
         </div>
         <div class="panel-actions">
           <button id="btn-resume-game" class="panel-btn panel-btn-primary" type="button" data-copy="buttons.resume">Reanudar</button>
-          <button id="btn-reset-progress" class="panel-btn panel-btn-soft" type="button" data-copy="buttons.reset">Reset progress</button>
+          <button id="btn-reset-progress" class="panel-btn panel-btn-soft" type="button" data-copy="buttons.reset">Reiniciar simulacion</button>
           <a class="panel-btn panel-btn-secondary" href="/experience.html" data-copy="buttons.exit">Volver al portfolio</a>
         </div>
       </div>
     </section>
 
-    <section id="game-over-overlay" class="game-overlay is-hidden" aria-modal="true">
-      <div class="game-panel game-panel-compact">
-        <span class="panel-tag panel-tag-danger" data-copy="gameOver.tag">Conexi&oacute;n perdida</span>
+    <section id="game-over-overlay" class="game-overlay is-hidden" aria-modal="true" aria-hidden="true" role="dialog">
+      <div class="game-panel game-panel-compact game-panel-status game-panel-danger">
+        <span class="panel-tag panel-tag-danger" data-copy="gameOver.tag">Conexion perdida</span>
         <h2 data-copy="gameOver.title">Sistema comprometido</h2>
-        <p class="panel-lead" id="game-over-msg" data-copy="gameOver.lead">La integridad de la operaci&oacute;n ha ca&iacute;do a cero.</p>
-        <div class="score-shell">
+        <p class="panel-lead" id="game-over-msg" data-copy="gameOver.lead">La integridad de la operacion ha caido a cero.</p>
+        <div class="score-shell score-shell-danger">
           <span data-copy="hud.score">Score</span>
           <strong id="final-score">000000</strong>
         </div>
@@ -185,12 +268,12 @@
       </div>
     </section>
 
-    <section id="game-victory-overlay" class="game-overlay is-hidden" aria-modal="true">
-      <div class="game-panel game-panel-compact">
+    <section id="game-victory-overlay" class="game-overlay is-hidden" aria-modal="true" aria-hidden="true" role="dialog">
+      <div class="game-panel game-panel-compact game-panel-status game-panel-success">
         <span class="panel-tag panel-tag-success" data-copy="victory.tag">Core online</span>
         <h2 data-copy="victory.title">Reinicio completado</h2>
-        <p class="panel-lead" data-copy="victory.lead">La red vuelve a estar estable. Puedes reiniciar la simulaci&oacute;n o regresar al portfolio principal.</p>
-        <div class="score-shell">
+        <p class="panel-lead" data-copy="victory.lead">La red vuelve a estar estable. Puedes reiniciar la simulacion o regresar al portfolio principal.</p>
+        <div class="score-shell score-shell-success">
           <span data-copy="victory.score">Score final</span>
           <strong id="victory-score">000000</strong>
         </div>
@@ -201,15 +284,15 @@
       </div>
     </section>
 
-    <section id="game-mission-toast" class="game-toast is-hidden" aria-live="polite">
-      <span class="panel-tag" data-copy="toast.tag">Actualizaci&oacute;n de misi&oacute;n</span>
+    <section id="game-mission-toast" class="game-toast is-hidden" aria-live="polite" aria-hidden="true" role="status">
+      <span class="panel-tag" data-copy="toast.tag">Actualizacion de mision</span>
       <h2 id="toast-title">Firewall Sector unlocked</h2>
-      <p id="toast-body">Dir&iacute;gete al siguiente distrito y completa la operaci&oacute;n.</p>
+      <p id="toast-body">Dirigete al siguiente distrito y completa la operacion.</p>
     </section>
 
-    <aside id="game-project-panel" class="game-side-panel is-hidden" aria-live="polite">
-      <span class="panel-tag" data-copy="panel.tag">Bit&aacute;cora</span>
-      <h2 data-copy="panel.title">Tactical readout</h2>
+    <aside id="game-project-panel" class="game-side-panel is-hidden" aria-live="polite" aria-hidden="true">
+      <span class="panel-tag" data-copy="panel.tag">Bitacora</span>
+      <h2 data-copy="panel.title">Briefing tactico</h2>
       <p class="panel-lead" id="panel-mission-summary">Boot Relay listo. Activa la baliza y cambia de modo en el dock pad.</p>
       <div class="panel-grid panel-grid-compact">
         <article>
@@ -222,16 +305,16 @@
         </article>
         <article>
           <h3 data-copy="panel.controls">Controles</h3>
-          <p data-copy="panel.controlsBody">Tab abre este panel. Esc pausa. E interact&uacute;a. Q cambia de modo en dock pads.</p>
+          <p data-copy="panel.controlsBody">Tab abre este panel. Esc pausa. E interactua. Q cambia de modo en dock pads.</p>
         </article>
       </div>
     </aside>
 
-    <section id="game-fallback-overlay" class="game-overlay is-hidden" aria-modal="true">
-      <div class="game-panel game-panel-compact">
-        <span class="panel-tag panel-tag-danger" data-copy="fallback.tag">Fallback</span>
+    <section id="game-fallback-overlay" class="game-overlay is-hidden" aria-modal="true" aria-hidden="true" role="dialog">
+      <div class="game-panel game-panel-compact game-panel-status game-panel-danger">
+        <span class="panel-tag panel-tag-danger" data-copy="fallback.tag">Compatibilidad</span>
         <h2 data-copy="fallback.title">WebGL no disponible</h2>
-        <p class="panel-lead" data-copy="fallback.lead">Tu navegador o GPU no exponen el contexto gr&aacute;fico necesario para cargar Red Cyber Ops.</p>
+        <p class="panel-lead" data-copy="fallback.lead">Tu navegador o GPU no exponen el contexto grafico necesario para cargar Red Cyber Ops.</p>
         <div class="panel-actions">
           <a class="panel-btn panel-btn-primary" href="/experience.html" data-copy="buttons.exit">Volver al portfolio</a>
         </div>
@@ -244,9 +327,9 @@
       </div>
       <div class="touch-action-cluster">
         <button class="touch-btn" type="button" data-touch-action="boost" data-copy="touch.boost">Boost</button>
-        <button class="touch-btn" type="button" data-touch-action="interact" data-copy="touch.interact">Use</button>
-        <button class="touch-btn" type="button" data-touch-action="toggle" data-copy="touch.toggle">Mode</button>
-        <button class="touch-btn" type="button" data-touch-action="pause" data-copy="touch.pause">Pause</button>
+        <button class="touch-btn" type="button" data-touch-action="interact" data-copy="touch.interact">Usar</button>
+        <button class="touch-btn" type="button" data-touch-action="toggle" data-copy="touch.toggle">Modo</button>
+        <button class="touch-btn" type="button" data-touch-action="pause" data-copy="touch.pause">Pausa</button>
       </div>
     </div>
   </main>

@@ -36,24 +36,48 @@ export function createMaterialLibrary(theme = 'dark') {
 
   return {
     palette,
-    ground: new THREE.MeshStandardMaterial({ color: palette.ground, roughness: 0.92, metalness: 0.08 }),
-    platform: new THREE.MeshStandardMaterial({ color: palette.platform, roughness: 0.78, metalness: 0.15 }),
-    border: new THREE.MeshStandardMaterial({ color: palette.border, roughness: 0.55, metalness: 0.3 }),
-    neutral: new THREE.MeshStandardMaterial({ color: palette.neutral, roughness: 0.45, metalness: 0.45 }),
-    glass: new THREE.MeshStandardMaterial({
+    ground: new THREE.MeshPhysicalMaterial({
+      color: palette.ground,
+      roughness: 0.96,
+      metalness: 0.06,
+      clearcoat: 0.02,
+    }),
+    platform: new THREE.MeshPhysicalMaterial({
+      color: palette.platform,
+      roughness: 0.68,
+      metalness: 0.24,
+      clearcoat: 0.08,
+    }),
+    border: new THREE.MeshPhysicalMaterial({
+      color: palette.border,
+      roughness: 0.44,
+      metalness: 0.42,
+      clearcoat: 0.18,
+    }),
+    neutral: new THREE.MeshPhysicalMaterial({
+      color: palette.neutral,
+      roughness: 0.34,
+      metalness: 0.52,
+      clearcoat: 0.24,
+    }),
+    glass: new THREE.MeshPhysicalMaterial({
       color: palette.groundSecondary,
-      roughness: 0.15,
-      metalness: 0.65,
+      roughness: 0.08,
+      metalness: 0.5,
+      transmission: 0.06,
+      thickness: 0.4,
+      clearcoat: 0.44,
       transparent: true,
       opacity: theme === 'light' ? 0.78 : 0.58,
     }),
     emissive(color = palette.emissive, intensity = 1.1) {
-      return new THREE.MeshStandardMaterial({
+      return new THREE.MeshPhysicalMaterial({
         color,
         emissive: color,
         emissiveIntensity: intensity,
-        roughness: 0.3,
-        metalness: 0.42,
+        roughness: 0.24,
+        metalness: 0.48,
+        clearcoat: 0.16,
       });
     },
   };
