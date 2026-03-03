@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' https://vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https: blob:; worker-src 'self' blob:; media-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" />
+  <title>WARP // World Drive</title>
+  <meta name="description"
+    content="Nuevo portfolio jugable de Iker Perez inspirado en una experiencia 3D tipo videojuego, integrado dentro de WARP." />
+  <meta name="theme-color" content="#061311" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="WARP // World Drive" />
+  <meta property="og:description"
+    content="Explora un portfolio 3D jugable con proyectos, historia tecnica e identidad propia." />
+  <meta property="og:url" content="https://portfolio-iker-perez.vercel.app/warp-folio.html" />
+  <link rel="canonical" href="https://portfolio-iker-perez.vercel.app/warp-folio.html" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/warp-folio/favicon/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/warp-folio/favicon/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/warp-folio/favicon/favicon-16x16.png" />
+  <link rel="manifest" href="/warp-folio/favicon/site.webmanifest" />
+  <link rel="mask-icon" href="/warp-folio/favicon/safari-pinned-tab.svg" color="#14e0b5" />
+  <meta name="apple-mobile-web-app-title" content="WARP World" />
+  <meta name="application-name" content="WARP World" />
+  <meta name="msapplication-TileColor" content="#061311" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=block" rel="stylesheet" />
+</head>
+
+<body class="warp-folio-page">
+  <canvas class="canvas js-canvas"></canvas>
+
+  <div class="warp-folio-ui" aria-hidden="false">
+    <header class="warp-folio-topbar">
+      <a class="warp-folio-pill" href="/">Volver a WARP</a>
+      <a class="warp-folio-pill warp-folio-pill-accent" href="/gaming.html">Juego actual</a>
+    </header>
+
+    <section class="warp-folio-story">
+      <span class="warp-folio-kicker">Nueva experiencia en construccion</span>
+      <h1>WARP // World Drive</h1>
+      <p>
+        Base estructural de portfolio 3D jugable, reinterpretada para contar la historia,
+        proyectos y ambicion tecnica de Iker Perez dentro de WARP.
+      </p>
+      <div class="warp-folio-actions">
+        <a class="warp-folio-button" href="/#projects">Ver portfolio base</a>
+        <a class="warp-folio-button warp-folio-button-secondary" href="/experience.html">Ruta visual</a>
+      </div>
+      <ul class="warp-folio-legend">
+        <li>Conduce para explorar sectores</li>
+        <li>Interactua con paneles y zonas</li>
+        <li>Esta ruta sera la base del nuevo juego narrativo</li>
+      </ul>
+    </section>
+  </div>
+
+  <div class="threejs-journey is-hover-none js-threejs-journey">
+    <div class="message js-message">
+      <div class="boy">
+        <div class="variant is-hi">
+          <div class="body"></div>
+          <div class="arm js-boy-arm"></div>
+        </div>
+        <div class="variant is-yay"></div>
+        <div class="variant is-shrugging"></div>
+      </div>
+      <div class="bubble">
+        <div class="text">Esta ruta va a convertirse en el portfolio jugable principal de WARP.</div>
+        <div class="tip"></div>
+      </div>
+    </div>
+    <div class="message js-message">
+      <div class="bubble">
+        <div class="text">Quieres volver al portfolio o seguir explorando este prototipo 3D?</div>
+        <div class="tip"></div>
+      </div>
+    </div>
+    <div class="message js-message is-answers">
+      <a href="#" class="answer is-no js-no">
+        <span class="background"></span>
+        <span class="hover"></span>
+        <span class="label">Seguir conduciendo</span>
+      </a>
+      <a href="/#projects" class="answer is-yes js-yes">
+        <span class="background"></span>
+        <span class="hover"></span>
+        <span class="label">Abrir portfolio</span>
+      </a>
+    </div>
+    <div class="message js-message">
+      <div class="bubble">
+        <div class="text">Perfecto. Prueba el mundo, revisa los sectores y no perdones los choques.</div>
+        <div class="tip"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/warp-folio/index.js"></script>
+</body>
+
+</html>

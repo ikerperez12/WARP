@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite';
+import glsl from 'vite-plugin-glsl';
 
 export default defineConfig({
+  plugins: [glsl()],
   build: {
     chunkSizeWarningLimit: 800,
     rollupOptions: {
@@ -9,6 +11,7 @@ export default defineConfig({
         experience: 'experience.html',
         admin: 'admin.html',
         gaming: 'gaming.html',
+        warpFolio: 'warp-folio.html',
         animeLanding: 'anime-landing.html',
         animeGaming: 'anime-gaming.html',
       },
