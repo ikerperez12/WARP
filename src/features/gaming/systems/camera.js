@@ -2,40 +2,40 @@ import * as THREE from 'three';
 
 const MODE_CONFIG = {
   vehicle: {
-    offset: new THREE.Vector3(8.8, 7.6, 13.4),
-    lookYOffset: 2.2,
-    damping: 0.088,
-    headingDamping: 0.095,
-    lateralBias: 0.4,
-    distanceScale: 0.22,
-    heightScale: 0.06,
-    leadScale: 0.22,
-    fov: [43, 49],
-    shoulderBias: 1.4,
+    offset: new THREE.Vector3(7.2, 5.2, -11.8),
+    lookYOffset: 1.4,
+    damping: 0.082,
+    headingDamping: 0.09,
+    lateralBias: 0.52,
+    distanceScale: 0.26,
+    heightScale: 0.05,
+    leadScale: 0.3,
+    fov: [50, 58],
+    shoulderBias: 2.2,
   },
   foot: {
-    offset: new THREE.Vector3(5.6, 5.6, 8.8),
-    lookYOffset: 2.1,
+    offset: new THREE.Vector3(4.8, 4.4, -7.6),
+    lookYOffset: 1.6,
     damping: 0.11,
     headingDamping: 0.135,
-    lateralBias: 0.24,
+    lateralBias: 0.28,
     distanceScale: 0.12,
     heightScale: 0.04,
-    leadScale: 0.14,
-    fov: [46, 52],
-    shoulderBias: 0.8,
+    leadScale: 0.16,
+    fov: [50, 56],
+    shoulderBias: 1.0,
   },
   cinematic: {
-    offset: new THREE.Vector3(10.5, 13.5, 21.5),
-    lookYOffset: 3.2,
-    damping: 0.06,
-    headingDamping: 0.05,
-    lateralBias: 0.4,
-    distanceScale: 0.22,
-    heightScale: 0.08,
-    leadScale: 0.2,
-    fov: [40, 45],
-    shoulderBias: 1.8,
+    offset: new THREE.Vector3(9.5, 10.5, -19.0),
+    lookYOffset: 2.4,
+    damping: 0.058,
+    headingDamping: 0.048,
+    lateralBias: 0.46,
+    distanceScale: 0.24,
+    heightScale: 0.07,
+    leadScale: 0.22,
+    fov: [44, 50],
+    shoulderBias: 2.4,
   },
 };
 
@@ -105,7 +105,7 @@ export function computeCameraOffset(config, motionLength = 0, heading = 0) {
   const offset = config.offset.clone();
   offset.z *= 1 + dynamicMotion * (config.distanceScale ?? 0);
   offset.y *= 1 + dynamicMotion * (config.heightScale ?? 0);
-  offset.x += Math.sin(heading) * offset.z * (config.lateralBias ?? 0);
+  offset.x += Math.sin(heading) * Math.abs(offset.z) * (config.lateralBias ?? 0);
   return offset;
 }
 
@@ -130,8 +130,8 @@ export class CameraSystem {
     this.targetPosition = new THREE.Vector3();
     this.lookAtTarget = new THREE.Vector3();
     this.smoothedLookAt = new THREE.Vector3();
-    this.heading = Math.PI / 4;
-    this.headingTarget = Math.PI / 4;
+    this.heading = Math.PI;
+    this.headingTarget = Math.PI;
     this.fovTarget = this.camera.fov;
     this.lastFocusTarget = null;
     this.motion = new THREE.Vector3();
@@ -177,7 +177,7 @@ export class CameraSystem {
 
     this.velocityBias.copy(this.motion);
     if (this.velocityBias.lengthSq() > 0.0001) {
-      this.velocityBias.normalize().multiplyScalar(motionLength * offset.z * frame.lookAhead);
+      this.velocityBias.normalize().multiplyScalar(motionLength * Math.abs(offset.z) * frame.lookAhead);
     } else {
       this.velocityBias.set(0, 0, 0);
     }

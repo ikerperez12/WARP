@@ -8,6 +8,105 @@ import { instantiateAsset, loadGameAssets, tintImportedModel } from './assets.js
 let shadowTexture;
 const labelTextureCache = new Map();
 const districtSurfaceTextureCache = new Map();
+const SECTION_FRAME_LAYOUTS = {
+  'boot-relay': {
+    center: { x: 0, z: 4 },
+    width: 86,
+    depth: 78,
+    gateSide: 'south',
+    gateWidth: 24,
+    gateLabel: 'ENTRY LOOP',
+    approachDepth: 18,
+  },
+  'firewall-sector': {
+    center: { x: -80, z: -10 },
+    width: 78,
+    depth: 62,
+    gateSide: 'east',
+    gateWidth: 20,
+    gateLabel: 'SECURITY GATE',
+    approachDepth: 14,
+  },
+  'routing-array': {
+    center: { x: 84, z: -10 },
+    width: 78,
+    depth: 62,
+    gateSide: 'west',
+    gateWidth: 20,
+    gateLabel: 'ROUTE GATE',
+    approachDepth: 14,
+  },
+  'inference-core': {
+    center: { x: 0, z: 92 },
+    width: 72,
+    depth: 68,
+    gateSide: 'south',
+    gateWidth: 20,
+    gateLabel: 'MODEL GATE',
+    approachDepth: 14,
+  },
+  'core-chamber': {
+    center: { x: 0, z: -92 },
+    width: 66,
+    depth: 58,
+    gateSide: 'north',
+    gateWidth: 18,
+    gateLabel: 'CORE ACCESS',
+    approachDepth: 12,
+  },
+};
+const CORRIDOR_TRAILS = [
+  {
+    id: 'boot-spine',
+    start: { x: 0, z: 14 },
+    end: { x: 0, z: -10 },
+    tileKeys: ['tileA', 'tileD', 'tileA', 'tileB'],
+    tint: '#72f1d5',
+    spacing: 2.2,
+    jitter: 0.32,
+    markerEvery: 4,
+  },
+  {
+    id: 'firewall-link',
+    start: { x: -16, z: -6 },
+    end: { x: -60, z: -10 },
+    tileKeys: ['tileD', 'tileC', 'tileD', 'tileB'],
+    tint: '#ff8758',
+    spacing: 2.08,
+    jitter: 0.36,
+    markerEvery: 5,
+  },
+  {
+    id: 'routing-link',
+    start: { x: 16, z: -6 },
+    end: { x: 62, z: -10 },
+    tileKeys: ['tileE', 'tileB', 'tileE', 'tileA'],
+    tint: '#5cc7ff',
+    spacing: 2.08,
+    jitter: 0.36,
+    markerEvery: 5,
+  },
+  {
+    id: 'inference-link',
+    start: { x: 0, z: 18 },
+    end: { x: 0, z: 64 },
+    tileKeys: ['tileE', 'tileA', 'tileE', 'tileC'],
+    tint: '#c391ff',
+    spacing: 2.18,
+    jitter: 0.28,
+    markerEvery: 5,
+  },
+  {
+    id: 'core-link',
+    start: { x: 0, z: -18 },
+    end: { x: 0, z: -66 },
+    tileKeys: ['tileC', 'tileA', 'tileC', 'tileD'],
+    tint: '#ffd166',
+    spacing: 2.18,
+    jitter: 0.28,
+    markerEvery: 5,
+  },
+];
 
 function nextFrame() {
   return new Promise((resolve) => {
@@ -374,6 +473,34 @@ function createDistrictSign(text, accent, width = 15.5, height = 3.9) {
   return group;
 }
 
+function splitEdge(length, gapSize = 0) {
+  if (!gapSize || gapSize >= length - 4) {
+    return [{ center: 0, length }];
+  }
+
+  const half = length / 2;
+  const gapHalf = gapSize / 2;
+  const leftLength = Math.max(0, half - gapHalf);
+  const rightLength = Math.max(0, half - gapHalf);
+  const segments = [];
+
+  if (leftLength > 0.8) {
+    segments.push({
+      center: -((half + gapHalf) / 2),
+      length: leftLength,
+    });
+  }
+
+  if (rightLength > 0.8) {
+    segments.push({
+      center: (half + gapHalf) / 2,
+      length: rightLength,
+    });
+  }
+
+  return segments;
+}
+
 export class GameWorld {
   constructor({ canvas, theme = 'dark', compatibility = false }) {
     this.canvas = canvas;
@@ -393,6 +520,7 @@ export class GameWorld {
     this.dockRings = [];
     this.importedInstances = [];
     this.groundShadows = [];
+    this.sectionFrames = new Map();
     this.focusedInteractableId = null;
     this.focusRing = null;
     this.focusBeam = null;
@@ -430,17 +558,20 @@ export class GameWorld {
     await nextFrame();
 
     await this.buildSectors({
-      onProgress: (value) => setProgress(0.76 + value * 0.08),
+      onProgress: (value) => setProgress(0.76 + value * 0.06),
+    });
+    await this.buildDistrictFrames({
+      onProgress: (value) => setProgress(0.82 + value * 0.05),
     });
     await this.buildCorridors({
-      onProgress: (value) => setProgress(0.84 + value * 0.05),
+      onProgress: (value) => setProgress(0.87 + value * 0.04),
     });
     await this.buildInteractables({
-      onProgress: (value) => setProgress(0.89 + value * 0.05),
+      onProgress: (value) => setProgress(0.91 + value * 0.04),
     });
     if (!this.assetFallback) {
       await this.buildScenery({
-        onProgress: (value) => setProgress(0.94 + value * 0.05),
+        onProgress: (value) => setProgress(0.95 + value * 0.04),
       });
     } else {
       this.buildCompatibilityScenery();
@@ -521,8 +652,8 @@ export class GameWorld {
     }
     if (options.tint) {
       object.userData.themeTint = options.tint;
-      object.userData.themeTintStrength = options.tintStrength ?? 0.32;
-      object.userData.themeEmissiveBoost = options.emissiveBoost ?? 0.18;
+      object.userData.themeTintStrength = options.tintStrength ?? (this.theme === 'light' ? 0.24 : 0.46);
+      object.userData.themeEmissiveBoost = options.emissiveBoost ?? (this.theme === 'light' ? 0.12 : 0.28);
       this.importedInstances.push(object);
     }
     parent.add(object);
@@ -578,17 +709,17 @@ export class GameWorld {
 
     this.addImportedInstance(group, 'defaultCarBrake', {
       height: height * 0.14,
-      position: { x: 0, y: height * 0.33, z: height * 0.56 },
+      position: { x: 0, y: height * 0.33, z: -height * 0.56 },
       tint: '#ff9f62',
       tintStrength: 0.42,
       emissiveBoost: 0.38,
     });
 
     const wheelOffsets = [
-      [-0.74, 0.28, -0.96],
-      [0.74, 0.28, -0.96],
-      [-0.74, 0.28, 1.04],
-      [0.74, 0.28, 1.04],
+      [-0.74, 0.3, 1.04],
+      [0.74, 0.3, 1.04],
+      [-0.74, 0.3, -0.96],
+      [0.74, 0.3, -0.96],
     ];
     wheelOffsets.forEach(([x, y, z], index) => {
       const wheel = this.addImportedInstance(group, 'defaultCarWheel', {
@@ -724,8 +855,8 @@ export class GameWorld {
   }
 
   buildLights() {
-    this.ambient = new THREE.AmbientLight('#d4e7ff', this.theme === 'light' ? 1.65 : 0.6);
-    this.sun = new THREE.DirectionalLight('#8fb8ff', this.theme === 'light' ? 1.8 : 1.22);
+    this.ambient = new THREE.AmbientLight('#d7e8ff', this.theme === 'light' ? 1.72 : 0.92);
+    this.sun = new THREE.DirectionalLight('#a9cbff', this.theme === 'light' ? 1.86 : 1.68);
     this.sun.position.set(54, 84, 34);
     this.sun.castShadow = true;
     this.sun.shadow.mapSize.width = 2048;
@@ -734,11 +865,24 @@ export class GameWorld {
     this.sun.shadow.camera.right = 180;
     this.sun.shadow.camera.top = 180;
     this.sun.shadow.camera.bottom = -180;
+    this.sun.shadow.bias = -0.0004;
 
-    this.rimLight = new THREE.PointLight('#4ce6ff', this.theme === 'light' ? 22 : 38, 240, 2);
+    // Counter-light from opposite side — adds depth to surfaces
+    this.moonLight = new THREE.DirectionalLight('#1e2e4a', this.theme === 'light' ? 0 : 0.42);
+    this.moonLight.position.set(-38, 22, -58);
+
+    this.rimLight = new THREE.PointLight('#4ce6ff', this.theme === 'light' ? 26 : 58, 260, 2);
     this.rimLight.position.set(0, 38, -14);
 
-    this.scene.add(this.ambient, this.sun, this.rimLight);
+    // Per-sector accent PointLights — each sector has its own color pool
+    this.sectorAccentLights = SECTORS.map((sector) => {
+      const light = new THREE.PointLight(sector.accent, this.theme === 'light' ? 2.8 : 5.2, 68, 1.6);
+      light.position.set(sector.center.x, 14, sector.center.z);
+      this.scene.add(light);
+      return light;
+    });
+
+    this.scene.add(this.ambient, this.sun, this.moonLight, this.rimLight);
   }
 
   buildGround() {
@@ -898,10 +1042,24 @@ export class GameWorld {
 
   buildSectorPlaza(sector) {
     const group = new THREE.Group();
+    const accentTint = new THREE.Color(sector.accent);
+    const glowTint = new THREE.Color(sector.glow);
+    const sectorBaseMaterial = new THREE.MeshPhysicalMaterial({
+      color: this.theme === 'light' ? glowTint.clone().lerp(new THREE.Color('#edf5ff'), 0.68) : accentTint.clone().lerp(new THREE.Color('#12243a'), 0.72),
+      roughness: 0.42,
+      metalness: 0.28,
+      clearcoat: 0.18,
+    });
+    const sectorPlateMaterial = new THREE.MeshPhysicalMaterial({
+      color: this.theme === 'light' ? accentTint.clone().lerp(new THREE.Color('#f7fbff'), 0.82) : glowTint.clone().lerp(new THREE.Color('#162840'), 0.76),
+      roughness: 0.28,
+      metalness: 0.36,
+      clearcoat: 0.24,
+    });
 
     const base = new THREE.Mesh(
       new THREE.CylinderGeometry(sector.radius, sector.radius + 3.2, 1.4, 48),
-      this.materials.platform,
+      sectorBaseMaterial,
     );
     base.position.set(sector.center.x, 0.7, sector.center.z);
     base.receiveShadow = true;
@@ -919,11 +1077,7 @@ export class GameWorld {
 
     const innerPad = new THREE.Mesh(
       new THREE.CylinderGeometry(sector.radius * 0.58, sector.radius * 0.62, 0.16, 40),
-      new THREE.MeshStandardMaterial({
-        color: this.theme === 'light' ? '#f7fbff' : '#14243b',
-        roughness: 0.32,
-        metalness: 0.38,
-      }),
+      sectorPlateMaterial,
     );
     innerPad.position.set(sector.center.x, 0.9, sector.center.z);
     group.add(innerPad);
@@ -941,10 +1095,11 @@ export class GameWorld {
       const radius = sector.radius * 0.48;
       const plate = new THREE.Mesh(
         new THREE.BoxGeometry(6.6, 0.2, 2.8),
-        new THREE.MeshStandardMaterial({
-          color: this.theme === 'light' ? '#edf5ff' : '#10243c',
-          roughness: 0.34,
-          metalness: 0.32,
+        new THREE.MeshPhysicalMaterial({
+          color: this.theme === 'light' ? glowTint.clone().lerp(new THREE.Color('#edf5ff'), 0.8) : accentTint.clone().lerp(new THREE.Color('#10243c'), 0.78),
+          roughness: 0.26,
+          metalness: 0.34,
+          clearcoat: 0.18,
         }),
       );
       plate.position.set(
@@ -1022,6 +1177,263 @@ export class GameWorld {
     group.add(sign);
 
     return group;
+  }
+
+  createSectionFrame(sector, layout) {
+    const group = new THREE.Group();
+    const center = layout.center ?? sector.center;
+    const width = layout.width;
+    const depth = layout.depth;
+    const gateSide = layout.gateSide;
+    const gateWidth = layout.gateWidth ?? 0;
+    const accentTint = new THREE.Color(sector.accent);
+    const glowTint = new THREE.Color(sector.glow);
+    const borderMaterial = new THREE.MeshStandardMaterial({
+      color: this.theme === 'light' ? glowTint.clone().lerp(new THREE.Color('#f4f8ff'), 0.55) : accentTint.clone().lerp(new THREE.Color('#0f2036'), 0.7),
+      roughness: 0.34,
+      metalness: 0.4,
+    });
+    const paneMaterial = new THREE.MeshBasicMaterial({
+      color: accentTint,
+      transparent: true,
+      opacity: this.theme === 'light' ? 0.14 : 0.22,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
+    const lineMaterial = new THREE.MeshBasicMaterial({
+      color: glowTint,
+      transparent: true,
+      opacity: this.theme === 'light' ? 0.52 : 0.84,
+      depthWrite: false,
+    });
+
+    const floorPlate = new THREE.Mesh(
+      new THREE.PlaneGeometry(width - 4, depth - 4),
+      new THREE.MeshStandardMaterial({
+        color: this.theme === 'light' ? glowTint.clone().lerp(new THREE.Color('#eef5ff'), 0.72) : accentTint.clone().lerp(new THREE.Color('#0d1b2d'), 0.78),
+        roughness: 0.72,
+        metalness: 0.14,
+        transparent: true,
+        opacity: this.theme === 'light' ? 0.62 : 0.7,
+      }),
+    );
+    floorPlate.rotation.x = -Math.PI / 2;
+    floorPlate.position.set(center.x, 0.08, center.z);
+    group.add(floorPlate);
+
+    const edgeConfigs = [
+      { axis: 'x', fixed: depth / 2, side: 'north', rotationY: 0 },
+      { axis: 'x', fixed: -depth / 2, side: 'south', rotationY: 0 },
+      { axis: 'z', fixed: -width / 2, side: 'west', rotationY: Math.PI / 2 },
+      { axis: 'z', fixed: width / 2, side: 'east', rotationY: Math.PI / 2 },
+    ];
+
+    edgeConfigs.forEach((edge) => {
+      const fullLength = edge.axis === 'x' ? width : depth;
+      const segments = edge.side === gateSide ? splitEdge(fullLength, gateWidth) : [{ center: 0, length: fullLength }];
+
+      segments.forEach((segment) => {
+        const border = new THREE.Mesh(
+          new THREE.BoxGeometry(edge.axis === 'x' ? segment.length : 1.8, 0.44, edge.axis === 'x' ? 1.8 : segment.length),
+          borderMaterial,
+        );
+        border.position.set(
+          center.x + (edge.axis === 'x' ? segment.center : edge.fixed),
+          0.26,
+          center.z + (edge.axis === 'x' ? edge.fixed : segment.center),
+        );
+        border.receiveShadow = true;
+        border.castShadow = true;
+        group.add(border);
+
+        const fence = new THREE.Mesh(
+          new THREE.PlaneGeometry(segment.length, 3.4),
+          paneMaterial,
+        );
+        fence.position.set(
+          center.x + (edge.axis === 'x' ? segment.center : edge.fixed),
+          1.9,
+          center.z + (edge.axis === 'x' ? edge.fixed : segment.center),
+        );
+        fence.rotation.y = edge.rotationY;
+        group.add(fence);
+
+        const line = new THREE.Mesh(
+          new THREE.PlaneGeometry(Math.max(2.2, segment.length - 1.1), 0.24),
+          lineMaterial,
+        );
+        line.rotation.x = -Math.PI / 2;
+        line.rotation.z = edge.rotationY;
+        line.position.set(
+          center.x + (edge.axis === 'x' ? segment.center : edge.fixed),
+          0.49,
+          center.z + (edge.axis === 'x' ? edge.fixed : segment.center),
+        );
+        group.add(line);
+      });
+    });
+
+    [
+      [center.x - width / 2, center.z - depth / 2],
+      [center.x + width / 2, center.z - depth / 2],
+      [center.x - width / 2, center.z + depth / 2],
+      [center.x + width / 2, center.z + depth / 2],
+    ].forEach(([x, z], index) => {
+      const corner = createColumn(this.materials.border, 4.8, 0.42);
+      corner.position.set(x, 2.4, z);
+      group.add(corner);
+
+      const cap = new THREE.Mesh(
+        new THREE.IcosahedronGeometry(0.58, 0),
+        this.materials.emissive(index % 2 === 0 ? sector.accent : sector.glow, this.theme === 'light' ? 0.24 : 0.72),
+      );
+      cap.position.set(x, 5.3, z);
+      group.add(cap);
+      this.orbiters.push({ object: cap, radius: 0, speed: 0.16 + index * 0.01 });
+    });
+
+    const gateDepth = layout.approachDepth ?? 12;
+    let gatePosition = { x: center.x, z: center.z };
+    let gateRotationY = 0;
+    let gateBridgeSize = { width: gateWidth + 6, depth: gateDepth };
+    if (gateSide === 'south') {
+      gatePosition = { x: center.x, z: center.z - depth / 2 - gateDepth / 2 + 1.8 };
+    } else if (gateSide === 'north') {
+      gatePosition = { x: center.x, z: center.z + depth / 2 + gateDepth / 2 - 1.8 };
+    } else if (gateSide === 'east') {
+      gatePosition = { x: center.x + width / 2 + gateDepth / 2 - 1.8, z: center.z };
+      gateRotationY = Math.PI / 2;
+      gateBridgeSize = { width: gateDepth, depth: gateWidth + 6 };
+    } else if (gateSide === 'west') {
+      gatePosition = { x: center.x - width / 2 - gateDepth / 2 + 1.8, z: center.z };
+      gateRotationY = Math.PI / 2;
+      gateBridgeSize = { width: gateDepth, depth: gateWidth + 6 };
+    }
+
+    const gateBridge = createBridge(this.materials.border, gateBridgeSize.width, gateBridgeSize.depth);
+    gateBridge.position.set(gatePosition.x, 0.82, gatePosition.z);
+    gateBridge.rotation.y = gateRotationY;
+    group.add(gateBridge);
+
+    const gateLine = new THREE.Mesh(
+      new THREE.BoxGeometry(gateRotationY ? gateBridgeSize.width * 0.72 : gateWidth * 0.72, 0.08, gateRotationY ? gateWidth * 0.72 : gateBridgeSize.depth * 0.72),
+      this.materials.emissive(sector.accent, this.theme === 'light' ? 0.24 : 0.68),
+    );
+    gateLine.position.set(gatePosition.x, 1.48, gatePosition.z);
+    gateLine.rotation.y = gateRotationY;
+    group.add(gateLine);
+
+    const gateSign = createDistrictSign(layout.gateLabel ?? 'ACCESS', sector.accent, gateWidth + 8, 3.1);
+    if (gateSide === 'south') {
+      gateSign.position.set(gatePosition.x, 4.8, gatePosition.z - gateDepth * 0.22);
+    } else if (gateSide === 'north') {
+      gateSign.position.set(gatePosition.x, 4.8, gatePosition.z + gateDepth * 0.22);
+      gateSign.rotation.y = Math.PI;
+    } else if (gateSide === 'east') {
+      gateSign.position.set(gatePosition.x + gateDepth * 0.22, 4.8, gatePosition.z);
+      gateSign.rotation.y = -Math.PI / 2;
+    } else {
+      gateSign.position.set(gatePosition.x - gateDepth * 0.22, 4.8, gatePosition.z);
+      gateSign.rotation.y = Math.PI / 2;
+    }
+    group.add(gateSign);
+
+    const ribCount = this.worldProfile.low ? 4 : 6;
+    for (let index = 0; index < ribCount; index += 1) {
+      const rib = new THREE.Mesh(
+        new THREE.BoxGeometry(width * 0.82, 0.16, 0.7),
+        new THREE.MeshStandardMaterial({
+          color: this.theme === 'light' ? '#f4f8ff' : '#11263d',
+          roughness: 0.38,
+          metalness: 0.28,
+        }),
+      );
+      const zOffset = -depth * 0.32 + (index / Math.max(1, ribCount - 1)) * depth * 0.64;
+      rib.position.set(center.x, 0.16, center.z + zOffset);
+      group.add(rib);
+    }
+
+    return group;
+  }
+
+  async buildDistrictFrames({ onProgress } = {}) {
+    const sectors = SECTORS.filter((sector) => SECTION_FRAME_LAYOUTS[sector.id]);
+
+    for (const [index, sector] of sectors.entries()) {
+      const frame = this.createSectionFrame(sector, SECTION_FRAME_LAYOUTS[sector.id]);
+      this.sectionFrames.set(sector.id, frame);
+      this.scene.add(frame);
+      onProgress?.((index + 1) / sectors.length);
+      await nextFrame();
+    }
+  }
+
+  addTileTrail(parent, options) {
+    const {
+      start,
+      end,
+      tileKeys = ['tileA', 'tileB', 'tileC', 'tileD'],
+      tint = '#46e0ff',
+      spacing = 2.2,
+      jitter = 0.3,
+      height = 1.02,
+      markerEvery = 5,
+    } = options;
+    const delta = new THREE.Vector2(end.x - start.x, end.z - start.z);
+    const distance = delta.length();
+    if (distance < spacing) return;
+
+    const direction = delta.clone().normalize();
+    const tangent = new THREE.Vector2(-direction.y, direction.x);
+    const count = Math.max(2, Math.floor(distance / spacing));
+    const rotationY = Math.atan2(direction.x, direction.y);
+
+    for (let index = 0; index <= count; index += 1) {
+      const t = index / count;
+      const base = new THREE.Vector2(
+        THREE.MathUtils.lerp(start.x, end.x, t),
+        THREE.MathUtils.lerp(start.z, end.z, t),
+      );
+      const offset = tangent.clone().multiplyScalar(((index % 2 === 0 ? 1 : -1) * jitter * (0.7 + (index % 3) * 0.18)));
+      const position = {
+        x: base.x + offset.x,
+        y: height,
+        z: base.y + offset.y,
+      };
+
+      this.addImportedInstance(parent, tileKeys[index % tileKeys.length], {
+        height: 1.02,
+        rotationY: rotationY + ((index % 4) - 1.5) * 0.04,
+        position,
+        tint,
+        tintStrength: 0.14,
+        emissiveBoost: 0.08,
+        shadow: { width: 2.8, depth: 2.8, opacity: 0.1 },
+      });
+
+      if (index % markerEvery === 0) {
+        const marker = new THREE.Mesh(
+          new THREE.PlaneGeometry(1.1, 0.24),
+          new THREE.MeshBasicMaterial({
+            color: tint,
+            transparent: true,
+            opacity: this.theme === 'light' ? 0.5 : 0.78,
+            depthWrite: false,
+          }),
+        );
+        marker.rotation.x = -Math.PI / 2;
+        marker.rotation.z = -rotationY;
+        marker.position.set(base.x, 0.24, base.y);
+        parent.add(marker);
+
+        const node = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.16, 0.22, 1.6, 6),
+          this.materials.emissive(tint, this.theme === 'light' ? 0.18 : 0.56),
+        );
+        node.position.set(base.x, 0.86, base.y);
+        parent.add(node);
+      }
+    }
   }
 
   async buildSectors({ onProgress } = {}) {
@@ -1111,17 +1523,72 @@ export class GameWorld {
           { x: 8.4, z: 21 },
         ];
         servicePosts.forEach((item, serviceIndex) => {
-          const post = createColumn(this.materials.border, 4.8, 0.46);
-          post.position.set(sector.center.x + item.x, 2.4, sector.center.z + item.z);
+          const post = createColumn(this.materials.border, 6.4, 0.52);
+          post.position.set(sector.center.x + item.x, 3.2, sector.center.z + item.z);
           group.add(post);
 
-          const halo = new THREE.Mesh(
-            new THREE.TorusGeometry(0.74, 0.08, 8, 24),
-            this.materials.emissive(serviceIndex % 2 === 0 ? '#5edfff' : '#72f1d5', this.theme === 'light' ? 0.28 : 0.72),
+          // Double ring stack for more visual presence
+          [4.2, 6.2].forEach((yPos, ringIndex) => {
+            const halo = new THREE.Mesh(
+              new THREE.TorusGeometry(0.88 - ringIndex * 0.18, 0.1, 8, 24),
+              this.materials.emissive(serviceIndex % 2 === 0 ? '#5edfff' : '#72f1d5', this.theme === 'light' ? 0.28 : 0.86),
+            );
+            halo.rotation.x = Math.PI / 2;
+            halo.position.set(sector.center.x + item.x, yPos, sector.center.z + item.z);
+            group.add(halo);
+          });
+        });
+
+        // Foreground arch — frames the boot relay from camera POV
+        [-10, 10].forEach((xSide) => {
+          const archPillar = createColumn(this.materials.border, 8.2, 0.44);
+          archPillar.position.set(sector.center.x + xSide, 4.1, sector.center.z - 10);
+          group.add(archPillar);
+
+          const archCap = new THREE.Mesh(
+            new THREE.OctahedronGeometry(0.7, 0),
+            this.materials.emissive('#5edfff', this.theme === 'light' ? 0.44 : 1.08),
           );
-          halo.rotation.x = Math.PI / 2;
-          halo.position.set(sector.center.x + item.x, 4.9, sector.center.z + item.z);
-          group.add(halo);
+          archCap.position.set(sector.center.x + xSide, 8.7, sector.center.z - 10);
+          group.add(archCap);
+          this.orbiters.push({ object: archCap, radius: 0, speed: 0.24 });
+        });
+
+        const archBeam = new THREE.Mesh(
+          new THREE.BoxGeometry(20.4, 0.52, 0.88),
+          this.materials.emissive('#4cd6ff', this.theme === 'light' ? 0.28 : 0.76),
+        );
+        archBeam.position.set(sector.center.x, 8.4, sector.center.z - 10);
+        group.add(archBeam);
+
+        // Ground scan lines — emissive grid sweeping the plaza floor
+        [-12, -6, 0, 6, 12].forEach((xLine) => {
+          const scanLine = new THREE.Mesh(
+            new THREE.PlaneGeometry(0.18, 38),
+            new THREE.MeshBasicMaterial({
+              color: '#3cf5d2',
+              transparent: true,
+              opacity: this.theme === 'light' ? 0.1 : 0.18,
+              depthWrite: false,
+            }),
+          );
+          scanLine.rotation.x = -Math.PI / 2;
+          scanLine.position.set(sector.center.x + xLine, 0.12, sector.center.z);
+          group.add(scanLine);
+        });
+        [-16, -8, 0, 8, 16].forEach((zLine) => {
+          const scanLine = new THREE.Mesh(
+            new THREE.PlaneGeometry(38, 0.18),
+            new THREE.MeshBasicMaterial({
+              color: '#3cf5d2',
+              transparent: true,
+              opacity: this.theme === 'light' ? 0.08 : 0.14,
+              depthWrite: false,
+            }),
+          );
+          scanLine.rotation.x = -Math.PI / 2;
+          scanLine.position.set(sector.center.x, 0.12, sector.center.z + zLine);
+          group.add(scanLine);
         });
 
         [
@@ -1130,15 +1597,19 @@ export class GameWorld {
           { x: 10, z: -8, tile: 'tileB', tint: '#79dfff', rot: 0.28 },
           { x: 13, z: 9, tile: 'tileE', tint: '#8cf4ff', rot: -0.08 },
           { x: 0, z: 17, tile: 'tileA', tint: '#72f1d5', rot: 0 },
+          { x: -17, z: 2, tile: 'tileD', tint: '#4fd6ff', rot: 0.42 },
+          { x: 16, z: -2, tile: 'tileC', tint: '#68f4e6', rot: -0.34 },
+          { x: -5, z: -14, tile: 'tileE', tint: '#8ce0ff', rot: 0.18 },
+          { x: 6, z: 13, tile: 'tileA', tint: '#5cf5d5', rot: -0.22 },
         ].forEach((item) => {
           this.addImportedInstance(group, item.tile, {
-            height: 1.18,
+            height: 1.42,
             rotationY: item.rot,
             position: { x: sector.center.x + item.x, y: 1.04, z: sector.center.z + item.z },
             tint: item.tint,
-            tintStrength: 0.14,
-            emissiveBoost: 0.08,
-            shadow: { width: 2.8, depth: 2.8, opacity: 0.12 },
+            tintStrength: 0.18,
+            emissiveBoost: 0.12,
+            shadow: { width: 3.2, depth: 3.2, opacity: 0.14 },
           });
         });
 
@@ -1148,6 +1619,60 @@ export class GameWorld {
         );
         bayBeam.position.set(sector.center.x, 4.6, sector.center.z + 16.8);
         group.add(bayBeam);
+
+        // Central obelisk — offset from spawn so it frames without blocking
+        // Positioned at the north side of the plaza (behind the spawn dock, visible from camera)
+        const obeliskX = sector.center.x;
+        const obeliskZ = sector.center.z - 16;  // behind spawn toward inner sector
+
+        const obeliskBase = new THREE.Mesh(
+          new THREE.CylinderGeometry(2.4, 3.6, 1.2, 8),
+          this.materials.border,
+        );
+        obeliskBase.position.set(obeliskX, 0.9, obeliskZ);
+        obeliskBase.castShadow = true;
+        group.add(obeliskBase);
+
+        const obeliskShaft = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.72, 1.4, 18, 8),
+          new THREE.MeshStandardMaterial({
+            color: this.theme === 'light' ? '#e8f2ff' : '#142238',
+            roughness: 0.28,
+            metalness: 0.58,
+          }),
+        );
+        obeliskShaft.position.set(obeliskX, 10, obeliskZ);
+        obeliskShaft.castShadow = true;
+        group.add(obeliskShaft);
+
+        // Stacked emissive rings
+        [3.2, 7.4, 12.8].forEach((yPos, ringIdx) => {
+          const band = new THREE.Mesh(
+            new THREE.TorusGeometry(1.1 - ringIdx * 0.1, 0.16, 8, 24),
+            this.materials.emissive(ringIdx % 2 === 0 ? '#5edfff' : '#72f1d5', this.theme === 'light' ? 0.36 : 0.98),
+          );
+          band.rotation.x = Math.PI / 2;
+          band.position.set(obeliskX, yPos, obeliskZ);
+          group.add(band);
+          this.dockRings.push(band);
+        });
+
+        const obeliskApex = new THREE.Mesh(
+          new THREE.OctahedronGeometry(1.8, 0),
+          this.materials.emissive('#7af0ff', this.theme === 'light' ? 0.58 : 1.5),
+        );
+        obeliskApex.position.set(obeliskX, 20.4, obeliskZ);
+        group.add(obeliskApex);
+        this.orbiters.push({ object: obeliskApex, radius: 0, speed: 0.28 });
+
+        const apexHalo = new THREE.Mesh(
+          new THREE.TorusGeometry(3.2, 0.18, 8, 36),
+          this.materials.emissive('#46e0ff', this.theme === 'light' ? 0.24 : 0.74),
+        );
+        apexHalo.rotation.x = Math.PI / 2;
+        apexHalo.position.set(obeliskX, 20.0, obeliskZ);
+        group.add(apexHalo);
+        this.dockRings.push(apexHalo);
       }
 
       if (sector.id === 'firewall-sector') {
@@ -1397,6 +1922,39 @@ export class GameWorld {
         });
       }
 
+      // Secondary sector obelisk for all non-boot sectors
+      if (sector.id !== 'boot-relay') {
+        const spireShaft = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.52, 1.1, 11, 6),
+          new THREE.MeshStandardMaterial({
+            color: this.theme === 'light' ? '#e8f2ff' : '#101e30',
+            roughness: 0.32,
+            metalness: 0.56,
+          }),
+        );
+        spireShaft.position.set(sector.center.x, 6, sector.center.z);
+        group.add(spireShaft);
+
+        [2.4, 5.6, 9.8].forEach((yPos, ringIdx) => {
+          const band = new THREE.Mesh(
+            new THREE.TorusGeometry(0.78 - ringIdx * 0.1, 0.13, 8, 20),
+            this.materials.emissive(ringIdx % 2 === 0 ? sector.accent : sector.glow, this.theme === 'light' ? 0.32 : 0.88),
+          );
+          band.rotation.x = Math.PI / 2;
+          band.position.set(sector.center.x, yPos, sector.center.z);
+          group.add(band);
+          this.dockRings.push(band);
+        });
+
+        const spireApex = new THREE.Mesh(
+          new THREE.OctahedronGeometry(1.2, 0),
+          this.materials.emissive(sector.accent, this.theme === 'light' ? 0.44 : 1.2),
+        );
+        spireApex.position.set(sector.center.x, 12.4, sector.center.z);
+        group.add(spireApex);
+        this.orbiters.push({ object: spireApex, radius: 0, speed: 0.22 });
+      }
+
       this.sectorMeshes.set(sector.id, group);
       this.scene.add(group);
       onProgress?.((index + 1) / SECTORS.length);
@@ -1406,11 +1964,25 @@ export class GameWorld {
 
   async buildCorridors({ onProgress } = {}) {
     const corridors = [
-      { x: -39, z: -6, width: 34, depth: 10, rotation: 0.1, tile: 'tileD' },
-      { x: 42, z: -5, width: 34, depth: 10, rotation: -0.1, tile: 'tileD' },
-      { x: 0, z: 46, width: 10, depth: 44, rotation: 0, tile: 'tileE' },
-      { x: 0, z: -48, width: 10, depth: 44, rotation: 0, tile: 'tileE' },
+      {
+        x: -39, z: -6, width: 34, depth: 10, rotation: 0.1, tile: 'tileD',
+        trail: CORRIDOR_TRAILS.find((item) => item.id === 'firewall-link'),
+      },
+      {
+        x: 42, z: -5, width: 34, depth: 10, rotation: -0.1, tile: 'tileD',
+        trail: CORRIDOR_TRAILS.find((item) => item.id === 'routing-link'),
+      },
+      {
+        x: 0, z: 46, width: 10, depth: 44, rotation: 0, tile: 'tileE',
+        trail: CORRIDOR_TRAILS.find((item) => item.id === 'inference-link'),
+      },
+      {
+        x: 0, z: -48, width: 10, depth: 44, rotation: 0, tile: 'tileE',
+        trail: CORRIDOR_TRAILS.find((item) => item.id === 'core-link'),
+      },
     ];
+
+    this.addTileTrail(this.scene, CORRIDOR_TRAILS.find((item) => item.id === 'boot-spine'));
 
     for (const [index, corridor] of corridors.entries()) {
       const mesh = createBridge(this.materials.border, corridor.width, corridor.depth);
@@ -1418,7 +1990,7 @@ export class GameWorld {
       mesh.rotation.y = corridor.rotation;
       this.scene.add(mesh);
 
-       const alongX = corridor.depth > corridor.width;
+      const alongX = corridor.depth > corridor.width;
       const strip = new THREE.Mesh(
         new THREE.BoxGeometry(
           alongX ? 1.4 : corridor.width * 0.78,
@@ -1467,6 +2039,33 @@ export class GameWorld {
           emissiveBoost: 0.04,
         });
       }
+
+      if (corridor.trail) {
+        this.addTileTrail(this.scene, corridor.trail);
+      }
+
+      const label = createDistrictSign(
+        corridor.trail?.id === 'firewall-link'
+          ? 'FIREWALL PATH'
+          : corridor.trail?.id === 'routing-link'
+            ? 'ROUTING PATH'
+            : corridor.trail?.id === 'inference-link'
+              ? 'MODEL SPINE'
+              : 'CORE SPINE',
+        corridor.trail?.tint ?? '#46e0ff',
+        corridor.depth > corridor.width ? 11.5 : 12.8,
+        2.9,
+      );
+      label.position.set(
+        corridor.x,
+        4.2,
+        corridor.z + (alongX ? -corridor.depth * 0.22 : -4.2),
+      );
+      if (alongX) {
+        label.rotation.y = Math.PI;
+      }
+      this.scene.add(label);
+
       onProgress?.((index + 1) / corridors.length);
       await nextFrame();
     }
@@ -1653,40 +2252,100 @@ export class GameWorld {
     });
 
     sceneryPhases.push(() => {
+      const towerColors = ['#5edfff', '#9b8cff', '#72f1d5', '#ff9f82', '#ffd166', '#85d5ff'];
       perimeter.forEach(([x, z], index) => {
-        const height = 8 + (index % 5) * 2.4;
-        const tower = createColumn(this.materials.border, height, 0.9 + (index % 3) * 0.18);
+        const height = 12 + (index % 6) * 3.8;
+        const radius = 0.72 + (index % 3) * 0.22;
+        const tower = createColumn(this.materials.border, height, radius);
         tower.position.set(x, height / 2, z);
         this.scene.add(tower);
 
-        const top = new THREE.Mesh(
-          new THREE.IcosahedronGeometry(1 + (index % 2) * 0.3),
-          this.materials.emissive(index % 2 === 0 ? '#5edfff' : '#9b8cff', 0.78),
+        // Mid-height platform shelf
+        const shelf = new THREE.Mesh(
+          new THREE.CylinderGeometry(radius * 2.8, radius * 2.4, 0.36, 8),
+          this.materials.border,
         );
-        top.position.set(x, height + 0.6, z);
+        shelf.position.set(x, height * 0.48, z);
+        this.scene.add(shelf);
+
+        // Emissive panel face on tower
+        const panel = new THREE.Mesh(
+          new THREE.PlaneGeometry(radius * 1.8, height * 0.28),
+          this.materials.emissive(towerColors[index % towerColors.length], this.theme === 'light' ? 0.18 : 0.44),
+        );
+        panel.position.set(x + radius * 1.02, height * 0.56, z);
+        panel.rotation.y = Math.PI / 2;
+        this.scene.add(panel);
+
+        // Top cap — larger, more angular
+        const topAccent = towerColors[index % towerColors.length];
+        const top = new THREE.Mesh(
+          new THREE.OctahedronGeometry(1.2 + (index % 3) * 0.4, 0),
+          this.materials.emissive(topAccent, this.theme === 'light' ? 0.38 : 0.92),
+        );
+        top.position.set(x, height + 1.4, z);
         this.scene.add(top);
-        this.orbiters.push({ object: top, radius: 0, speed: 0.2 + (index % 4) * 0.05 });
+        this.orbiters.push({ object: top, radius: 0, speed: 0.18 + (index % 4) * 0.04 });
+
+        // Halo ring at top
+        const halo = new THREE.Mesh(
+          new THREE.TorusGeometry(radius * 2.2, 0.14, 8, 24),
+          this.materials.emissive(topAccent, this.theme === 'light' ? 0.22 : 0.62),
+        );
+        halo.position.set(x, height + 0.2, z);
+        halo.rotation.x = Math.PI / 2;
+        this.scene.add(halo);
 
         if (index < perimeter.length - 1) {
           const [nextX, nextZ] = perimeter[index + 1];
           const distance = Math.hypot(nextX - x, nextZ - z);
-          if (distance < 72) {
+          if (distance < 80) {
+            // High span between towers
+            const spanHeight = Math.min(height, 12 + (index % 3) * 2.4) - 1.8;
             const span = new THREE.Mesh(
-              new THREE.BoxGeometry(distance, 0.54, 2.4),
+              new THREE.BoxGeometry(distance, 0.54, 2.2),
               new THREE.MeshStandardMaterial({
                 color: this.theme === 'light' ? '#d9e7fb' : '#11253c',
-                roughness: 0.6,
-                metalness: 0.22,
+                roughness: 0.54,
+                metalness: 0.28,
               }),
             );
-            span.position.set((x + nextX) / 2, 4.4, (z + nextZ) / 2);
-            span.lookAt(nextX, 4.4, nextZ);
+            span.position.set((x + nextX) / 2, spanHeight, (z + nextZ) / 2);
+            span.lookAt(nextX, spanHeight, nextZ);
             span.rotateY(Math.PI / 2);
             span.castShadow = true;
-            span.receiveShadow = true;
             this.scene.add(span);
+
+            // Emissive wire along span
+            const wire = new THREE.Mesh(
+              new THREE.BoxGeometry(distance * 0.96, 0.1, 0.1),
+              this.materials.emissive(topAccent, this.theme === 'light' ? 0.14 : 0.48),
+            );
+            wire.position.set((x + nextX) / 2, spanHeight + 0.34, (z + nextZ) / 2);
+            wire.lookAt(nextX, spanHeight + 0.34, nextZ);
+            wire.rotateY(Math.PI / 2);
+            this.scene.add(wire);
           }
         }
+      });
+
+      // Second inner ring — mid-distance structures for depth layering
+      const innerRing = [
+        [-88, -38], [-84, 12], [-72, 52], [-42, 82], [0, 96], [48, 80], [82, 44], [88, -8], [74, -68], [28, -94], [-28, -92], [-72, -62],
+      ];
+      innerRing.forEach(([x, z], index) => {
+        const h = 5.8 + (index % 4) * 1.8;
+        const col = createColumn(this.materials.neutral, h, 0.44 + (index % 2) * 0.12);
+        col.position.set(x, h / 2, z);
+        this.scene.add(col);
+
+        const accent = towerColors[(index + 2) % towerColors.length];
+        const cap = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.9, 1.1, 0.28, 6),
+          this.materials.emissive(accent, this.theme === 'light' ? 0.24 : 0.68),
+        );
+        cap.position.set(x, h + 0.22, z);
+        this.scene.add(cap);
       });
     });
 
@@ -1759,6 +2418,50 @@ export class GameWorld {
         line.rotation.z = -angle;
         this.scene.add(line);
       }
+    });
+
+    // Intersection chevrons — floor marking arrows at corridor entry/exit
+    sceneryPhases.push(() => {
+      const chevronEntries = [
+        { x: -16, z: -6, angle: Math.PI / 2, color: '#ff8758' },   // firewall entry
+        { x: 16,  z: -6, angle: -Math.PI / 2, color: '#5cc7ff' },  // routing entry
+        { x: 0,   z: 18, angle: Math.PI, color: '#c391ff' },        // inference entry
+        { x: 0,   z: -18, angle: 0, color: '#ffd166' },             // core entry
+        { x: -60, z: -10, angle: -Math.PI / 2, color: '#ff8758' },  // firewall exit
+        { x: 62,  z: -10, angle: Math.PI / 2, color: '#5cc7ff' },  // routing exit
+        { x: 0,   z: 64, angle: 0, color: '#c391ff' },              // inference exit
+        { x: 0,   z: -66, angle: Math.PI, color: '#ffd166' },       // core exit
+      ];
+      const chevronMat = (color) => new THREE.MeshBasicMaterial({
+        color,
+        transparent: true,
+        opacity: this.theme === 'light' ? 0.44 : 0.72,
+        depthWrite: false,
+      });
+
+      chevronEntries.forEach(({ x, z, angle, color }) => {
+        const mat = chevronMat(color);
+        // Two V-shaped stripes
+        [-2.4, 0, 2.4].forEach((offset) => {
+          const stripe = new THREE.Mesh(new THREE.PlaneGeometry(0.48, 2.6), mat);
+          stripe.rotation.x = -Math.PI / 2;
+          stripe.rotation.z = angle + (offset !== 0 ? Math.sign(offset) * 0.38 : 0);
+          stripe.position.set(
+            x + Math.sin(angle) * offset * 0.5,
+            0.18,
+            z + Math.cos(angle) * offset * 0.5,
+          );
+          this.scene.add(stripe);
+        });
+
+        // Accent dot at tip
+        const dot = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.44, 0.44, 0.1, 8),
+          this.materials.emissive(color, this.theme === 'light' ? 0.36 : 0.86),
+        );
+        dot.position.set(x, 0.1, z);
+        this.scene.add(dot);
+      });
     });
 
     districts.forEach((district) => {
@@ -1865,15 +2568,27 @@ export class GameWorld {
     this.theme = theme;
     const palette = getPalette(theme);
     this.scene.background = new THREE.Color(palette.background);
-    this.scene.fog = new THREE.Fog(palette.fog, 76, 260);
-    if (this.ambient) this.ambient.intensity = theme === 'light' ? 1.65 : 0.6;
+    this.scene.fog = new THREE.Fog(palette.fog, 58, 220);
+    if (this.ambient) {
+      this.ambient.intensity = theme === 'light' ? 1.72 : 0.92;
+      this.ambient.color.set(theme === 'light' ? '#d4e7ff' : '#c8dbff');
+    }
     if (this.sun) {
-      this.sun.intensity = theme === 'light' ? 1.8 : 1.22;
-      this.sun.color.set(theme === 'light' ? '#8aa5ff' : '#9cc8ff');
+      this.sun.intensity = theme === 'light' ? 1.86 : 1.68;
+      this.sun.color.set(theme === 'light' ? '#8aa5ff' : '#a9cbff');
+    }
+    if (this.moonLight) {
+      this.moonLight.intensity = theme === 'light' ? 0 : 0.42;
     }
     if (this.rimLight) {
-      this.rimLight.intensity = theme === 'light' ? 18 : 38;
+      this.rimLight.intensity = theme === 'light' ? 22 : 58;
       this.rimLight.color.set(theme === 'light' ? '#3d8bff' : '#4ce6ff');
+    }
+    if (this.sectorAccentLights) {
+      this.sectorAccentLights.forEach((light, index) => {
+        light.intensity = theme === 'light' ? 2.8 : 5.2;
+        light.color.set(SECTORS[index]?.accent ?? '#46e0ff');
+      });
     }
     if (this.focusBeam?.material) {
       this.focusBeam.material.color.set(theme === 'light' ? '#1476db' : '#46e0ff');
@@ -1891,11 +2606,11 @@ export class GameWorld {
         object,
         tint,
         theme === 'light'
-          ? Math.max(0.08, (object.userData.themeTintStrength ?? 0.16) * 0.72)
-          : object.userData.themeTintStrength ?? 0.16,
+          ? Math.max(0.14, (object.userData.themeTintStrength ?? 0.24) * 0.8)
+          : object.userData.themeTintStrength ?? 0.24,
         theme === 'light'
-          ? Math.max(0.04, (object.userData.themeEmissiveBoost ?? 0.1) * 0.62)
-          : object.userData.themeEmissiveBoost ?? 0.1,
+          ? Math.max(0.08, (object.userData.themeEmissiveBoost ?? 0.14) * 0.72)
+          : object.userData.themeEmissiveBoost ?? 0.14,
       );
     });
     this.groundShadows.forEach((shadow) => {

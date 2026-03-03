@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { clampToWorld, normalizeInput } from '../systems/collision.js';
+import { clampToWorld } from '../systems/collision.js';
 import { instantiateAsset } from '../world/assets.js';
 
 function clampUnit(value) {
@@ -62,6 +62,84 @@ function createFallbackBrakeLight() {
       roughness: 0.28,
     }),
   );
+}
+
+function createHeadlightAssembly(color = '#9af0ff') {
+  const group = new THREE.Group();
+  const lensGeo = new THREE.BoxGeometry(0.48, 0.18, 0.12);
+  const lensMat = new THREE.MeshStandardMaterial({
+    color,
+    emissive: color,
+    emissiveIntensity: 1.6,
+    metalness: 0.12,
+    roughness: 0.08,
+  });
+  [-0.52, 0.52].forEach((xOffset) => {
+    const lens = new THREE.Mesh(lensGeo, lensMat);
+    lens.position.set(xOffset, 0, 0);
+    group.add(lens);
+  });
+  return { group, material: lensMat };
+}
+
+function createVehicleAccentKit({
+  width = 2.1,
+  length = 4.4,
+  roofY = 1.3,
+  frontZ = 2,
+  rearZ = -2,
+  bodyColor = '#3f7dff',
+  accentColor = '#7eeeff',
+} = {}) {
+  const group = new THREE.Group();
+  const shellMaterial = new THREE.MeshPhysicalMaterial({
+    color: bodyColor,
+    emissive: bodyColor,
+    emissiveIntensity: 0.12,
+    metalness: 0.72,
+    roughness: 0.18,
+    clearcoat: 0.82,
+    clearcoatRoughness: 0.14,
+  });
+  const accentMaterial = new THREE.MeshStandardMaterial({
+    color: accentColor,
+    emissive: accentColor,
+    emissiveIntensity: 0.86,
+    metalness: 0.36,
+    roughness: 0.12,
+  });
+
+  const roofFin = new THREE.Mesh(
+    new THREE.BoxGeometry(width * 0.44, 0.12, length * 0.34),
+    shellMaterial,
+  );
+  roofFin.position.set(0, roofY + 0.34, -length * 0.06);
+  roofFin.castShadow = true;
+  roofFin.receiveShadow = true;
+
+  const hoodStrip = new THREE.Mesh(
+    new THREE.BoxGeometry(width * 0.52, 0.08, 0.16),
+    accentMaterial,
+  );
+  hoodStrip.position.set(0, roofY - 0.18, frontZ - 0.12);
+
+  const sideBlades = [-1, 1].map((side) => {
+    const blade = new THREE.Mesh(
+      new THREE.BoxGeometry(0.08, 0.12, length * 0.7),
+      accentMaterial,
+    );
+    blade.position.set(side * (width * 0.44), 0.58, 0.08);
+    return blade;
+  });
+
+  const diffuser = new THREE.Mesh(
+    new THREE.BoxGeometry(width * 0.56, 0.1, 0.2),
+    accentMaterial,
+  );
+  diffuser.position.set(0, 0.52, rearZ + 0.14);
+
+  group.add(roofFin, hoodStrip, diffuser, ...sideBlades);
+  return group;
 }
 
 function measureRenderableAsset(asset) {
@@ -128,39 +206,90 @@ function resolveVehicleAssetSet(assets = null) {
 
 function createHeroFallbackVehicle(materials) {
   const group = new THREE.Group();
+  const bodyMaterial = new THREE.MeshPhysicalMaterial({
+    color: '#5aa7ff',
+    emissive: '#164f9a',
+    emissiveIntensity: 0.24,
+    metalness: 0.76,
+    roughness: 0.16,
+    clearcoat: 0.84,
+    clearcoatRoughness: 0.18,
+  });
+  const panelMaterial = new THREE.MeshPhysicalMaterial({
+    color: '#d9f3ff',
+    emissive: '#4be5ff',
+    emissiveIntensity: 0.18,
+    metalness: 0.58,
+    roughness: 0.22,
+    clearcoat: 0.58,
+    clearcoatRoughness: 0.12,
+  });
   const chassis = new THREE.Mesh(
-    new THREE.BoxGeometry(2.3, 0.72, 4.4),
-    new THREE.MeshStandardMaterial({
-      color: '#b9d5ff',
-      emissive: '#46d7ff',
-      emissiveIntensity: 0.16,
-      metalness: 0.62,
-      roughness: 0.24,
-    }),
+    new THREE.BoxGeometry(2.28, 0.68, 4.56),
+    bodyMaterial,
   );
-  chassis.position.y = 0.76;
+  chassis.position.y = 0.74;
   chassis.castShadow = true;
   chassis.receiveShadow = true;
 
+  const hood = new THREE.Mesh(
+    new THREE.BoxGeometry(1.78, 0.18, 1.02),
+    panelMaterial,
+  );
+  hood.position.set(0, 0.96, 1.74);
+  hood.castShadow = true;
+  hood.receiveShadow = true;
+
   const cabin = new THREE.Mesh(
-    new THREE.BoxGeometry(1.54, 0.86, 1.9),
+    new THREE.BoxGeometry(1.5, 0.88, 1.96),
     materials.glass.clone(),
   );
-  cabin.position.set(0, 1.3, -0.16);
+  cabin.material.color.set('#8bc0ff');
+  cabin.position.set(0, 1.3, -0.22);
   cabin.castShadow = true;
   cabin.receiveShadow = true;
 
   const nose = new THREE.Mesh(
-    new THREE.BoxGeometry(1.8, 0.18, 0.86),
+    new THREE.BoxGeometry(1.82, 0.16, 0.74),
     materials.emissive('#7de9ff', 1.08),
   );
-  nose.position.set(0, 0.88, 2.16);
+  nose.position.set(0, 0.88, 2.26);
+
+  const roofPanel = new THREE.Mesh(
+    new THREE.BoxGeometry(1.24, 0.08, 1.34),
+    new THREE.MeshPhysicalMaterial({
+      color: '#f3fbff',
+      emissive: '#84dfff',
+      emissiveIntensity: 0.12,
+      metalness: 0.44,
+      roughness: 0.24,
+      clearcoat: 0.72,
+    }),
+  );
+  roofPanel.position.set(0, 1.78, -0.24);
+
+  const sideRails = [-1, 1].map((side) => {
+    const rail = new THREE.Mesh(
+      new THREE.BoxGeometry(0.12, 0.14, 3.52),
+      new THREE.MeshStandardMaterial({
+        color: '#153356',
+        emissive: '#1f6eb5',
+        emissiveIntensity: 0.08,
+        metalness: 0.64,
+        roughness: 0.22,
+      }),
+    );
+    rail.position.set(side * 1.02, 0.5, 0.12);
+    rail.castShadow = true;
+    rail.receiveShadow = true;
+    return rail;
+  });
 
   const rearBar = createFallbackBrakeLight();
   rearBar.scale.set(1.16, 1, 1);
   rearBar.position.set(0, 0.76, -2.22);
 
-  group.add(chassis, cabin, nose, rearBar);
+  group.add(chassis, hood, cabin, nose, roofPanel, rearBar, ...sideRails);
   return { group, brake: rearBar };
 }
 
@@ -169,11 +298,11 @@ function deriveVehicleLayout(bounds) {
   return {
     wheelHeight: Math.max(0.72, Math.min(1.05, size.y * 0.44)),
     wheelX: Math.max(0.68, size.x * 0.34),
-    wheelFrontZ: -Math.max(0.84, size.z * 0.28),
-    wheelRearZ: Math.max(0.92, size.z * 0.29),
-    wheelY: Math.max(0.28, size.y * 0.17),
+    wheelFrontZ: Math.max(0.92, size.z * 0.29),
+    wheelRearZ: -Math.max(0.88, size.z * 0.27),
+    wheelY: Math.max(0.36, size.y * 0.19),
     antennaPosition: new THREE.Vector3(size.x * 0.03, Math.max(1.08, size.y * 0.84), -size.z * 0.3),
-    brakePosition: new THREE.Vector3(0, Math.max(0.38, size.y * 0.34), Math.max(1.02, size.z * 0.47)),
+    brakePosition: new THREE.Vector3(0, Math.max(0.38, size.y * 0.34), -Math.max(1.02, size.z * 0.47)),
     shadowWidth: Math.max(2.8, size.x * 1.46),
     shadowDepth: Math.max(4.4, size.z * 1.24),
   };
@@ -208,7 +337,7 @@ export function computeVehicleFeedback({
 
   return {
     normalizedSpeed,
-    bodyOffset: Math.sin(bodyFloat) * Math.min(0.12, speed * 0.004),
+    bodyOffset: Math.abs(Math.sin(bodyFloat)) * Math.min(0.12, speed * 0.004),
     roll: velocityX * 0.004 - steering * (0.035 + normalizedSpeed * 0.02),
     pitch: -velocityY * 0.0015 - normalizedSpeed * 0.035 - boostAmount * 0.028,
     steerAngle: steering * (0.1 + normalizedSpeed * 0.3),
@@ -227,11 +356,14 @@ export class VehicleEntity {
   constructor(materials, assets = null) {
     this.group = new THREE.Group();
     this.velocity = new THREE.Vector2();
-    this.heading = 0;
+    this.heading = Math.PI;
     this.speed = 0;
+    this.forwardSpeed = 0;
     this.maxSpeed = 34;
+    this.maxReverseSpeed = 14;
     this.acceleration = 48;
-    this.drag = 8;
+    this.drag = 7.2;
+    this.turnRate = 2.8;
     this.bodyFloat = 0;
     this.wheels = [];
     this.antenna = null;
@@ -252,12 +384,12 @@ export class VehicleEntity {
     const vehicleAssets = resolveVehicleAssetSet(assets);
 
     if (vehicleAssets) {
-      const chassisTint = vehicleAssets.id === 'default' ? '#9ee6ff' : '#3cf5d2';
+      const chassisTint = vehicleAssets.id === 'default' ? '#5ea2ff' : '#3cf5d2';
       const chassis = instantiateAsset(vehicleAssets.chassis, {
         height: vehicleAssets.id === 'default' ? 2.45 : 2.18,
         tint: chassisTint,
-        tintStrength: vehicleAssets.id === 'default' ? 0.08 : 0.16,
-        emissiveBoost: vehicleAssets.id === 'default' ? 0.08 : 0.14,
+        tintStrength: vehicleAssets.id === 'default' ? 0.24 : 0.2,
+        emissiveBoost: vehicleAssets.id === 'default' ? 0.2 : 0.18,
       });
       chassis.position.y = 0.08;
       const chassisBounds = new THREE.Box3().setFromObject(chassis);
@@ -266,9 +398,28 @@ export class VehicleEntity {
       this.accentMaterials.push(...collectEmissiveMaterials(chassis));
       this.group.add(chassis);
 
+      const accentKit = createVehicleAccentKit({
+        width: layout.shadowWidth * 0.54,
+        length: layout.shadowDepth * 0.72,
+        roofY: Math.max(1.02, chassisBounds.max.y * 0.62),
+        frontZ: layout.wheelFrontZ + 0.7,
+        rearZ: layout.wheelRearZ - 0.56,
+        bodyColor: vehicleAssets.id === 'default' ? '#4f82ff' : '#18b7a5',
+        accentColor: vehicleAssets.id === 'default' ? '#8ef1ff' : '#72ffe8',
+      });
+      this.group.add(accentKit);
+      this.accentMaterials.push(...collectEmissiveMaterials(accentKit));
+
+      // Headlights — positioned at the front face of the chassis bounds
+      const headlightColor = vehicleAssets.id === 'default' ? '#9af0ff' : '#4dffd8';
+      const headlights = createHeadlightAssembly(headlightColor);
+      headlights.group.position.set(0, Math.max(0.72, chassisBounds.max.y * 0.38), -chassisBounds.min.z + 0.06);
+      this.group.add(headlights.group);
+      this.accentMaterials.push({ material: headlights.material, baseIntensity: 1.6 });
+
       const canopyHalo = new THREE.Mesh(
         new THREE.TorusGeometry(Math.max(0.42, layout.shadowWidth * 0.18), 0.06, 8, 28),
-        materials.emissive(vehicleAssets.id === 'default' ? '#7be3ff' : '#3cf5d2', 0.82),
+        materials.emissive(vehicleAssets.id === 'default' ? '#7be3ff' : '#3cf5d2', 1.06),
       );
       canopyHalo.rotation.x = Math.PI / 2;
       canopyHalo.position.set(0, Math.max(0.96, chassisBounds.max.y * 0.64), -layout.brakePosition.z * 0.18);
@@ -325,6 +476,12 @@ export class VehicleEntity {
       this.accentMaterials.push(...collectEmissiveMaterials(fallback.group));
       this.group.add(fallback.group);
 
+      // Headlights on fallback vehicle
+      const fallbackHeadlights = createHeadlightAssembly('#9af0ff');
+      fallbackHeadlights.group.position.set(0, 0.88, 2.28);
+      this.group.add(fallbackHeadlights.group);
+      this.accentMaterials.push({ material: fallbackHeadlights.material, baseIntensity: 1.6 });
+
       this.antenna = createFallbackAntenna();
       this.antenna.position.copy(layout.antennaPosition);
       this.group.add(this.antenna);
@@ -356,7 +513,18 @@ export class VehicleEntity {
         return wheel;
       });
     }
+    // Hero fill light — parented to vehicle group, moves for free
+    this.heroLight = new THREE.PointLight('#5ae8ff', 2.8, 22, 1.8);
+    this.heroLight.position.set(0, 3.2, 0);
+    this.group.add(this.heroLight);
+
+    // Soft ground bounce — warm accent below
+    this.groundFill = new THREE.PointLight('#ffe580', 1.1, 14, 2.2);
+    this.groundFill.position.set(0, -0.4, 0);
+    this.group.add(this.groundFill);
+
     this.group.position.set(0, 0, 0);
+    this.group.rotation.y = this.heading;
     this.group.userData.entity = 'vehicle';
   }
 
@@ -381,20 +549,31 @@ export class VehicleEntity {
     const rawX = input.moveX;
     const rawY = input.moveY;
     const moving = rawX !== 0 || rawY !== 0;
+    const boost = input.boost ? 1.28 : 1;
+    const throttle = rawY;
+    const steer = rawX;
+    const targetLimit = throttle >= 0 ? this.maxSpeed * boost : this.maxReverseSpeed;
 
-    if (moving) {
-      const dir = normalizeInput(rawX, rawY);
-      const boost = input.boost ? 1.28 : 1;
-      this.velocity.x += dir.x * this.acceleration * boost * dt;
-      this.velocity.y += -dir.y * this.acceleration * boost * dt;
-      const speed = this.velocity.length();
-      const limit = this.maxSpeed * boost;
-      if (speed > limit) this.velocity.setLength(limit);
-      this.heading = Math.atan2(this.velocity.x, this.velocity.y);
-      this.group.rotation.y = this.heading;
+    if (throttle !== 0) {
+      const direction = throttle > 0 ? 1 : -1;
+      this.forwardSpeed += direction * this.acceleration * boost * dt;
+      this.forwardSpeed = THREE.MathUtils.clamp(this.forwardSpeed, -this.maxReverseSpeed, targetLimit);
     } else {
-      this.velocity.multiplyScalar(Math.max(0, 1 - this.drag * dt));
+      const dragAmount = Math.max(0, 1 - this.drag * dt);
+      this.forwardSpeed *= dragAmount;
+      if (Math.abs(this.forwardSpeed) < 0.025) this.forwardSpeed = 0;
     }
+
+    if (steer !== 0 && Math.abs(this.forwardSpeed) > 0.08) {
+      const speedRatio = clampUnit(Math.abs(this.forwardSpeed) / (this.maxSpeed * Math.max(1, boost)));
+      const direction = this.forwardSpeed >= 0 ? 1 : -1;
+      this.heading += steer * (0.9 + speedRatio * 1.6) * this.turnRate * direction * dt;
+    }
+
+    const forwardX = Math.sin(this.heading);
+    const forwardZ = Math.cos(this.heading);
+    this.velocity.set(forwardX * this.forwardSpeed, forwardZ * this.forwardSpeed);
+    this.group.rotation.y = this.heading;
 
     this.group.position.x += this.velocity.x * dt;
     this.group.position.z += this.velocity.y * dt;
@@ -410,7 +589,7 @@ export class VehicleEntity {
       maxSpeed: this.maxSpeed,
       velocityX: this.velocity.x,
       velocityY: this.velocity.y,
-      inputX: rawX,
+      inputX: steer,
       boost: Boolean(input.boost),
       bodyFloat: this.bodyFloat,
       moving,
@@ -426,7 +605,7 @@ export class VehicleEntity {
     this.group.scale.set(feedback.squashXZ, feedback.squashY, feedback.squashXZ);
 
     if (this.wheels.length) {
-      const wheelSpin = this.speed * dt * 0.22;
+      const wheelSpin = this.forwardSpeed * dt * 0.26;
       this.wheels.forEach((wheel, index) => {
         wheel.rotation.x -= wheelSpin;
         const baseY = wheel.userData.baseRotationY ?? 0;
@@ -445,5 +624,14 @@ export class VehicleEntity {
     this.accentMaterials.forEach(({ material, baseIntensity }) => {
       material.emissiveIntensity = Math.max(baseIntensity, baseIntensity + feedback.boostGlow);
     });
+
+    // Hero light reacts to speed and boost
+    if (this.heroLight) {
+      this.heroLight.intensity = 2.8 + feedback.normalizedSpeed * 1.4 + (input.boost ? 2.2 : 0);
+      this.heroLight.distance = 22 + feedback.normalizedSpeed * 8 + (input.boost ? 6 : 0);
+    }
+    if (this.groundFill) {
+      this.groundFill.intensity = 1.1 + feedback.normalizedSpeed * 0.6;
+    }
   }
 }

@@ -1,0 +1,42 @@
+{
+  "targetUrl": "http://127.0.0.1:4173/gaming.html",
+  "outputDir": "C:\\Users\\ijpg1\\projects\\WARP\\artifacts\\gaming-captures",
+  "console": [
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x42fc00a91500]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x42fc00a91500]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x42fc00a91500]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "type": "warning",
+      "text": "[.WebGL-0x42fc00a91500]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+    }
+  ],
+  "pageErrors": [],
+  "requestFailures": [],
+  "badResponses": [],
+  "overlayState": {
+    "title": "WARP Red Cyber Ops",
+    "overlays": {
+      "game-loading-overlay": {
+        "hidden": true,
+        "active": false
+      },
+      "game-start-overlay": {
+        "hidden": true,
+        "active": false
+      },
+      "game-fallback-overlay": {
+        "hidden": true,
+        "active": false
+      }
+    }
+  }
+}

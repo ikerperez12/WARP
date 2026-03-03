@@ -129,13 +129,16 @@ export function tintImportedModel(object, color, strength = 0.48, emissiveBoost 
           material.emissive.setHex(material.userData.baseEmissive);
         }
         material.emissive.lerp(tint, emissiveBoost);
-        material.emissiveIntensity = Math.max(material.emissiveIntensity ?? 0, 0.18 + emissiveBoost * 1.8);
+        material.emissiveIntensity = Math.max(material.emissiveIntensity ?? 0, 0.3 + emissiveBoost * 2.1);
       }
       if ('roughness' in material && typeof material.roughness === 'number') {
-        material.roughness = Math.min(material.roughness, 0.82);
+        material.roughness = Math.min(material.roughness, 0.68);
       }
       if ('metalness' in material && typeof material.metalness === 'number') {
-        material.metalness = Math.max(material.metalness, 0.16);
+        material.metalness = Math.max(material.metalness, 0.22);
+      }
+      if ('envMapIntensity' in material && typeof material.envMapIntensity === 'number') {
+        material.envMapIntensity = Math.max(material.envMapIntensity, 1.1);
       }
     });
   });

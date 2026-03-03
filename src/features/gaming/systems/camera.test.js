@@ -40,7 +40,7 @@ test('computeCameraOffset increases distance with motion', () => {
   const calm = computeCameraOffset(config, 0, 0);
   const moving = computeCameraOffset(config, 1, 0);
 
-  assert.ok(moving.z > calm.z);
+  assert.ok(Math.abs(moving.z) > Math.abs(calm.z));
   assert.ok(moving.y > calm.y);
 });
 
