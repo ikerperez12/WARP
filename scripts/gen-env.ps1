@@ -1,14 +1,14 @@
 param(
-  [string]$Domain = 'portfolio-iker-perez.vercel.app',
-  [string]$AllowedIps = '0.0.0.0',
-  [string]$AllowedPrefixes = '192.168.1.',
-  [string]$ContactEmail = 'iker.perez@udc.es',
-  [string]$ContactToEmails = 'iker.perez@udc.es',
-  [string]$KvRestApiUrl = 'https://upstash-redacted.example',
-  [string]$KvRestApiToken = 'REDACTED_KV_REST_API_TOKEN',
-  [string]$KvRestApiReadOnlyToken = 'REDACTED_KV_REST_API_READ_ONLY_TOKEN',
-  [string]$KvUrl = 'rediss://default:REDACTED_KV_REST_API_TOKEN@upstash-redacted.example:6379',
-  [string]$RedisUrl = 'rediss://default:REDACTED_KV_REST_API_TOKEN@upstash-redacted.example:6379'
+  [string]$Domain = 'your-domain.vercel.app',
+  [string]$AllowedIps = '',
+  [string]$AllowedPrefixes = '',
+  [string]$ContactEmail = 'you@example.com',
+  [string]$ContactToEmails = 'you@example.com',
+  [string]$KvRestApiUrl = '',
+  [string]$KvRestApiToken = '',
+  [string]$KvRestApiReadOnlyToken = '',
+  [string]$KvUrl = '',
+  [string]$RedisUrl = ''
 )
 
 function New-RandBytes([int]$count) {
