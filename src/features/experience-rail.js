@@ -5,9 +5,14 @@ export function initExperienceRail() {
   const links = Array.from(rail.querySelectorAll('a[data-rail]'));
   if (!links.length) return;
 
-  const sections = links
-    .map((link) => document.getElementById(link.dataset.rail || ''))
-    .filter(Boolean);
+  const sectionIds = links.map((link) => link.dataset.rail).filter(Boolean);
+  const sectionSelector = sectionIds
+    .map((id) => (CSS.escape ? `#${CSS.escape(id)}` : `#${id}`))
+    .join(',');
+
+  const sectionNodes = sectionSelector ? document.querySelectorAll(sectionSelector) : [];
+  const sectionMap = new Map(Array.from(sectionNodes).map((node) => [node.id, node]));
+  const sections = sectionIds.map((id) => sectionMap.get(id)).filter(Boolean);
 
   const countEl = document.getElementById('experience-rail-count');
   const updateCount = () => {
