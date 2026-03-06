@@ -5,7 +5,9 @@ export function toSafeGithubUrl(value) {
   const fallback = 'https://github.com/ikerperez12';
   if (typeof value !== 'string') return fallback;
   try {
-    const parsed = new URL(value, window.location.origin);
+    const url = value.trim();
+    if (!/^https?:\/\//i.test(url)) return fallback;
+    const parsed = new URL(url);
     if (parsed.protocol !== 'https:' || parsed.username || parsed.password) return fallback;
     return parsed.toString();
   } catch {
