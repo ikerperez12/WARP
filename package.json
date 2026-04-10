@@ -1,0 +1,38 @@
+{
+  "name": "portfolio-3d",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "packageManager": "pnpm@10.30.3",
+  "engines": {
+    "node": ">=20.19.0 <25"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test \"tests/**/*.test.js\"",
+    "export:original-glb": "node scripts/export-original-glb.mjs",
+    "sync:projects": "node scripts/sync-github-projects.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.58.2",
+    "vite": "^8.0.8",
+    "vite-plugin-glsl": "^1.5.5"
+  },
+  "dependencies": {
+    "@studio-freight/lenis": "^1.0.42",
+    "@vercel/kv": "^3.0.0",
+    "animejs": "^3.2.2",
+    "gsap": "^3.14.2",
+    "three": "^0.162.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "overrides": {
+    "rollup": "^4.59.0"
+  }
+}

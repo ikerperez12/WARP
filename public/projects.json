@@ -1,0 +1,194 @@
+﻿[
+  {
+    "id": "warp-portfolio-3d",
+    "repoName": "WARP",
+    "name": "WARP Portfolio 3D",
+    "description": "Portfolio inmersivo con Three.js, motion design y una interfaz cuidada para presentar trabajo técnico con identidad propia.",
+    "impact": "Unifica marca personal, casos técnicos y visualización interactiva en una sola experiencia web.",
+    "language": "JavaScript",
+    "stack": [
+      "Vite",
+      "Three.js",
+      "Anime.js",
+      "Vercel"
+    ],
+    "domain": "web frontend ux production core",
+    "githubUrl": "https://github.com/ikerperez12/WARP",
+    "demoUrl": "https://portfolio-iker-perez.vercel.app/",
+    "imageUrl": "https://opengraph.githubassets.com/1/ikerperez12/WARP",
+    "imageAlt": "Vista previa del repositorio WARP Portfolio 3D",
+    "stars": 0,
+    "forks": 0,
+    "updatedAt": "2026-02-28T21:51:57Z",
+    "accent": "accent-1",
+    "featured": true
+  },
+  {
+    "id": "auditoria-pqc",
+    "repoName": "1.2-AuditoriaPQC",
+    "name": "Auditoria PQC",
+    "description": "Análisis aplicado de protocolos criptográficos post-cuánticos, trazas de red y validación de seguridad en laboratorio.",
+    "impact": "Refuerza criterio técnico en criptografía, auditoría y evaluación de riesgo.",
+    "language": "Python",
+    "stack": [
+      "Python",
+      "PQC",
+      "Wireshark",
+      "Auditing"
+    ],
+    "domain": "security backend data production core",
+    "githubUrl": "https://github.com/ikerperez12/1.2-AuditoriaPQC",
+    "demoUrl": "",
+    "imageUrl": "https://opengraph.githubassets.com/1/ikerperez12/1.2-AuditoriaPQC",
+    "imageAlt": "Vista previa del repositorio Auditoria PQC",
+    "stars": 2,
+    "forks": 0,
+    "updatedAt": "2026-02-28T21:45:42Z",
+    "accent": "accent-3",
+    "featured": true
+  },
+  {
+    "id": "gpt-cmd",
+    "repoName": "GPT_CMD",
+    "name": "GPT CMD",
+    "description": "CLI experimental para automatizar flujos asistidos por IA y acelerar tareas repetitivas en entorno técnico.",
+    "impact": "Reduce tiempo operativo en prompts, ejecución y experimentación local.",
+    "language": "Python",
+    "stack": [
+      "Python",
+      "CLI",
+      "LLM Ops"
+    ],
+    "domain": "ai backend exploratory core",
+    "githubUrl": "https://github.com/ikerperez12/GPT_CMD",
+    "demoUrl": "",
+    "imageUrl": "https://opengraph.githubassets.com/1/ikerperez12/GPT_CMD",
+    "imageAlt": "Vista previa del repositorio GPT CMD",
+    "stars": 0,
+    "forks": 0,
+    "updatedAt": "2026-01-31T19:02:49Z",
+    "accent": "accent-2",
+    "featured": true
+  },
+  {
+    "id": "internet-y-sistemas-distribuidos",
+    "repoName": "ISD",
+    "name": "Internet y Sistemas Distribuidos",
+    "description": "Repositorio de prácticas y entregables sobre APIs, servicios distribuidos, despliegue y comunicación entre componentes.",
+    "impact": "Muestra base solida en arquitectura distribuida y servicios backend.",
+    "language": "Java",
+    "stack": [
+      "Java",
+      "REST",
+      "Docker",
+      "PostgreSQL"
+    ],
+    "domain": "backend cloud production core",
+    "githubUrl": "https://github.com/ikerperez12/ISD",
+    "demoUrl": "",
+    "imageUrl": "https://opengraph.githubassets.com/1/ikerperez12/ISD",
+    "imageAlt": "Vista previa del repositorio Internet y Sistemas Distribuidos",
+    "stars": 0,
+    "forks": 0,
+    "updatedAt": "2025-10-02T07:31:22Z",
+    "accent": "accent-4",
+    "featured": true
+  },
+  {
+    "id": "shell-y-sistemas-operativos",
+    "repoName": "SO-SHELL-p2",
+    "name": "Shell y Sistemas Operativos",
+    "description": "Implementación académica centrada en shell, procesos, concurrencia y fundamentos de sistemas.",
+    "impact": "Aporta profundidad en sistemas, bajo nivel y diagnóstico de comportamiento.",
+    "language": "C",
+    "stack": [
+      "C",
+      "POSIX",
+      "Shell",
+      "Processes"
+    ],
+    "domain": "systems backend core exploratory",
+    "githubUrl": "https://github.com/ikerperez12/SO-SHELL-p2",
+    "demoUrl": "",
+    "imageUrl": "https://opengraph.githubassets.com/1/ikerperez12/SO-SHELL-p2",
+    "imageAlt": "Vista previa del repositorio Shell y Sistemas Operativos",
+    "stars": 0,
+    "forks": 0,
+    "updatedAt": "2024-12-02T11:42:34Z",
+    "accent": "accent-1",
+    "featured": true
+  },
+  {
+    "id": "sistemas-operativos-23-24",
+    "repoName": "SO-2324",
+    "name": "Sistemas Operativos 23/24",
+    "description": "Colección de prácticas y ejercicios sobre gestión de procesos, memoria y herramientas de sistemas.",
+    "impact": "Consolida fundamentos para software robusto y cercano a infraestructura.",
+    "language": "C",
+    "stack": [
+      "C",
+      "Linux",
+      "Diagnostics"
+    ],
+    "domain": "systems backend exploratory",
+    "githubUrl": "https://github.com/ikerperez12/SO-2324",
+    "demoUrl": "",
+    "imageUrl": "https://opengraph.githubassets.com/1/ikerperez12/SO-2324",
+    "imageAlt": "Vista previa del repositorio Sistemas Operativos 23/24",
+    "stars": 0,
+    "forks": 0,
+    "updatedAt": "2023-10-24T17:16:53Z",
+    "accent": "accent-2",
+    "featured": true
+  },
+  {
+    "id": "software-design",
+    "repoName": "Software-Design",
+    "name": "Software Design",
+    "description": "Trabajo orientado a modelado de software, estructura de dominio y patrones de diseño aplicados.",
+    "impact": "Refuerza base de análisis, modelado y mantenimiento de sistemas complejos.",
+    "language": "Java",
+    "stack": [
+      "Java",
+      "Design Patterns",
+      "Modeling"
+    ],
+    "domain": "backend core production",
+    "githubUrl": "https://github.com/ikerperez12/Software-Design",
+    "demoUrl": "",
+    "imageUrl": "https://opengraph.githubassets.com/1/ikerperez12/Software-Design",
+    "imageAlt": "Vista previa del repositorio Software Design",
+    "stars": 0,
+    "forks": 0,
+    "updatedAt": "2024-12-02T12:27:02Z",
+    "accent": "accent-3",
+    "featured": false
+  },
+  {
+    "id": "basketball-api",
+    "repoName": "Basketball-API",
+    "name": "Basketball API",
+    "description": "Backend con API REST y capa web para exponer datos y flujos funcionales sobre dominio deportivo.",
+    "impact": "Demuestra integración de backend, routing y presentación sobre una misma base de código.",
+    "language": "Python",
+    "stack": [
+      "Python",
+      "Django",
+      "REST API",
+      "Frontend"
+    ],
+    "domain": "frontend backend production core",
+    "githubUrl": "https://github.com/ikerperez12/Basketball-API",
+    "demoUrl": "",
+    "imageUrl": "https://opengraph.githubassets.com/1/ikerperez12/Basketball-API",
+    "imageAlt": "Vista previa del repositorio Basketball API",
+    "stars": 0,
+    "forks": 0,
+    "updatedAt": "2024-12-02T12:09:28Z",
+    "accent": "accent-4",
+    "featured": false
+  }
+]
+
+
+
