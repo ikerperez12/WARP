@@ -1,510 +1,425 @@
-﻿import { prefs, togglePref } from './preferences.js';
+import { prefs, togglePref } from './preferences.js';
 
-const translations = {
+const copy = {
   es: {
-    nav: ['Sobre mí', 'Skills', 'Servicios', 'Proyectos', 'Método', 'Trayectoria', 'Visual', 'Contacto'],
-    heroBadge: 'Disponible para prácticas y proyectos tech de alto impacto',
-    floatingBadge: 'Ingeniería de software - Ciberseguridad - IA - Cloud',
-    heroLines: ['Iker Pérez García', 'Software & Security', 'Product Engineer'],
-    heroDescription: 'Ingeniero de Software especializado en crear sistemas distribuidos, seguros y de alto rendimiento. Enfoque integral en arquitectura backend, hardening de sistemas y experiencias de usuario inmersivas. Especial interés en',
-    heroHighlights: ['SICUE en UPM - enfoque empresarial', 'ES / GL nativo + Inglés B2', 'Cloud, redes y automatización', 'IA aplicada y ciberseguridad'],
-    ctas: ['Ver proyectos', 'Experiencia visual', 'Contactar'],
-    stats: ['Año de carrera', 'Proyectos y prácticas', 'Cursos y certificaciones'],
-    serviceFilters: ['Todo', 'Base técnica', 'Producción', 'I+D exploratoria'],
-    projectFilters: ['Todos', 'Core', 'Producción', 'Exploración', 'Frontend', 'Backend', 'Cloud', 'Seguridad', 'IA/Datos', 'Sistemas'],
-    projectDataStrip: ['Repos actualizados desde GitHub', 'Portadas con preview visual', 'Curación versionada en public/projects.json'],
-    ui: ['Grano', 'Cursor', 'Motion'],
+    meta: {
+      title: 'Iker Perez Garcia | Software Engineer',
+      description: 'Portfolio profesional de Iker Perez Garcia. Backend, APIs, sistemas distribuidos, Linux, Docker, seguridad aplicada y automatizacion.',
+      theme: '#0a0a0f',
+    },
     misc: {
       skip: 'Saltar al contenido principal',
       backTop: 'Volver arriba',
-      threeCanvas: 'Escena 3D interactiva de portátil en movimiento',
-      threeDesc: 'Fondo 3D decorativo de un portátil que responde al puntero y al scroll.',
-      uiToggle: 'Visual',
-      mobileTheme: { dark: 'Oscuro', light: 'Claro' },
-      themeAria: 'Cambiar tema',
       langAria: 'Cambiar idioma',
+      themeAria: 'Cambiar tema',
+      mobileTheme: { dark: 'Oscuro', light: 'Claro' },
+      mobileLang: 'ES / EN',
     },
-    ticker: ['Secure by design', 'Backend architecture', 'Cloud automation', 'AI product prototyping', 'Data reliability', 'UX with performance', 'Full stack delivery', 'Continuous improvement'],
+    nav: ['Perfil', 'Stack', 'Proyectos', 'Trayectoria', 'Contacto'],
+    hero: {
+      kicker: 'Iker Perez Garcia / Ingenieria Informatica / Backend / Sistemas',
+      badge: 'Disponible para practicas y puesto junior tecnico',
+      lines: ['Software Engineer', 'backend, sistemas, automatizacion y seguridad aplicada'],
+      description: 'Ingeniero informatico en formacion, con foco en APIs, Linux, Docker, automatizacion y software mantenible. Busco incorporarme a equipos donde pueda aportar criterio tecnico, autonomia y capacidad real de ejecucion.',
+      ctas: ['Ver proyectos', 'Contactar'],
+      stats: ['Areas tecnicas activas', 'Proyectos y practicas', 'Herramientas y entornos frecuentes'],
+      chips: ['Linux + Docker', 'APIs / Backend', 'Seguridad aplicada'],
+      techLabel: 'Tecnologias de trabajo',
+    },
+    heroPanel: {
+      kicker: 'Perfil tecnico',
+      title: 'Backend, sistemas y seguridad aplicada',
+      list: [
+        'Diseno e implementacion de APIs y servicios mantenibles.',
+        'Trabajo comodo con Linux, terminal, contenedores y despliegues reproducibles.',
+        'Interes real por seguridad, validacion y lectura tecnica del riesgo.',
+        'Capacidad para moverme entre codigo, infraestructura y tooling interno.',
+      ],
+      metaLabels: ['Ubicacion', 'Idiomas', 'Objetivo'],
+      metaValues: ['A Coruna / Galicia', 'ES / GL nativo / Ingles B2', 'Practicas, backend y sistemas'],
+      stackLabel: 'Core stack',
+      stackTitles: ['APIs', 'Sistemas', 'Seguridad', 'Tooling'],
+      stackValues: ['REST, contratos, servicios', 'Linux, shell, Docker', 'PQC, trafico, validacion', 'CLI, automatizacion, IA'],
+      mapLabel: 'Mapa tecnico',
+      mapNodes: ['Core', 'Backend', 'Linux', 'Security', 'CLI', 'Docker'],
+    },
     sections: {
-      aboutTitle: 'Sobre mí',
-      skillsTitle: 'Tech Stack',
-      skillsSubtitle: 'Tecnologías y herramientas con las que trabajo',
-      servicesTitle: 'Categorías de valor',
-      servicesSubtitle: 'Trabajo por dominios claros para entregar resultados medibles, no solo código.',
-      projectsTitle: 'Proyectos con impacto',
-      projectsSubtitle: 'Trabajo técnico real: rendimiento, seguridad, experiencia de usuario y escalabilidad.',
-      processTitle: 'Cómo trabajo',
-      processSubtitle: 'Método de trabajo para entregar software útil, seguro y mantenible',
-      experienceTitle: 'Formación & trayectoria',
-      contactTitle: '¿Hablamos?',
-      contactSubtitle: 'Busco prácticas, colaboraciones y proyectos interesantes',
-      experienceHeroTitle: 'Experiencia Cinematográfica',
-      experienceHeroSubtitle: 'Visuales guiados por scroll, paneles interactivos y storytelling técnico concentrados en una página para explorarlos sin fricciones.',
-      experienceHeroPrimary: 'Volver al portfolio',
-      experienceHeroSecondary: 'Contactar',
-      experienceCtaTitle: 'Experiencia Visual',
-      experienceCtaSubtitle: 'Accede a la narrativa cinematográfica, los laboratorios interactivos y el playbook técnico en una página dedicada.',
-      experienceCtaBody: 'He separado las escenas de motion, los paneles y los comparadores para que la home cargue más rápido sin perder el bloque visual.',
-      experienceCtaButton: 'Ver experiencia visual',
-      engineeringTitle: 'Foco Ingeniería',
-      engineeringSubtitle: 'Estructura clara de prioridades técnicas: backend, seguridad, cloud y delivery con mentalidad de producto.',
-      showcaseTitle: 'Cinematic Composition',
-      showcaseSubtitle: 'Dirección visual y ritmo de movimiento sincronizados al scroll para presentar producto con lectura editorial.',
-      reelTitle: 'Casos Reales en Movimiento',
-      reelSubtitle: 'Narrativa visual de proyectos con enfoque en impacto, ejecución técnica y resultado en producto.',
-      neoTitle: 'Panel de Decisión Técnica',
-      neoSubtitle: 'Simulación de priorización para elegir foco de sprint en proyectos reales: calidad, velocidad y seguridad.',
-      animeTitle: 'Cadencia de Entrega',
-      animeSubtitle: 'Bloques que muestran el flujo de trabajo real en un proyecto: entrada, transformación, release y aprendizaje.',
-      deckTitle: 'Matriz de Prioridades',
-      deckSubtitle: 'Mapa interactivo para decidir qué atacar primero en un proyecto: fiabilidad, experiencia, seguridad o velocidad.',
-      cloudTitle: 'Stack Cloud Aplicado a Proyectos',
-      cloudSubtitle: 'No es una lista de herramientas: son escenarios de portfolio donde cloud e IA aportan valor real.',
-      flowTitle: 'Roadmap de Ejecución en Proyectos',
-      flowSubtitle: 'Panel interactivo para explicar cómo paso de discovery a release estable con decisiones técnicas trazables.',
-      topologyTitle: 'Arquitectura de Proyecto en Producción',
-      topologySubtitle: 'Mapa interactivo para explicar cómo conecto cloud, seguridad, IA y datos en casos reales.',
-      splitTitle: 'Evolución Visual de Proyecto',
-      splitSubtitle: 'Comparador para mostrar el salto desde una versión base hasta una entrega optimizada y lista para escalar.',
-      eliteTitle: 'Casos de Portfolio High Impact',
-      eliteSubtitle: 'Ejemplos tipo producción con métricas de impacto y stack moderno para backend, seguridad, cloud e IA.',
-      playbookTitle: 'Playbook Técnico Interactivo',
-      playbookSubtitle: 'Escenarios reales para enseñar cómo aterrizo arquitectura, seguridad y observabilidad según objetivo de negocio.',
+      profileTitle: 'Perfil tecnico',
+      profileSubtitle: 'Perfil orientado a backend, operacion, seguridad y automatizacion, con buena base academica y foco en software mantenible.',
+      stackTitle: 'Stack y tecnologias',
+      stackSubtitle: 'Tecnologias y areas con las que puedo trabajar hoy con soltura o buena autonomia.',
+      projectsTitle: 'Proyectos destacados',
+      projectsSubtitle: 'Seleccion corta para ensenar backend, sistemas, seguridad, arquitectura y automatizacion con una lectura rapida.',
+      experienceTitle: 'Trayectoria y formacion',
+      experienceSubtitle: 'Base academica solida y evolucion tecnica apoyada en proyectos, laboratorio y autoformacion.',
+      contactTitle: 'Contacto',
+      contactSubtitle: 'Abierto a practicas, colaboracion tecnica y primeras experiencias donde sumar backend, sistemas, automatizacion o seguridad aplicada.',
     },
-    visualDna: {
-      title: 'Arquitectura Visual',
-      subtitle: 'Segunda capa de la experiencia: sistema visual, ritmo editorial y decisiones de composición documentadas.',
-      cards: [
+    about: {
+      paragraphs: [
+        'Mi base viene de Ingenieria Informatica, con recorrido en algoritmos, bases de datos, redes, sistemas operativos, inteligencia artificial y sistemas distribuidos. Esa combinacion me permite leer un problema desde el codigo hasta la operacion.',
+        'Busco equipos donde se valore escribir bien, entender el stack completo y entregar piezas que se puedan mantener. Me adapto rapido, aprendo deprisa y tengo especial interes en backend, seguridad, Linux, Docker y tooling.',
+      ],
+      factsLabels: ['Formacion', 'Movilidad', 'Enfoque'],
+      factsValues: ['Grado en Ingenieria Informatica / UDC', 'SICUE en ETSISI-UPM', 'Backend, sistemas, seguridad y automatizacion'],
+      cardTitles: ['Backend y APIs', 'Sistemas y despliegue', 'Seguridad aplicada', 'Tooling e IA'],
+      cardTexts: [
+        'Servicios claros, contratos estables, estructura mantenible y trabajo comodo con Java, Python y SQL.',
+        'Linux, terminal, Docker y entornos reproducibles para desarrollar y desplegar con menos friccion.',
+        'Validacion, lectura de trafico, hardening y atencion al riesgo en la implementacion tecnica.',
+        'Automatizacion de flujos, uso de CLI y apoyo de herramientas de IA cuando mejoran velocidad y control.',
+      ],
+    },
+    skills: {
+      titles: ['Lenguajes', 'Backend y datos', 'Frontend util', 'Sistemas y cloud', 'Seguridad y tooling'],
+    },
+    projects: {
+      filters: ['Todos', 'Backend', 'Seguridad', 'Automatizacion', 'Sistemas'],
+      filterAria: 'Filtrar proyectos',
+    },
+    experience: {
+      kicker: 'Aportacion',
+      title: 'Lo que puedo sumar desde el primer tramo',
+      list: [
+        'Base tecnica amplia para moverme entre backend, sistemas y codigo de apoyo.',
+        'Buena adaptacion a terminal, contenedores, validacion y entornos reales.',
+        'Interes fuerte por aprender rapido y entregar con criterio tecnico.',
+      ],
+      metricTitles: ['Backend', 'Sistemas', 'Seguridad'],
+      metricValues: ['APIs, contratos, integracion', 'Linux, shell, Docker', 'Lectura tecnica y validacion'],
+      timeline: [
         {
-          title: 'Ritmo editorial',
-          text: 'Mapa de beats que alterna apertura, detalle técnico y cierre orientado a conversión.',
-          tags: ['Beat map', 'Scroll sync', 'Timing'],
+          title: 'Grado en Ingenieria Informatica',
+          company: 'Universidade da Coruna',
+          date: '2022 - Presente',
+          body: 'Formacion en algoritmos, sistemas operativos, redes, bases de datos, inteligencia artificial, diseno de software y sistemas distribuidos.',
         },
         {
-          title: 'Profundidad realista',
-          text: 'Capas de luz, grano y sombra suave para mantener legibilidad sin perder atmósfera.',
-          tags: ['Depth', 'Film grain', 'Contrast'],
+          title: 'Programa SICUE / ETSISI-UPM',
+          company: 'Intercambio academico',
+          date: '2025 - 2026',
+          body: 'Etapa orientada a ampliar vision de sistemas de informacion, software aplicado a empresa y entrega tecnica con contexto mas amplio.',
         },
         {
-          title: 'UI táctil',
-          text: 'Botones y paneles con micro-feedback y peso visual inspirado en hardware.',
-          tags: ['Neumorphism', 'Micro motion', 'Haptics'],
+          title: 'Seguridad en sistemas',
+          company: 'Trabajo tutelado y laboratorio',
+          date: '2024 - 2025',
+          body: 'Trabajo con criptografia postcuantica, analisis de trafico, validacion de protocolos y revision tecnica de superficie de riesgo.',
         },
         {
-          title: 'Entrega técnica',
-          text: 'Visualización clara del stack, resultados y garantías técnicas para perfiles senior.',
-          tags: ['Stack clarity', 'Metrics', 'QA'],
+          title: 'Autoformacion y proyectos personales',
+          company: 'GitHub / CLI / IA / Cloud',
+          date: '2023 - Presente',
+          body: 'Desarrollo continuo en tooling, cloud, automatizacion local, integracion de modelos y construccion de software con foco practico.',
         },
       ],
-      stripLabel: 'Stack visual',
-      stripTags: ['Three.js', 'Anime.js', 'Motion tokens', 'Scroll staging', 'Color grading'],
-    },
-    engineeringFocus: {
-      cards: [
-        {
-          tag: 'Backend Systems',
-          title: 'Arquitectura distribuida',
-          text: 'Servicios modulares, contratos estables y observabilidad desde el primer release.',
-          metrics: ['APIs', 'Reliability', 'Latency'],
-        },
-        {
-          tag: 'Security',
-          title: 'Secure by design',
-          text: 'Hardening de superficie, validación estricta y reducción de riesgo en producción.',
-          metrics: ['Threats', 'Validation', 'Audit'],
-        },
-        {
-          tag: 'Cloud',
-          title: 'Delivery en la nube',
-          text: 'Pipeline CI/CD, despliegues trazables y escalado con costes controlados.',
-          metrics: ['CI/CD', 'Infra', 'Cost'],
-        },
-        {
-          tag: 'AI / Data',
-          title: 'Prototipos útiles',
-          text: 'Validación rápida de hipótesis con modelos y datos antes de escalar roadmap.',
-          metrics: ['LLMs', 'Discovery', 'Ops'],
-        },
-      ],
-      calloutKicker: 'Capas prioritarias',
-      calloutTitle: 'Perfil técnico orientado a estabilidad y resultados',
-      calloutText: 'Trabajo desde el core técnico hacia la experiencia, priorizando fiabilidad y claridad en cada entrega.',
-      pills: ['Arquitectura', 'Seguridad', 'Producto', 'Escala'],
     },
     contact: {
-      cards: ['Email', 'GitHub', 'LinkedIn', 'Ubicación'],
-      topicLabel: 'Categoría',
-      topicPlaceholder: 'Selecciona una categoría',
-      topicOptions: ['Frontend + UX', 'Backend + APIs', 'Cloud + DevOps', 'Security review', 'AI / Data prototype', 'Otra colaboración'],
+      cardTitles: ['Email', 'GitHub', 'LinkedIn', 'Disponibilidad'],
+      availabilityValue: 'A Coruna / Remoto / Hibrido',
+      availabilityText: 'Busco entornos donde pueda sumar desde backend, sistemas, automatizacion o seguridad aplicada.',
+      topicLabel: 'Categoria',
+      topicPlaceholder: 'Selecciona una categoria',
+      topicOptions: ['Backend y APIs', 'Sistemas e infraestructura', 'Automatizacion', 'Seguridad aplicada', 'Tooling e IA', 'Practicas o colaboracion'],
       nameLabel: 'Nombre',
       namePlaceholder: 'Tu nombre',
       emailLabel: 'Email',
       emailPlaceholder: 'tu@email.com',
       messageLabel: 'Mensaje',
-      messagePlaceholder: 'Cuéntame tu propuesta...',
+      messagePlaceholder: 'Cuentame el contexto, el tipo de colaboracion y el objetivo tecnico.',
       websiteLabel: 'Website',
       submit: 'Enviar mensaje',
       success: 'Gracias. El mensaje se ha enviado correctamente.',
       error: 'No se pudo enviar el mensaje. Revisa los datos e intenta de nuevo.',
     },
     footer: {
-      byline: 'Diseñado y desarrollado por Iker Pérez.',
-      meta: 'Software, seguridad, cloud e IA aplicada.',
-      nav: ['Sobre mí', 'Servicios', 'Proyectos', 'Contacto'],
-      availability: 'Disponible para prácticas y colaboraciones técnicas.',
+      meta: 'Backend, sistemas, automatizacion y seguridad aplicada.',
+      nav: ['Perfil', 'Stack', 'Proyectos', 'Trayectoria', 'Contacto'],
+      availability: 'Disponible para practicas y colaboracion tecnica.',
     },
   },
   en: {
-    nav: ['About', 'Skills', 'Services', 'Projects', 'Method', 'Journey', 'Visual', 'Contact'],
-    heroBadge: 'Available for internships and high-impact tech projects',
-    floatingBadge: 'Software engineering - Cybersecurity - AI - Cloud',
-    heroLines: ['Iker Pérez García', 'Software & Security', 'Product Engineer'],
-    heroDescription: 'Software Engineer focused on building distributed, secure and high-performance systems. End-to-end approach across backend architecture, system hardening and immersive product experiences. Special interest in',
-    heroHighlights: ['SICUE at UPM - business-oriented perspective', 'Native ES / GL + English B2', 'Cloud, networking and automation', 'Applied AI and cybersecurity'],
-    ctas: ['View projects', 'Visual experience', 'Contact'],
-    stats: ['Years of degree', 'Projects and internships', 'Courses and certifications'],
-    serviceFilters: ['All', 'Core Skills', 'Production Ready', 'Exploratory R&D'],
-    projectFilters: ['All', 'Core', 'Production', 'Exploratory', 'Frontend', 'Backend', 'Cloud', 'Security', 'AI/Data', 'Systems'],
-    projectDataStrip: ['Repos synced from GitHub', 'Cards with visual preview', 'Versioned curation in public/projects.json'],
-    ui: ['Grain', 'Cursor', 'Motion'],
+    meta: {
+      title: 'Iker Perez Garcia | Software Engineer',
+      description: 'Professional portfolio of Iker Perez Garcia. Backend, APIs, distributed systems, Linux, Docker, applied security and automation.',
+      theme: '#eff5ff',
+    },
     misc: {
       skip: 'Skip to main content',
       backTop: 'Back to top',
-      threeCanvas: 'Interactive 3D moving laptop scene',
-      threeDesc: 'Decorative 3D laptop background reacting to pointer and scroll.',
-      uiToggle: 'Visual',
-      mobileTheme: { dark: 'Dark', light: 'Light' },
-      themeAria: 'Toggle theme',
       langAria: 'Change language',
+      themeAria: 'Change theme',
+      mobileTheme: { dark: 'Dark', light: 'Light' },
+      mobileLang: 'EN / ES',
     },
-    ticker: ['Secure by design', 'Backend architecture', 'Cloud automation', 'AI product prototyping', 'Data reliability', 'UX with performance', 'Full stack delivery', 'Continuous improvement'],
+    nav: ['Profile', 'Stack', 'Projects', 'Journey', 'Contact'],
+    hero: {
+      kicker: 'Iker Perez Garcia / Computer Engineering / Backend / Systems',
+      badge: 'Available for internships and junior engineering roles',
+      lines: ['Software Engineer', 'backend, systems, automation and applied security'],
+      description: 'Computer engineering student focused on APIs, Linux, Docker, automation and maintainable software. I am looking to join teams where I can contribute sound technical judgement, autonomy and strong execution.',
+      ctas: ['View projects', 'Contact'],
+      stats: ['Active technical areas', 'Projects and lab work', 'Tools and operating environments'],
+      chips: ['Linux + Docker', 'APIs / Backend', 'Applied security'],
+      techLabel: 'Working technologies',
+    },
+    heroPanel: {
+      kicker: 'Technical profile',
+      title: 'Backend, systems and applied security',
+      list: [
+        'Design and implementation of maintainable APIs and services.',
+        'Comfortable working with Linux, terminal tooling, containers and reproducible deployments.',
+        'Real interest in security, validation and technical risk review.',
+        'Able to move between code, infrastructure and internal tooling.',
+      ],
+      metaLabels: ['Location', 'Languages', 'Goal'],
+      metaValues: ['A Coruna / Galicia', 'Native ES / GL / English B2', 'Internships, backend and systems'],
+      stackLabel: 'Core stack',
+      stackTitles: ['APIs', 'Systems', 'Security', 'Tooling'],
+      stackValues: ['REST, contracts, services', 'Linux, shell, Docker', 'PQC, traffic, validation', 'CLI, automation, AI'],
+      mapLabel: 'Technical map',
+      mapNodes: ['Core', 'Backend', 'Linux', 'Security', 'CLI', 'Docker'],
+    },
     sections: {
-      aboutTitle: 'About me',
-      skillsTitle: 'Tech Stack',
-      skillsSubtitle: 'Technologies and tools I work with',
-      servicesTitle: 'Value categories',
-      servicesSubtitle: 'I work through clear domains to deliver measurable outcomes, not just code.',
-      projectsTitle: 'Projects with impact',
-      projectsSubtitle: 'Real technical work across performance, security, user experience and scalability.',
-      processTitle: 'How I work',
-      processSubtitle: 'Working method to deliver useful, secure and maintainable software',
-      experienceTitle: 'Education & journey',
-      contactTitle: 'Let\'s talk',
-      contactSubtitle: 'I am looking for internships, collaborations and interesting projects',
-      experienceHeroTitle: 'Cinematic Experience',
-      experienceHeroSubtitle: 'Scroll-driven visuals, interactive panels, and technical storytelling curated on a dedicated page.',
-      experienceHeroPrimary: 'Back to portfolio',
-      experienceHeroSecondary: 'Contact',
-      experienceCtaTitle: 'Visual Experience',
-      experienceCtaSubtitle: 'Access the cinematic narrative, interactive labs, and technical playbook on a dedicated page.',
-      experienceCtaBody: 'I separated motion scenes, panels, and comparators so the home loads faster without losing the visual block.',
-      experienceCtaButton: 'Open visual experience',
-      engineeringTitle: 'Engineering Focus',
-      engineeringSubtitle: 'Clear technical priorities: backend, security, cloud, and delivery with product mindset.',
-      showcaseTitle: 'Cinematic Composition',
-      showcaseSubtitle: 'Visual direction and motion rhythm synchronized to scroll to present product with editorial clarity.',
-      reelTitle: 'Real Cases in Motion',
-      reelSubtitle: 'Visual storytelling for projects focused on impact, technical execution and product outcome.',
-      neoTitle: 'Technical Decision Panel',
-      neoSubtitle: 'Prioritization simulator to choose sprint focus in real projects: quality, speed and security.',
-      animeTitle: 'Delivery Cadence',
-      animeSubtitle: 'Blocks showing a real project workflow: input, transformation, release and learning.',
-      deckTitle: 'Priority Matrix',
-      deckSubtitle: 'Interactive map to decide what to attack first in a project: reliability, experience, security or speed.',
-      cloudTitle: 'Cloud Stack Applied to Projects',
-      cloudSubtitle: 'Not a tool list: real portfolio scenarios where cloud and AI create value.',
-      flowTitle: 'Project Execution Roadmap',
-      flowSubtitle: 'Interactive panel explaining how I move from discovery to a stable release with traceable technical decisions.',
-      topologyTitle: 'Production Project Architecture',
-      topologySubtitle: 'Interactive map showing how I connect cloud, security, AI and data in real cases.',
-      splitTitle: 'Project Visual Evolution',
-      splitSubtitle: 'Comparator showing the jump from a base version to an optimized delivery ready to scale.',
-      eliteTitle: 'High Impact Portfolio Cases',
-      eliteSubtitle: 'Production-like examples with impact metrics and a modern stack for backend, security, cloud and AI.',
-      playbookTitle: 'Interactive Technical Playbook',
-      playbookSubtitle: 'Real scenarios showing how I land architecture, security and observability based on business goals.',
+      profileTitle: 'Technical profile',
+      profileSubtitle: 'Profile focused on backend, operations, security and automation, backed by strong academic foundations and a maintainability mindset.',
+      stackTitle: 'Stack and technologies',
+      stackSubtitle: 'Technologies and domains I can work with today with solid autonomy.',
+      projectsTitle: 'Selected projects',
+      projectsSubtitle: 'A short set of projects showing backend, systems, security, architecture and automation with quick readability.',
+      experienceTitle: 'Journey and education',
+      experienceSubtitle: 'Solid academic base and technical growth supported by projects, lab work and self-driven learning.',
+      contactTitle: 'Contact',
+      contactSubtitle: 'Open to internships, technical collaboration and early-career roles in backend, systems, automation or applied security.',
     },
-    visualDna: {
-      title: 'Visual Architecture',
-      subtitle: 'Second layer of the experience: visual system, editorial rhythm, and documented composition decisions.',
-      cards: [
+    about: {
+      paragraphs: [
+        'My background comes from Computer Engineering, with work across algorithms, databases, networks, operating systems, artificial intelligence and distributed systems. That mix lets me understand problems from code down to operations.',
+        'I look for teams that value clear engineering, full-stack understanding and software that stays maintainable over time. I adapt quickly, learn fast and have a strong interest in backend, security, Linux, Docker and tooling.',
+      ],
+      factsLabels: ['Education', 'Mobility', 'Focus'],
+      factsValues: ['Computer Engineering Degree / UDC', 'SICUE at ETSISI-UPM', 'Backend, systems, security and automation'],
+      cardTitles: ['Backend and APIs', 'Systems and delivery', 'Applied security', 'Tooling and AI'],
+      cardTexts: [
+        'Clear services, stable contracts, maintainable structure and hands-on work with Java, Python and SQL.',
+        'Linux, terminal workflows, Docker and reproducible environments for building and shipping with less friction.',
+        'Validation, traffic inspection, hardening and attention to risk during implementation.',
+        'Workflow automation, CLI-first habits and AI tools when they improve speed and control.',
+      ],
+    },
+    skills: {
+      titles: ['Languages', 'Backend and data', 'Useful frontend', 'Systems and cloud', 'Security and tooling'],
+    },
+    projects: {
+      filters: ['All', 'Backend', 'Security', 'Automation', 'Systems'],
+      filterAria: 'Filter projects',
+    },
+    experience: {
+      kicker: 'Contribution',
+      title: 'What I can add from the first stage',
+      list: [
+        'Broad technical base to move between backend, systems and supporting code.',
+        'Strong adaptation to terminal workflows, containers, validation and real environments.',
+        'Clear motivation to learn fast and deliver with technical judgement.',
+      ],
+      metricTitles: ['Backend', 'Systems', 'Security'],
+      metricValues: ['APIs, contracts, integration', 'Linux, shell, Docker', 'Technical reading and validation'],
+      timeline: [
         {
-          title: 'Editorial rhythm',
-          text: 'Beat map alternating opening, technical detail, and conversion-focused closure.',
-          tags: ['Beat map', 'Scroll sync', 'Timing'],
+          title: 'Computer Engineering Degree',
+          company: 'Universidade da Coruna',
+          date: '2022 - Present',
+          body: 'Training in algorithms, operating systems, networking, databases, artificial intelligence, software design and distributed systems.',
         },
         {
-          title: 'Realistic depth',
-          text: 'Light, grain and soft shadow layers to keep legibility without losing atmosphere.',
-          tags: ['Depth', 'Film grain', 'Contrast'],
+          title: 'SICUE Program / ETSISI-UPM',
+          company: 'Academic exchange',
+          date: '2025 - 2026',
+          body: 'Stage focused on broadening my view of information systems, enterprise software and technically grounded delivery.',
         },
         {
-          title: 'Tactile UI',
-          text: 'Buttons and panels with micro feedback and hardware-inspired weight.',
-          tags: ['Neumorphism', 'Micro motion', 'Haptics'],
+          title: 'Systems security',
+          company: 'Supervised work and lab practice',
+          date: '2024 - 2025',
+          body: 'Work with post-quantum cryptography, traffic analysis, protocol validation and technical review of risk surface.',
         },
         {
-          title: 'Technical delivery',
-          text: 'Clear view of stack, results, and technical guarantees for senior profiles.',
-          tags: ['Stack clarity', 'Metrics', 'QA'],
+          title: 'Self-directed learning and personal projects',
+          company: 'GitHub / CLI / AI / Cloud',
+          date: '2023 - Present',
+          body: 'Ongoing work in tooling, cloud, local automation, model integration and software built with a practical mindset.',
         },
       ],
-      stripLabel: 'Visual stack',
-      stripTags: ['Three.js', 'Anime.js', 'Motion tokens', 'Scroll staging', 'Color grading'],
-    },
-    engineeringFocus: {
-      cards: [
-        {
-          tag: 'Backend Systems',
-          title: 'Distributed architecture',
-          text: 'Modular services, stable contracts, and observability from the first release.',
-          metrics: ['APIs', 'Reliability', 'Latency'],
-        },
-        {
-          tag: 'Security',
-          title: 'Secure by design',
-          text: 'Surface hardening, strict validation, and risk reduction in production.',
-          metrics: ['Threats', 'Validation', 'Audit'],
-        },
-        {
-          tag: 'Cloud',
-          title: 'Cloud delivery',
-          text: 'CI/CD pipeline, traceable deployments, and controlled scaling costs.',
-          metrics: ['CI/CD', 'Infra', 'Cost'],
-        },
-        {
-          tag: 'AI / Data',
-          title: 'Useful prototypes',
-          text: 'Fast hypothesis validation with models and data before scaling the roadmap.',
-          metrics: ['LLMs', 'Discovery', 'Ops'],
-        },
-      ],
-      calloutKicker: 'Priority layers',
-      calloutTitle: 'Technical profile oriented to stability and results',
-      calloutText: 'I work from the technical core toward experience, prioritizing reliability and clarity in every delivery.',
-      pills: ['Architecture', 'Security', 'Product', 'Scale'],
     },
     contact: {
-      cards: ['Email', 'GitHub', 'LinkedIn', 'Location'],
+      cardTitles: ['Email', 'GitHub', 'LinkedIn', 'Availability'],
+      availabilityValue: 'A Coruna / Remote / Hybrid',
+      availabilityText: 'I am looking for environments where I can contribute through backend, systems, automation or applied security.',
       topicLabel: 'Category',
       topicPlaceholder: 'Select a category',
-      topicOptions: ['Frontend + UX', 'Backend + APIs', 'Cloud + DevOps', 'Security review', 'AI / Data prototype', 'Other collaboration'],
+      topicOptions: ['Backend and APIs', 'Systems and infrastructure', 'Automation', 'Applied security', 'Tooling and AI', 'Internship or collaboration'],
       nameLabel: 'Name',
       namePlaceholder: 'Your name',
       emailLabel: 'Email',
       emailPlaceholder: 'you@email.com',
       messageLabel: 'Message',
-      messagePlaceholder: 'Tell me about your proposal...',
+      messagePlaceholder: 'Tell me about the context, collaboration type and technical goal.',
       websiteLabel: 'Website',
       submit: 'Send message',
       success: 'Thanks. The message has been sent successfully.',
       error: 'The message could not be sent. Check the data and try again.',
     },
     footer: {
-      byline: 'Designed and developed by Iker Pérez.',
-      meta: 'Software, security, cloud and applied AI.',
-      nav: ['About', 'Services', 'Projects', 'Contact'],
-      availability: 'Available for internships and technical collaborations.',
+      meta: 'Backend, systems, automation and applied security.',
+      nav: ['Profile', 'Stack', 'Projects', 'Journey', 'Contact'],
+      availability: 'Available for internships and technical collaboration.',
     },
   },
 };
 
 export function initSiteControls() {
-  bindThemeToggle();
-  bindLangToggle();
-  applyLanguage();
-  syncControls();
-  window.addEventListener('warp:prefs-changed', () => {
-    applyLanguage();
-    syncControls();
-  });
-  window.addEventListener('warp:site-content-applied', applyLanguage);
+  bindThemeControls();
+  bindLanguageControls();
+  applySiteControls();
+  window.addEventListener('warp:prefs-changed', applySiteControls);
 }
 
-export function getLangCopy() {
-  return translations[prefs.lang] || translations.es;
-}
-
-function bindThemeToggle() {
+function bindThemeControls() {
   const checkbox = document.getElementById('theme-toggle-input');
   const mobileBtn = document.getElementById('mobile-theme-toggle');
+
   if (checkbox) {
     checkbox.checked = prefs.theme === 'light';
     checkbox.addEventListener('change', () => togglePref('theme'));
   }
+
   mobileBtn?.addEventListener('click', () => togglePref('theme'));
 }
 
-function bindLangToggle() {
-  const langBtn = document.getElementById('lang-toggle');
-  const mobileBtn = document.getElementById('mobile-lang-toggle');
-  langBtn?.addEventListener('click', () => togglePref('lang'));
-  mobileBtn?.addEventListener('click', () => togglePref('lang'));
+function bindLanguageControls() {
+  document.getElementById('lang-toggle')?.addEventListener('click', () => togglePref('lang'));
+  document.getElementById('mobile-lang-toggle')?.addEventListener('click', () => togglePref('lang'));
 }
 
-function syncControls() {
-  const copy = getLangCopy();
+function applySiteControls() {
+  const langCopy = copy[prefs.lang] || copy.es;
+
+  document.title = langCopy.meta.title;
+  document.documentElement.lang = prefs.lang;
+  setMeta('description', langCopy.meta.description);
+  setMeta('theme-color', langCopy.meta.theme);
+  setMetaProperty('og:title', langCopy.meta.title);
+  setMetaProperty('og:description', langCopy.meta.description);
+
+  setText('.skip-link', langCopy.misc.skip);
+  setAria('#back-to-top', langCopy.misc.backTop);
+  setAria('#lang-toggle', langCopy.misc.langAria);
+  setAria('.cosmic-toggle', langCopy.misc.themeAria);
+
+  setTextList('.nav-links .nav-link', langCopy.nav);
+  setTextList('.mobile-menu .mobile-link[data-mobile-nav]', langCopy.nav);
+  setTextList('.footer-nav a', langCopy.footer.nav);
+
+  setText('.hero-kicker', langCopy.hero.kicker);
+  setText('.hero-badge span:last-child', langCopy.hero.badge);
+  setTextList('.hero-title .hero-line', langCopy.hero.lines);
+  setText('.hero-description', langCopy.hero.description);
+  setTextList('.hero-cta .btn span', langCopy.hero.ctas);
+  setTextList('.hero-stats .stat-label', langCopy.hero.stats);
+  setTextList('.hero-chip-row .hero-chip', langCopy.hero.chips);
+  setText('.hero-tech-label', langCopy.hero.techLabel);
+
+  setText('.summary-panel-kicker', langCopy.heroPanel.kicker);
+  setText('.hero-summary-panel h2', langCopy.heroPanel.title);
+  setTextList('.hero-summary-panel .summary-list li', langCopy.heroPanel.list);
+  setTextList('.summary-meta-item span', langCopy.heroPanel.metaLabels);
+  setTextList('.summary-meta-item strong', langCopy.heroPanel.metaValues);
+  setText('.hero-stack-widget .summary-panel-kicker', langCopy.heroPanel.stackLabel);
+  setTextList('.hero-stack-cell strong', langCopy.heroPanel.stackTitles);
+  setTextList('.hero-stack-cell span', langCopy.heroPanel.stackValues);
+  setText('.hero-focus-map .summary-panel-kicker', langCopy.heroPanel.mapLabel);
+  setTextList('.focus-ring .focus-node', langCopy.heroPanel.mapNodes);
+
+  setText('#about .section-title', langCopy.sections.profileTitle);
+  setText('#about .section-subtitle', langCopy.sections.profileSubtitle);
+  setTextList('.profile-copy p', langCopy.about.paragraphs);
+  setTextList('.profile-fact span', langCopy.about.factsLabels);
+  setTextList('.profile-fact strong', langCopy.about.factsValues);
+  setTextList('.profile-card h3', langCopy.about.cardTitles);
+  setTextList('.profile-card p', langCopy.about.cardTexts);
+
+  setText('#skills .section-title', langCopy.sections.stackTitle);
+  setText('#skills .section-subtitle', langCopy.sections.stackSubtitle);
+  setTextList('.skill-category-header h3', langCopy.skills.titles);
+
+  setText('#projects .section-title', langCopy.sections.projectsTitle);
+  setText('#projects .section-subtitle', langCopy.sections.projectsSubtitle);
+  setAria('#project-filters', langCopy.projects.filterAria);
+  setTextList('.project-filter', langCopy.projects.filters);
+
+  setText('#experience .section-title', langCopy.sections.experienceTitle);
+  setText('#experience .section-subtitle', langCopy.sections.experienceSubtitle);
+  setText('.experience-panel .summary-panel-kicker', langCopy.experience.kicker);
+  setText('.experience-panel h3', langCopy.experience.title);
+  setTextList('.experience-panel .summary-list li', langCopy.experience.list);
+  setTextList('.experience-metric strong', langCopy.experience.metricTitles);
+  setTextList('.experience-metric span', langCopy.experience.metricValues);
+  applyTimelineCopy(langCopy.experience.timeline);
+
+  setText('#contact .section-title', langCopy.sections.contactTitle);
+  setText('#contact .section-subtitle', langCopy.sections.contactSubtitle);
+  setTextList('.contact-card h4', langCopy.contact.cardTitles);
+  setText('.contact-note .fw-600', langCopy.contact.availabilityValue);
+  setText('.contact-note p', langCopy.contact.availabilityText);
+  setSelect('#topic', langCopy.contact.topicPlaceholder, langCopy.contact.topicOptions);
+  setText('label[for="topic"]', langCopy.contact.topicLabel);
+  setInput('#name', 'label[for="name"]', langCopy.contact.namePlaceholder, langCopy.contact.nameLabel);
+  setInput('#email', 'label[for="email"]', langCopy.contact.emailPlaceholder, langCopy.contact.emailLabel);
+  setInput('#website', 'label[for="website"]', '', langCopy.contact.websiteLabel);
+  setTextarea('#message', 'label[for="message"]', langCopy.contact.messagePlaceholder, langCopy.contact.messageLabel);
+  setText('#contact-form button[type="submit"] span', langCopy.contact.submit);
+  setText('#contact-success', langCopy.contact.success);
+  setText('#contact-error', langCopy.contact.error);
+
+  setText('.footer-meta', langCopy.footer.meta);
+  setText('.footer-availability', langCopy.footer.availability);
+
+  syncThemeButtons(langCopy);
+  syncLanguageButtons();
+  window.dispatchEvent(new CustomEvent('warp:lang-changed', { detail: { lang: prefs.lang } }));
+}
+
+function applyTimelineCopy(items) {
+  const timelines = Array.from(document.querySelectorAll('.timeline-item'));
+  timelines.forEach((item, index) => {
+    const entry = items[index];
+    if (!entry) return;
+    setNodeText(item.querySelector('.timeline-header h3'), entry.title);
+    setNodeText(item.querySelector('.timeline-company'), entry.company);
+    setNodeText(item.querySelector('.timeline-date'), entry.date);
+    setNodeText(item.querySelector('.timeline-content p'), entry.body);
+  });
+}
+
+function syncThemeButtons(langCopy) {
   const checkbox = document.getElementById('theme-toggle-input');
   if (checkbox) checkbox.checked = prefs.theme === 'light';
 
-  const langLabels = document.querySelectorAll('.lang-toggle-label');
-  if (langLabels[0]) langLabels[0].classList.toggle('muted', prefs.lang !== 'es');
-  if (langLabels[1]) langLabels[1].classList.toggle('muted', prefs.lang !== 'en');
-
   const mobileTheme = document.getElementById('mobile-theme-toggle');
-  if (mobileTheme) mobileTheme.textContent = prefs.theme === 'light' ? copy.misc.mobileTheme.light : copy.misc.mobileTheme.dark;
+  if (mobileTheme) {
+    mobileTheme.textContent = prefs.theme === 'light'
+      ? langCopy.misc.mobileTheme.light
+      : langCopy.misc.mobileTheme.dark;
+  }
+}
+
+function syncLanguageButtons() {
+  const labels = document.querySelectorAll('.lang-toggle-label');
+  if (labels[0]) labels[0].classList.toggle('muted', prefs.lang !== 'es');
+  if (labels[1]) labels[1].classList.toggle('muted', prefs.lang !== 'en');
 
   const mobileLang = document.getElementById('mobile-lang-toggle');
-  if (mobileLang) mobileLang.textContent = prefs.lang === 'es' ? 'ES / EN' : 'EN / ES';
-}
-
-function applyLanguage() {
-  const copy = getLangCopy();
-
-  applyNavCopy('.nav-links .nav-link', copy.nav);
-  applyNavCopy('.mobile-menu .mobile-link', copy.nav);
-  document.querySelectorAll('.footer-nav a').forEach((node, index) => setNodeText(node, copy.footer.nav[index]));
-  document.querySelectorAll('.ticker-item').forEach((node, index) => setNodeText(node, copy.ticker[index]));
-
-  setText('.skip-link', copy.misc.skip);
-  setText('.nav-topline', copy.heroBadge);
-  setAria('#back-to-top', copy.misc.backTop);
-  setAria('#three-canvas', copy.misc.threeCanvas);
-  setText('#three-scene-desc', copy.misc.threeDesc);
-  setAria('#lang-toggle', copy.misc.langAria);
-  setAria('.cosmic-toggle', copy.misc.themeAria);
-  setText('#ui-toggle', copy.misc.uiToggle);
-
-  setText('.hero-badge-text', copy.heroBadge);
-  setText('.floating-badge', copy.floatingBadge);
-  document.querySelectorAll('.hero-title .hero-line').forEach((node, index) => setNodeText(node, copy.heroLines[index]));
-  setText('.hero-description-text', copy.heroDescription);
-  document.querySelectorAll('.hero-value-pill').forEach((node, index) => setNodeText(node, copy.heroHighlights[index]));
-  document.querySelectorAll('.hero-cta .btn span').forEach((node, index) => setNodeText(node, copy.ctas[index]));
-  document.querySelectorAll('.stat-label').forEach((node, index) => setNodeText(node, copy.stats[index]));
-  document.querySelectorAll('.ui-option > span:first-child').forEach((node, index) => setNodeText(node, copy.ui[index]));
-  document.querySelectorAll('.service-chip').forEach((node, index) => setNodeText(node, copy.serviceFilters[index]));
-  document.querySelectorAll('.project-filter').forEach((node, index) => setNodeText(node, copy.projectFilters[index]));
-  document.querySelectorAll('.project-data-pill').forEach((node, index) => setNodeText(node, copy.projectDataStrip[index]));
-
-  setSectionTitle('about', copy.sections.aboutTitle);
-  setSectionTitle('skills', copy.sections.skillsTitle);
-  setSectionSubtitle('skills', copy.sections.skillsSubtitle);
-  setSectionTitle('services', copy.sections.servicesTitle);
-  setSectionSubtitle('services', copy.sections.servicesSubtitle);
-  setSectionTitle('projects', copy.sections.projectsTitle);
-  setSectionSubtitle('projects', copy.sections.projectsSubtitle);
-  setSectionTitle('process', copy.sections.processTitle);
-  setSectionSubtitle('process', copy.sections.processSubtitle);
-  setSectionTitle('experience', copy.sections.experienceTitle);
-  setSectionTitle('contact', copy.sections.contactTitle);
-  setSectionSubtitle('contact', copy.sections.contactSubtitle);
-  setSectionTitle('experience-hero', copy.sections.experienceHeroTitle);
-  setSectionSubtitle('experience-hero', copy.sections.experienceHeroSubtitle);
-  const experienceActions = document.querySelectorAll('#experience-hero .experience-hero-actions a');
-  if (experienceActions[0]) experienceActions[0].textContent = copy.sections.experienceHeroPrimary;
-  if (experienceActions[1]) experienceActions[1].textContent = copy.sections.experienceHeroSecondary;
-  setSectionTitle('experience-cta', copy.sections.experienceCtaTitle);
-  setSectionSubtitle('experience-cta', copy.sections.experienceCtaSubtitle);
-  setText('#experience-cta .experience-cta-body p', copy.sections.experienceCtaBody);
-  setText('#experience-cta .experience-cta-body a', copy.sections.experienceCtaButton);
-  setSectionTitle('showcase', copy.sections.showcaseTitle);
-  setSectionSubtitle('showcase', copy.sections.showcaseSubtitle);
-  setSectionTitle('motion-reel', copy.sections.reelTitle);
-  setSectionSubtitle('motion-reel', copy.sections.reelSubtitle);
-  setSectionTitle('neo-lab', copy.sections.neoTitle);
-  setSectionSubtitle('neo-lab', copy.sections.neoSubtitle);
-  setSectionTitle('anime-lab', copy.sections.animeTitle);
-  setSectionSubtitle('anime-lab', copy.sections.animeSubtitle);
-  setSectionTitle('interaction-deck', copy.sections.deckTitle);
-  setSectionSubtitle('interaction-deck', copy.sections.deckSubtitle);
-  setSectionTitle('google-services-section', copy.sections.cloudTitle);
-  setSectionSubtitle('google-services-section', copy.sections.cloudSubtitle);
-  setSectionTitle('flow-simulator', copy.sections.flowTitle);
-  setSectionSubtitle('flow-simulator', copy.sections.flowSubtitle);
-  setSectionTitle('topology-lab', copy.sections.topologyTitle);
-  setSectionSubtitle('topology-lab', copy.sections.topologySubtitle);
-  setSectionTitle('split-reveal', copy.sections.splitTitle);
-  setSectionSubtitle('split-reveal', copy.sections.splitSubtitle);
-  setSectionTitle('elite-cases', copy.sections.eliteTitle);
-  setSectionSubtitle('elite-cases', copy.sections.eliteSubtitle);
-  setSectionTitle('tech-playbook', copy.sections.playbookTitle);
-  setSectionSubtitle('tech-playbook', copy.sections.playbookSubtitle);
-
-  if (copy.visualDna) {
-    setSectionTitle('visual-dna', copy.visualDna.title);
-    setSectionSubtitle('visual-dna', copy.visualDna.subtitle);
-    const visualCards = Array.from(document.querySelectorAll('#visual-dna .visual-dna-card'));
-    visualCards.forEach((card, index) => {
-      const cardCopy = copy.visualDna.cards?.[index];
-      if (!cardCopy) return;
-      setNodeText(card.querySelector('h3'), cardCopy.title);
-      setNodeText(card.querySelector('p'), cardCopy.text);
-      const pills = Array.from(card.querySelectorAll('.visual-dna-pills span'));
-      pills.forEach((pill, pillIndex) => setNodeText(pill, cardCopy.tags?.[pillIndex]));
-    });
-    setText('#visual-dna .visual-dna-label', copy.visualDna.stripLabel);
-    document.querySelectorAll('#visual-dna .visual-dna-tags span').forEach((tag, index) => {
-      setNodeText(tag, copy.visualDna.stripTags?.[index]);
-    });
-  }
-
-  setSectionTitle('engineering-focus', copy.sections.engineeringTitle);
-  setSectionSubtitle('engineering-focus', copy.sections.engineeringSubtitle);
-  if (copy.engineeringFocus) {
-    const cards = Array.from(document.querySelectorAll('#engineering-focus [data-engineering-card]'));
-    cards.forEach((card, index) => {
-      const cardCopy = copy.engineeringFocus.cards?.[index];
-      if (!cardCopy) return;
-      setNodeText(card.querySelector('.engineering-tag'), cardCopy.tag);
-      setNodeText(card.querySelector('h3'), cardCopy.title);
-      setNodeText(card.querySelector('p'), cardCopy.text);
-      const metrics = Array.from(card.querySelectorAll('.engineering-metrics span'));
-      metrics.forEach((metric, metricIndex) => setNodeText(metric, cardCopy.metrics?.[metricIndex]));
-    });
-    setText('#engineering-focus .engineering-callout-kicker', copy.engineeringFocus.calloutKicker);
-    setText('#engineering-focus .engineering-callout h3', copy.engineeringFocus.calloutTitle);
-    setText('#engineering-focus .engineering-callout p', copy.engineeringFocus.calloutText);
-    document.querySelectorAll('#engineering-focus .engineering-pill-row span').forEach((pill, index) => {
-      setNodeText(pill, copy.engineeringFocus.pills?.[index]);
-    });
-  }
-
-  document.querySelectorAll('#contact .contact-card h4').forEach((node, index) => setNodeText(node, copy.contact.cards[index]));
-  setFormField('#topic', '#contact label[for="topic"]', copy.contact.topicPlaceholder, copy.contact.topicLabel, copy.contact.topicOptions);
-  setInput('#name', '#contact label[for="name"]', copy.contact.namePlaceholder, copy.contact.nameLabel);
-  setInput('#email', '#contact label[for="email"]', copy.contact.emailPlaceholder, copy.contact.emailLabel);
-  setTextarea('#message', '#contact label[for="message"]', copy.contact.messagePlaceholder, copy.contact.messageLabel);
-  setInput('#website', '#contact label[for="website"]', '', copy.contact.websiteLabel);
-  setText('#contact-form button[type="submit"] span', copy.contact.submit);
-  setText('#contact-success', copy.contact.success);
-  setText('#contact-error', copy.contact.error);
-
-  setText('.footer-brand > p:first-of-type', copy.footer.byline);
-  setText('.footer-meta', copy.footer.meta);
-  setText('.footer-availability', copy.footer.availability);
-  document.documentElement.lang = prefs.lang;
-  window.dispatchEvent(new CustomEvent('warp:lang-changed', { detail: { lang: prefs.lang, copy } }));
-}
-
-function setSectionTitle(id, value) {
-  const node = document.querySelector(`#${id} .section-title`);
-  if (node && typeof value === 'string') node.textContent = value;
-}
-
-function setSectionSubtitle(id, value) {
-  setText(`#${id} .section-subtitle`, value);
-}
-
-function setFormField(selectSelector, labelSelector, placeholder, label, options) {
-  const select = document.querySelector(selectSelector);
-  if (select) {
-    const first = select.querySelector('option[value=""]');
-    if (first) first.textContent = placeholder;
-    const optionNodes = Array.from(select.querySelectorAll('option:not([value=""])'));
-    optionNodes.forEach((node, index) => setNodeText(node, options?.[index]));
-  }
-  setText(labelSelector, label);
+  if (mobileLang) mobileLang.textContent = prefs.lang === 'es' ? copy.es.misc.mobileLang : copy.en.misc.mobileLang;
 }
 
 function setInput(inputSelector, labelSelector, placeholder, label) {
@@ -514,18 +429,31 @@ function setInput(inputSelector, labelSelector, placeholder, label) {
 }
 
 function setTextarea(selector, labelSelector, placeholder, label) {
-  const node = document.querySelector(selector);
-  if (node && typeof placeholder === 'string') node.setAttribute('placeholder', placeholder);
+  const field = document.querySelector(selector);
+  if (field && typeof placeholder === 'string') field.setAttribute('placeholder', placeholder);
   setText(labelSelector, label);
 }
 
-function setText(selector, value) {
-  const node = document.querySelector(selector);
-  setNodeText(node, value);
+function setSelect(selector, placeholder, options) {
+  const select = document.querySelector(selector);
+  if (!select) return;
+
+  const placeholderNode = select.querySelector('option[value=""]');
+  if (placeholderNode) placeholderNode.textContent = placeholder;
+
+  Array.from(select.querySelectorAll('option:not([value=""])')).forEach((option, index) => {
+    setNodeText(option, options[index]);
+  });
 }
 
-function setTextAll(selector, value) {
-  document.querySelectorAll(selector).forEach((node) => setNodeText(node, value));
+function setMeta(name, value) {
+  const node = document.querySelector(`meta[name="${name}"]`);
+  if (node && typeof value === 'string') node.setAttribute('content', value);
+}
+
+function setMetaProperty(name, value) {
+  const node = document.querySelector(`meta[property="${name}"]`);
+  if (node && typeof value === 'string') node.setAttribute('content', value);
 }
 
 function setAria(selector, value) {
@@ -533,13 +461,16 @@ function setAria(selector, value) {
   if (node && typeof value === 'string') node.setAttribute('aria-label', value);
 }
 
-function setNodeText(node, value) {
-  if (node && typeof value === 'string') node.textContent = value;
+function setText(selector, value) {
+  setNodeText(document.querySelector(selector), value);
 }
 
-function applyNavCopy(selector, labels) {
+function setTextList(selector, values) {
   document.querySelectorAll(selector).forEach((node, index) => {
-    setNodeText(node, labels?.[index]);
+    setNodeText(node, values[index]);
   });
 }
 
+function setNodeText(node, value) {
+  if (node && typeof value === 'string') node.textContent = value;
+}

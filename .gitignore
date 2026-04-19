@@ -7,13 +7,16 @@ dist/
 # Local tooling state
 .codex/
 .vercel/
+.wrangler/
 .history/
+.env.cloudflare.local
 agent-diseno-ia/
 .pr-integrate/
 agent-handoff/
 folio-2019/
 tmp/
 webgl-black-hole/
+IMAGENES/
 
 # PERSONAL FILES
 .personal/
@@ -47,3 +50,15 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 .vercel
+preview.log
+preview.local*.log
+studio*.log
+
+# Visual QA artefacts
+*-check.png
+*-ref.png
+preview-*.png
+section-*.png
+shot-*.png
+qa-local-*.png
+qa-local-home*.png

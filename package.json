@@ -1,5 +1,5 @@
 {
-  "name": "portfolio-3d",
+  "name": "warp-portfolio",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -11,21 +11,19 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "cf:dev": "wrangler dev",
+    "cf:deploy": "wrangler deploy",
+    "cf:check": "wrangler check",
     "test": "node --test \"tests/**/*.test.js\"",
-    "export:original-glb": "node scripts/export-original-glb.mjs",
     "sync:projects": "node scripts/sync-github-projects.mjs"
   },
   "devDependencies": {
     "playwright": "^1.58.2",
     "vite": "^8.0.8",
-    "vite-plugin-glsl": "^1.5.5"
+    "wrangler": "^4.81.1"
   },
   "dependencies": {
-    "@studio-freight/lenis": "^1.0.42",
-    "@vercel/kv": "^3.0.0",
-    "animejs": "^3.2.2",
-    "gsap": "^3.14.2",
-    "three": "^0.162.0"
+    "@vercel/kv": "^3.0.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

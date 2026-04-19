@@ -1,327 +1,425 @@
-import { toText, toId, toSafeGithubUrl } from '../utils/helpers.js';
-import { isReduced, supportsFinePointer, MOTION } from '../utils/motion.js';
-import { announce } from '../utils/dom.js';
-import anime from 'animejs/lib/anime.es.js';
+import { refreshSurfaceInteractions } from './ui.js';
+import { toId, toSafeGithubUrl, toText } from '../utils/helpers.js';
+import { prefs } from './preferences.js';
+
+const TECH_ICON_MAP = {
+  java: { label: 'Java', icon: '/media/icons/java.webp' },
+  python: { label: 'Python', icon: '/media/icons/python.webp' },
+  docker: { label: 'Docker', icon: '/media/icons/docker.webp' },
+  react: { label: 'React', icon: '/media/icons/react.webp' },
+  github: { label: 'GitHub', icon: '/media/icons/github.webp' },
+  linux: { label: 'Linux', icon: '/media/icons/linux.webp' },
+  windows: { label: 'Windows', icon: '/media/icons/windows.webp' },
+  copilot: { label: 'Copilot', icon: '/media/icons/copilot.webp' },
+  gemini: { label: 'Gemini', icon: '/media/icons/gemini.webp' },
+};
+
+const FILTER_KEYS = ['all', 'backend', 'security', 'automation', 'systems'];
+
+const UI_COPY = {
+  es: {
+    filters: {
+      all: 'todos',
+      backend: 'backend',
+      security: 'seguridad',
+      automation: 'automatizacion',
+      systems: 'sistemas',
+    },
+    count: (shown, total, label) => label === 'todos'
+      ? `Mostrando ${shown} de ${total} proyectos`
+      : `Mostrando ${shown} proyectos en ${label}`,
+    empty: 'No hay proyectos en esta categoria todavia.',
+    problem: 'Problema',
+    outcome: 'Resultado',
+    code: 'Ver codigo',
+    demo: 'Ver demo',
+    repo: 'Repositorio publico',
+    featured: 'Seleccion principal',
+  },
+  en: {
+    filters: {
+      all: 'all',
+      backend: 'backend',
+      security: 'security',
+      automation: 'automation',
+      systems: 'systems',
+    },
+    count: (shown, total, label) => label === 'all'
+      ? `Showing ${shown} of ${total} projects`
+      : `Showing ${shown} projects in ${label}`,
+    empty: 'There are no projects in this category yet.',
+    problem: 'Problem',
+    outcome: 'Outcome',
+    code: 'View code',
+    demo: 'View demo',
+    repo: 'Public repository',
+    featured: 'Primary selection',
+  },
+};
 
 const FALLBACK_PROJECTS = [
   {
-    id: 'warp-portfolio-3d',
-    repoName: 'WARP',
-    name: 'WARP Portfolio 3D',
-    description: 'Portfolio inmersivo con render 3D, motion design y una presentación técnica más visual.',
-    impact: 'Unifica identidad, narrativa y demostración técnica en una sola experiencia.',
-    language: 'JavaScript',
-    stack: ['Vite', 'Three.js', 'Anime.js', 'Vercel'],
-    domain: 'web frontend ux production core',
-    githubUrl: 'https://github.com/ikerperez12/WARP',
-    demoUrl: 'https://portfolio-iker-perez.vercel.app/',
-    imageUrl: 'https://opengraph.githubassets.com/1/ikerperez12/WARP',
-    imageAlt: 'Vista previa del portfolio WARP',
-    stars: 0,
-    forks: 0,
-    updatedAt: '2026-02-28T21:51:57Z',
-    accent: 'accent-1',
+    id: 'isd',
+    repoName: 'ISD',
+    name: 'Internet y Sistemas Distribuidos',
+    role: 'Backend y sistemas distribuidos',
+    year: '2025',
+    status: 'Academico',
+    summary: 'Servicios desacoplados, APIs REST y despliegue reproducible con Docker y PostgreSQL.',
+    problem: 'Disenar una base backend clara para comunicacion entre servicios, persistencia relacional y despliegue consistente.',
+    outcome: 'Evidencia buen criterio en arquitectura backend, endpoints, contenedores y trabajo con bases de datos relacionales.',
+    highlights: [
+      'Diseno de endpoints y contratos para servicios distribuidos.',
+      'Dockerizacion del entorno y persistencia sobre PostgreSQL.',
+      'Trabajo orientado a integracion, arquitectura y mantenibilidad.',
+    ],
+    featuredTech: ['java', 'docker', 'github'],
+    stack: ['Java', 'REST', 'Docker', 'PostgreSQL'],
+    categories: ['backend', 'systems'],
+    githubUrl: 'https://github.com/ikerperez12/ISD',
+    demoUrl: '',
+    featured: true,
   },
   {
     id: 'auditoria-pqc',
     repoName: '1.2-AuditoriaPQC',
     name: 'Auditoria PQC',
-    description: 'Análisis aplicado de protocolos post-cuánticos y capturas de red en laboratorio.',
-    impact: 'Refuerza criterio técnico en criptografía, auditoría y validación de seguridad.',
-    language: 'Python',
-    stack: ['Python', 'PQC', 'Wireshark', 'Auditing'],
-    domain: 'security backend data production core',
+    role: 'Investigacion en seguridad',
+    year: '2026',
+    status: 'Investigacion',
+    summary: 'Analisis tecnico de criptografia postcuantica, trafico de red y validacion de protocolos.',
+    problem: 'Comprobar comportamiento real de protocolos y detectar puntos de riesgo desde capturas y revision tecnica.',
+    outcome: 'Refuerza criterio en seguridad aplicada, lectura defensiva del sistema y documentacion de hallazgos.',
+    highlights: [
+      'Revision de protocolos postcuanticos con enfoque de validacion.',
+      'Captura e interpretacion de trafico para verificar comportamiento real.',
+      'Documentacion tecnica de hallazgos y superficie de riesgo.',
+    ],
+    featuredTech: ['python', 'linux', 'github'],
+    stack: ['Python', 'PQC', 'Wireshark', 'Auditoria'],
+    categories: ['security', 'systems'],
     githubUrl: 'https://github.com/ikerperez12/1.2-AuditoriaPQC',
     demoUrl: '',
-    imageUrl: 'https://opengraph.githubassets.com/1/ikerperez12/1.2-AuditoriaPQC',
-    imageAlt: 'Vista previa del repositorio Auditoria PQC',
-    stars: 2,
-    forks: 0,
-    updatedAt: '2026-02-28T21:45:42Z',
-    accent: 'accent-3',
+    featured: true,
+  },
+  {
+    id: 'gpt-cmd',
+    repoName: 'GPT_CMD',
+    name: 'GPT CMD',
+    role: 'CLI y automatizacion',
+    year: '2026',
+    status: 'Automatizacion',
+    summary: 'CLI para automatizar tareas tecnicas repetitivas con apoyo de IA y trabajo desde terminal.',
+    problem: 'Reducir friccion en operaciones repetidas y flujos de terminal manteniendo control tecnico.',
+    outcome: 'Demuestra iniciativa en tooling interno, automatizacion local y utilidades orientadas a productividad.',
+    highlights: [
+      'Automatizacion de prompts, comandos y pasos repetidos.',
+      'Interfaz CLI pensada para uso diario y ciclos rapidos de prueba.',
+      'Base util para evolucionar utilidades y tooling interno.',
+    ],
+    featuredTech: ['python', 'copilot', 'github'],
+    stack: ['Python', 'CLI', 'Automatizacion', 'LLM Ops'],
+    categories: ['automation', 'backend'],
+    githubUrl: 'https://github.com/ikerperez12/GPT_CMD',
+    demoUrl: '',
+    featured: true,
+  },
+  {
+    id: 'so-shell',
+    repoName: 'SO-SHELL-p2',
+    name: 'Shell y Sistemas Operativos',
+    role: 'Programacion de sistemas',
+    year: '2024',
+    status: 'Sistemas',
+    summary: 'Procesos, shell y fundamentos de sistemas con mentalidad de entorno operativo real.',
+    problem: 'Trabajar cerca del sistema operativo para entender procesos, recursos y ejecucion en entorno POSIX.',
+    outcome: 'Refuerza base de bajo nivel, diagnostico y razonamiento sobre comportamiento del sistema.',
+    highlights: [
+      'Control de procesos y ejecucion sobre entorno POSIX.',
+      'Practicas de shell y automatizacion a bajo nivel.',
+      'Diagnostico de comportamiento y recursos del sistema.',
+    ],
+    featuredTech: ['linux', 'github'],
+    stack: ['C', 'POSIX', 'Shell', 'Procesos'],
+    categories: ['systems'],
+    githubUrl: 'https://github.com/ikerperez12/SO-SHELL-p2',
+    demoUrl: '',
+    featured: true,
   },
 ];
 
-let activeProjectFilter = 'all';
-let activeServiceFilter = 'all';
-let projectRegistry = FALLBACK_PROJECTS.slice();
-const projectMap = new Map();
-const PROJECT_COPY = {
-  es: {
-    allCategories: 'todas las categorías',
-    showing: (shown, total, label) => `Mostrando ${shown} de ${total} proyectos (${label})`,
-    updated: 'Actualizado',
-    updatedToday: 'Actualizado hoy',
-    agoDays: (days) => `Hace ${days} días`,
-    topPick: 'Top pick',
-    github: 'GitHub',
-    impact: 'Impacto:',
-    stackBase: 'stack base',
-    stars: 'stars',
-    forks: 'forks',
-  },
-  en: {
-    allCategories: 'all categories',
-    showing: (shown, total, label) => `Showing ${shown} of ${total} projects (${label})`,
-    updated: 'Updated',
-    updatedToday: 'Updated today',
-    agoDays: (days) => `${days} days ago`,
-    topPick: 'Top pick',
-    github: 'GitHub',
-    impact: 'Impact:',
-    stackBase: 'core stack',
-    stars: 'stars',
-    forks: 'forks',
-  },
-};
+let projectRegistry = FALLBACK_PROJECTS.map((item, index) => normalizeProject(item, index));
+let activeFilter = 'all';
 
 export function initProjects() {
-  initFilters();
-  applyProjectFilter(activeProjectFilter);
-  applyServiceFilter(activeServiceFilter);
+  bindProjectFilters();
+  renderProjectCards();
+  emitProjectRegistry();
   fetchProjects();
-  window.addEventListener('warp:lang-changed', () => {
-    renderProjectCards();
-    initCardInteractions();
-    applyProjectFilter(activeProjectFilter);
-  });
+  window.addEventListener('warp:prefs-changed', renderProjectCards);
 }
 
-function initFilters() {
-  document.querySelectorAll('.project-filter').forEach((button) => {
+function bindProjectFilters() {
+  const buttons = Array.from(document.querySelectorAll('.project-filter'));
+  if (!buttons.length) return;
+
+  buttons.forEach((button) => {
     button.addEventListener('click', () => {
-      applyProjectFilter(button.dataset.filter || 'all');
-      announce(`Filtro de proyectos: ${button.dataset.filter || 'all'}`);
+      const nextFilter = button.dataset.filter || 'all';
+      if (nextFilter === activeFilter) return;
+      activeFilter = nextFilter;
+      syncProjectFilters(buttons);
+      renderProjectCards();
     });
   });
 
-  document.querySelectorAll('.service-chip').forEach((button) => {
-    button.addEventListener('click', () => {
-      applyServiceFilter(button.dataset.serviceFilter || 'all');
-      announce(`Categoría de servicio: ${button.dataset.serviceFilter || 'all'}`);
-    });
-  });
+  syncProjectFilters(buttons);
 }
 
-function initCardInteractions() {
-  document.querySelectorAll('.projects-grid .project-card').forEach((card) => {
-    if (supportsFinePointer) {
-      card.addEventListener('pointermove', (event) => {
-        const rect = card.getBoundingClientRect();
-        card.style.setProperty('--spotlight-x', `${event.clientX - rect.left}px`);
-        card.style.setProperty('--spotlight-y', `${event.clientY - rect.top}px`);
-      });
-    }
-
-    card.addEventListener('mouseenter', () => {
-      if (isReduced()) return;
-      anime({
-        targets: card.querySelectorAll('.project-tags span, .project-metrics li'),
-        translateY: [-4, 0],
-        opacity: [0.68, 1],
-        delay: anime.stagger(32),
-        easing: MOTION.easeSoft,
-        duration: MOTION.durationFast,
-      });
-    });
-  });
-}
-
-function applyProjectFilter(filter) {
-  const cards = Array.from(document.querySelectorAll('.projects-grid .project-card:not(.is-skeleton)'));
-  activeProjectFilter = toText(filter, 'all').toLowerCase();
-  let shown = 0;
-
-  cards.forEach((card) => {
-    const domains = toText(card.dataset.domain, '').toLowerCase().split(/\s+/).filter(Boolean);
-    const visible = activeProjectFilter === 'all' || domains.includes(activeProjectFilter);
-    card.classList.toggle('is-hidden', !visible);
-    card.setAttribute('aria-hidden', visible ? 'false' : 'true');
-    if (visible) shown += 1;
-  });
-
-  document.querySelectorAll('.project-filter').forEach((button) => {
-    const value = toText(button.dataset.filter, 'all').toLowerCase();
-    const active = value === activeProjectFilter;
+function syncProjectFilters(buttons = Array.from(document.querySelectorAll('.project-filter'))) {
+  buttons.forEach((button) => {
+    const active = (button.dataset.filter || 'all') === activeFilter;
     button.classList.toggle('is-active', active);
     button.setAttribute('aria-pressed', active ? 'true' : 'false');
   });
-
-  const status = document.getElementById('project-filter-status');
-  if (status) {
-    const copy = PROJECT_COPY[document.documentElement.lang === 'en' ? 'en' : 'es'];
-    const label = activeProjectFilter === 'all' ? copy.allCategories : activeProjectFilter;
-    status.textContent = copy.showing(shown, cards.length, label);
-  }
-
-  if (!isReduced()) {
-    const visibleCards = cards.filter((card) => !card.classList.contains('is-hidden'));
-    anime.remove(visibleCards);
-    anime({
-      targets: visibleCards,
-      opacity: [0, 1],
-      translateY: [12, 0],
-      easing: MOTION.easePrimary,
-      duration: MOTION.durationFast + 80,
-      delay: anime.stagger(40),
-    });
-  }
 }
 
-function applyServiceFilter(filter) {
-  const cards = Array.from(document.querySelectorAll('.services-grid .service-card'));
-  activeServiceFilter = toText(filter, 'all').toLowerCase();
-  cards.forEach((card) => {
-    const domains = toText(card.dataset.serviceDomain, '').toLowerCase().split(/\s+/).filter(Boolean);
-    const visible = activeServiceFilter === 'all' || domains.includes(activeServiceFilter);
-    card.classList.toggle('is-hidden', !visible);
-    card.setAttribute('aria-hidden', visible ? 'false' : 'true');
-  });
-
-  document.querySelectorAll('.service-chip').forEach((button) => {
-    const value = toText(button.dataset.serviceFilter, 'all').toLowerCase();
-    const active = value === activeServiceFilter;
-    button.classList.toggle('is-active', active);
-    button.setAttribute('aria-pressed', active ? 'true' : 'false');
-  });
+function fetchProjects() {
+  fetch('/projects.json')
+    .then((response) => (response.ok ? response.json() : Promise.reject(new Error(`HTTP ${response.status}`))))
+    .then((data) => {
+      if (!Array.isArray(data)) return;
+      const normalized = data.map((item, index) => normalizeProject(item, index)).filter(Boolean);
+      if (!normalized.length) return;
+      projectRegistry = normalized;
+      renderProjectCards();
+      emitProjectRegistry();
+    })
+    .catch(() => {
+      renderProjectCards();
+      emitProjectRegistry();
+    });
 }
 
 function normalizeProject(item, index) {
   const id = toId(item?.id || item?.repoName || item?.name || `project_${index + 1}`);
-  const stack = Array.isArray(item?.stack)
-    ? item.stack.map((entry) => toText(entry)).filter(Boolean).slice(0, 4)
+  if (!id) return null;
+
+  const tech = Array.isArray(item?.featuredTech)
+    ? item.featuredTech
+        .map((entry) => toText(entry).toLowerCase())
+        .filter((entry) => TECH_ICON_MAP[entry])
+        .slice(0, 4)
     : [];
+
+  const stack = Array.isArray(item?.stack)
+    ? item.stack.map((entry) => toText(entry)).filter(Boolean).slice(0, 6)
+    : [];
+
+  const role = toText(item?.role, 'Proyecto tecnico');
+  const status = toText(item?.status, 'Proyecto');
+  const summary = toText(item?.summary || item?.focus || item?.description, 'Proyecto tecnico orientado a software mantenible y capacidad de entrega.');
+  const problem = toText(item?.problem, 'Resolver una necesidad tecnica real con criterio de implementacion y mantenibilidad.');
+  const outcome = toText(item?.outcome || item?.impact, 'Demuestra base tecnica, autonomia y capacidad para construir soluciones solidas.');
 
   return {
     id,
-    repoName: toText(item?.repoName, item?.name || id),
+    repoName: toText(item?.repoName, toText(item?.name, 'Repo')),
     name: toText(item?.name, 'Proyecto'),
-    description: toText(item?.description, 'Proyecto técnico con ejecución real y enfoque en producto.'),
-    impact: toText(item?.impact, 'Aporta evidencia práctica del stack, criterio técnico y capacidad de entrega.'),
-    language: toText(item?.language, 'Code'),
-    stack: stack.length ? stack : [toText(item?.language, 'Code')],
-    domain: toText(item?.domain, 'core production'),
+    role,
+    year: /^\d{4}$/.test(toText(item?.year)) ? toText(item?.year) : String(new Date().getFullYear()),
+    status,
+    summary,
+    problem,
+    outcome,
+    highlights: Array.isArray(item?.highlights)
+      ? item.highlights.map((entry) => toText(entry)).filter(Boolean).slice(0, 3)
+      : [],
+    featuredTech: tech,
+    stack,
+    categories: deriveCategories(item, { role, status, summary, problem, outcome, stack }),
     githubUrl: toSafeGithubUrl(item?.githubUrl),
     demoUrl: /^https:\/\//.test(toText(item?.demoUrl)) ? item.demoUrl : '',
-    imageUrl: /^https:\/\//.test(toText(item?.imageUrl)) ? item.imageUrl : '',
-    imageAlt: toText(item?.imageAlt, `Vista previa de ${toText(item?.name, 'proyecto')}`),
-    stars: Number(item?.stars || 0),
-    forks: Number(item?.forks || 0),
-    updatedAt: toText(item?.updatedAt),
-    accent: /accent-[1-4]/.test(toText(item?.accent)) ? item.accent : `accent-${(index % 4) + 1}`,
+    featured: item?.featured !== false,
   };
 }
 
-function fetchProjects() {
-  hydrateRegistry(FALLBACK_PROJECTS);
+function deriveCategories(item, normalized) {
+  const explicit = Array.isArray(item?.categories)
+    ? item.categories.map((entry) => toText(entry).toLowerCase()).filter(Boolean)
+    : [];
 
-  fetch('/projects.json')
-    .then((response) => (response.ok ? response.json() : Promise.reject(new Error(`HTTP ${response.status}`))))
-    .then((data) => {
-      const normalized = Array.isArray(data)
-        ? data.map((item, index) => normalizeProject(item, index)).filter((item) => item.id)
-        : [];
-      hydrateRegistry(normalized.length ? normalized : FALLBACK_PROJECTS);
-    })
-    .catch((error) => {
-      console.warn('[projects] using fallback project registry', error);
-      hydrateRegistry(FALLBACK_PROJECTS);
-    });
-}
+  const categories = new Set(explicit);
+  const haystack = [
+    normalized.role,
+    normalized.status,
+    normalized.summary,
+    normalized.problem,
+    normalized.outcome,
+    ...normalized.stack,
+  ].join(' ').toLowerCase();
 
-function hydrateRegistry(items) {
-  projectRegistry = items.slice();
-  projectMap.clear();
-  projectRegistry.forEach((item) => projectMap.set(item.id, item));
-  renderProjectCards();
-  initCardInteractions();
-  applyProjectFilter(activeProjectFilter);
-  window.dispatchEvent(new CustomEvent('warp:project-registry', { detail: { projects: projectRegistry } }));
+  if (/backend|rest|api|postgres|sql|spring|servicio/.test(haystack)) categories.add('backend');
+  if (/seguridad|security|pqc|wireshark|auditoria|crypto|criptografia/.test(haystack)) categories.add('security');
+  if (/automatizacion|automation|cli|tooling|llm|agente/.test(haystack)) categories.add('automation');
+  if (/sistema|systems|linux|docker|shell|posix|infraestructura|procesos/.test(haystack)) categories.add('systems');
+  if (!categories.size) categories.add('backend');
+
+  return Array.from(categories).filter((entry) => FILTER_KEYS.includes(entry)).slice(0, 3);
 }
 
 function renderProjectCards() {
   const grid = document.getElementById('projects-grid');
+  const status = document.getElementById('project-filter-status');
   if (!grid) return;
 
-  grid.innerHTML = projectRegistry.map((project, index) => createProjectCardMarkup(project, index)).join('');
-  bindCardMediaFallbacks(grid);
-}
-
-function createProjectCardMarkup(project, index) {
-  const copy = PROJECT_COPY[document.documentElement.lang === 'en' ? 'en' : 'es'];
-  const updatedLabel = formatRelativeDate(project.updatedAt);
-  const metrics = [
-    `<li><strong>${project.language}</strong><span>${copy.stackBase}</span></li>`,
-    `<li><strong>${project.stars}</strong><span>${copy.stars}</span></li>`,
-    `<li><strong>${project.forks}</strong><span>${copy.forks}</span></li>`,
-  ].join('');
-
-  const actions = [
-    `<a href="${escapeHtml(project.githubUrl)}" rel="noopener noreferrer" class="project-link" aria-label="Abrir repositorio ${escapeHtml(project.name)} en GitHub">` +
-      `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>` +
-    `</a>`,
-  ];
-
-  if (project.demoUrl) {
-    actions.push(
-      `<a href="${escapeHtml(project.demoUrl)}" rel="noopener noreferrer" class="project-link" aria-label="Abrir demo de ${escapeHtml(project.name)}">` +
-        `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3h7v7"/><path d="M10 14L21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>` +
-      `</a>`
-    );
+  const items = getVisibleProjects();
+  const langCopy = getProjectCopy();
+  if (!items.length) {
+    grid.innerHTML = `<div class="project-empty">${langCopy.empty}</div>`;
+  } else {
+    grid.innerHTML = items.map((project, index) => createProjectCard(project, index)).join('');
+    requestAnimationFrame(() => {
+      Array.from(grid.querySelectorAll('.project-card')).forEach((card, index) => {
+        card.style.setProperty('--enter-delay', `${index * 60}ms`);
+        requestAnimationFrame(() => card.classList.add('is-visible'));
+      });
+    });
   }
 
+  const filterLabel = langCopy.filters[activeFilter] || langCopy.filters.all;
+  if (status) status.textContent = langCopy.count(items.length, projectRegistry.length, filterLabel);
+  refreshSurfaceInteractions();
+}
+
+function getVisibleProjects() {
+  const ordered = [...projectRegistry].sort((a, b) => {
+    if (a.featured !== b.featured) return Number(b.featured) - Number(a.featured);
+    return Number(b.year) - Number(a.year);
+  });
+
+  if (activeFilter === 'all') return ordered;
+  return ordered.filter((project) => project.categories.includes(activeFilter));
+}
+
+function createProjectCard(project, index) {
+  const langCopy = getProjectCopy();
+  const links = [];
+  if (project.githubUrl) {
+    links.push(`<a href="${escapeHtml(project.githubUrl)}" rel="noopener noreferrer" class="project-link">${langCopy.code}</a>`);
+  }
+  if (project.demoUrl) {
+    links.push(`<a href="${escapeHtml(project.demoUrl)}" rel="noopener noreferrer" class="project-link">${langCopy.demo}</a>`);
+  }
+
+  const tone = project.categories[0] || 'backend';
+  const isPrimary = activeFilter === 'all' && index === 0;
+  const categoryChips = project.categories.length
+    ? `<div class="project-categories">${project.categories.map((item) => `<span>${escapeHtml(langCopy.filters[item] || item)}</span>`).join('')}</div>`
+    : '';
+  const stackPreview = project.stack.slice(0, 3);
+  const signalWidths = deriveSignalWidths(project);
+  const visualIcons = project.featuredTech.length
+    ? project.featuredTech.map(createTechOrb).join('')
+    : '';
+
   return `
-    <article class="project-card anim-reveal" data-project-id="${escapeHtml(project.id)}" data-domain="${escapeHtml(project.domain)}">
-      <div class="project-image">
-        <img class="project-image-media" src="${escapeHtml(project.imageUrl)}" alt="${escapeHtml(project.imageAlt)}" loading="lazy" decoding="async" />
-        <div class="project-image-placeholder ${escapeHtml(project.accent)}" aria-hidden="true">
-          <span class="project-placeholder-label">${escapeHtml(project.repoName)}</span>
+    <article class="project-card ${isPrimary ? 'project-card--featured' : ''}" data-project-id="${escapeHtml(project.id)}" data-tone="${escapeHtml(tone)}">
+      <div class="project-card-shell">
+        <div class="project-info">
+          <div class="project-card-top">
+            <span class="project-status">${escapeHtml(project.status)}</span>
+            <span class="project-year">${escapeHtml(project.year)}</span>
+          </div>
+          <div class="project-card-heading">
+            <div>
+              ${isPrimary ? `<span class="project-accent-label">${escapeHtml(langCopy.featured)}</span>` : ''}
+              <span class="project-role">${escapeHtml(project.role)}</span>
+              <h3 class="project-title">${escapeHtml(project.name)}</h3>
+            </div>
+            <span class="project-repo">${escapeHtml(project.repoName)}</span>
+          </div>
+          <p class="project-summary">${escapeHtml(project.summary)}</p>
+          ${categoryChips}
+          <div class="project-detail-grid">
+            <div class="project-detail">
+              <span>${langCopy.problem}</span>
+              <p>${escapeHtml(project.problem)}</p>
+            </div>
+            <div class="project-detail">
+              <span>${langCopy.outcome}</span>
+              <p>${escapeHtml(project.outcome)}</p>
+            </div>
+          </div>
+          ${project.highlights.length ? `<ul class="project-highlight-list">${project.highlights.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : ''}
+          ${project.featuredTech.length ? `<div class="project-tech-row">${project.featuredTech.map(createTechChip).join('')}</div>` : ''}
+          ${project.stack.length ? `<div class="project-tags">${project.stack.map((item) => `<span>${escapeHtml(item)}</span>`).join('')}</div>` : ''}
+          <div class="project-footer">
+            <span class="project-role">${langCopy.repo}</span>
+            <div class="project-footer-links">${links.join('')}</div>
+          </div>
         </div>
-        <div class="project-overlay">
-          <div class="project-actions">${actions.join('')}</div>
+        <div class="project-visual" aria-hidden="true">
+          <div class="project-visual-glass">
+            <div class="project-visual-head">
+              <span class="project-visual-path">/${escapeHtml(project.repoName.toLowerCase())}</span>
+              <span class="project-visual-badge">${escapeHtml(project.year)}</span>
+            </div>
+            <div class="project-visual-stage">
+              <div class="project-visual-orbs">${visualIcons}</div>
+              <div class="project-visual-panels">
+                ${signalWidths.map((width, signalIndex) => `<span class="project-signal project-signal-${signalIndex + 1}" style="--signal-width:${width}%"></span>`).join('')}
+              </div>
+            </div>
+            <div class="project-visual-foot">
+              ${stackPreview.map((item) => `<span class="project-visual-pill">${escapeHtml(item)}</span>`).join('')}
+            </div>
+          </div>
         </div>
-        <div class="project-badges">
-          <span class="project-flag">${index < 3 ? copy.topPick : copy.github}</span>
-          <span class="project-update">${escapeHtml(updatedLabel)}</span>
-        </div>
-      </div>
-      <div class="project-info">
-        <div class="project-tags">${project.stack.map((tag) => `<span>${escapeHtml(tag)}</span>`).join('')}</div>
-        <h3 class="project-title">${escapeHtml(project.name)}</h3>
-        <p class="project-desc">${escapeHtml(project.description)}</p>
-        <ul class="project-metrics">${metrics}</ul>
-        <p class="project-impact"><strong>${copy.impact}</strong> ${escapeHtml(project.impact)}</p>
       </div>
     </article>
   `;
 }
 
-function bindCardMediaFallbacks(grid) {
-  grid.querySelectorAll('.project-image-media').forEach((image) => {
-    const showFallback = () => {
-      image.classList.add('is-hidden');
-      const placeholder = image.parentElement?.querySelector('.project-image-placeholder');
-      if (placeholder) placeholder.classList.add('is-visible');
-    };
+function createTechChip(key) {
+  const tech = TECH_ICON_MAP[key];
+  if (!tech) return '';
 
-    image.addEventListener('error', showFallback, { once: true });
-    image.addEventListener('load', () => {
-      const placeholder = image.parentElement?.querySelector('.project-image-placeholder');
-      if (placeholder) placeholder.classList.remove('is-visible');
-    }, { once: true });
-  });
+  return `
+    <span class="project-tech-chip">
+      <span class="project-tech-icon"><img src="${escapeHtml(tech.icon)}" alt="" aria-hidden="true" loading="lazy" decoding="async" /></span>
+      <span>${escapeHtml(tech.label)}</span>
+    </span>
+  `;
 }
 
-function formatRelativeDate(value) {
-  const copy = PROJECT_COPY[document.documentElement.lang === 'en' ? 'en' : 'es'];
-  if (!value) return copy.updated;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return copy.updated;
-  const diffDays = Math.max(0, Math.round((Date.now() - date.getTime()) / 86400000));
-  if (diffDays <= 1) return copy.updatedToday;
-  if (diffDays < 30) return copy.agoDays(diffDays);
-  const formatter = new Intl.DateTimeFormat(document.documentElement.lang === 'en' ? 'en-US' : 'es-ES', { month: 'short', year: 'numeric' });
-  return formatter.format(date);
+function createTechOrb(key) {
+  const tech = TECH_ICON_MAP[key];
+  if (!tech) return '';
+
+  return `
+    <span class="project-tech-orb">
+      <img src="${escapeHtml(tech.icon)}" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+    </span>
+  `;
+}
+
+function deriveSignalWidths(project) {
+  const seed = `${project.id}${project.year}${project.stack.join('')}`;
+  let hash = 0;
+  for (let i = 0; i < seed.length; i += 1) {
+    hash = (hash * 31 + seed.charCodeAt(i)) % 997;
+  }
+
+  return [0, 1, 2].map((offset) => 36 + ((hash + offset * 73) % 48));
+}
+
+function emitProjectRegistry() {
+  window.dispatchEvent(new CustomEvent('warp:project-registry', { detail: { projects: projectRegistry } }));
+}
+
+function getProjectCopy() {
+  return UI_COPY[prefs.lang] || UI_COPY.es;
 }
 
 function escapeHtml(value) {

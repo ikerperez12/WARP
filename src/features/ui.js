@@ -1,35 +1,61 @@
-import { prefs, togglePref } from './preferences.js';
-import { isReduced, MOTION } from '../utils/motion.js';
-import anime from 'animejs/lib/anime.es.js';
+import { isReduced, supportsFinePointer } from '../utils/motion.js';
 
 export function initUI() {
-  initPreloader();
-  initTicker();
   initMobileMenu();
   initBackToTop();
-  initSettingsPanel();
-  syncVisualLabels();
-
-  window.addEventListener('warp:prefs-changed', syncVisualLabels);
+  initTicker();
+  initCustomCursor();
+  initHeroAmbient();
+  refreshSurfaceInteractions();
 }
 
-function initPreloader() {
-  const preloader = document.getElementById('preloader');
-  const preloaderFill = document.getElementById('preloader-fill');
-  if (preloader && preloaderFill) {
-    requestAnimationFrame(() => {
-      preloaderFill.style.width = '100%';
-      window.setTimeout(() => preloader.classList.add('is-hidden'), 620);
+export function refreshSurfaceInteractions() {
+  if (!supportsFinePointer || isReduced()) return;
+
+  const surfaces = Array.from(document.querySelectorAll([
+    '[data-depth-card]',
+    '.project-card',
+    '.contact-card',
+    '.contact-form',
+    '.project-filter',
+    '.utility-link',
+  ].join(',')));
+
+  surfaces.forEach((surface) => {
+    if (surface.dataset.surfaceBound === 'true') return;
+    surface.dataset.surfaceBound = 'true';
+    surface.style.setProperty('--pointer-x', '50%');
+    surface.style.setProperty('--pointer-y', '50%');
+    surface.style.setProperty('--float-x', '0px');
+    surface.style.setProperty('--float-y', '0px');
+    surface.style.setProperty('--tilt-x', '0deg');
+    surface.style.setProperty('--tilt-y', '0deg');
+
+    surface.addEventListener('pointermove', (event) => {
+      const rect = surface.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const rx = ((x / rect.width) - 0.5) * 10;
+      const ry = ((y / rect.height) - 0.5) * 10;
+
+      surface.style.setProperty('--pointer-x', `${x}px`);
+      surface.style.setProperty('--pointer-y', `${y}px`);
+      surface.style.setProperty('--float-x', `${rx * 0.45}px`);
+      surface.style.setProperty('--float-y', `${ry * 0.45}px`);
+      surface.style.setProperty('--tilt-x', `${rx * 0.22}deg`);
+      surface.style.setProperty('--tilt-y', `${ry * -0.22}deg`);
     });
-  }
-}
 
-function initTicker() {
-  const ticker = document.getElementById('tech-ticker-track');
-  if (ticker && ticker.dataset.cloned !== 'true') {
-    ticker.append(...Array.from(ticker.children).map((node) => node.cloneNode(true)));
-    ticker.dataset.cloned = 'true';
-  }
+    surface.addEventListener('pointerleave', () => {
+      surface.style.setProperty('--pointer-x', '50%');
+      surface.style.setProperty('--pointer-y', '50%');
+      surface.style.setProperty('--float-x', '0px');
+      surface.style.setProperty('--float-y', '0px');
+      surface.style.setProperty('--tilt-x', '0deg');
+      surface.style.setProperty('--tilt-y', '0deg');
+    });
+  });
 }
 
 function initMobileMenu() {
@@ -49,16 +75,6 @@ function initMobileMenu() {
     navToggle.addEventListener('click', () => {
       const open = !mobileMenu.classList.contains('open');
       setMenu(open);
-      if (open && !isReduced()) {
-        anime({
-          targets: '.mobile-link',
-          translateX: [42, 0],
-          opacity: [0, 1],
-          delay: anime.stagger(70, { start: 160 }),
-          easing: MOTION.easePrimary,
-          duration: MOTION.durationBase
-        });
-      }
     });
 
     mobileLinks.forEach((link) => link.addEventListener('click', () => setMenu(false)));
@@ -78,44 +94,64 @@ function initBackToTop() {
   }
 }
 
-function initSettingsPanel() {
-  const uiToggle = document.getElementById('ui-toggle');
-  const uiPanel = document.getElementById('ui-panel');
-  if (uiToggle && uiPanel) {
-    const closePanel = () => {
-      uiPanel.classList.remove('open');
-      uiPanel.setAttribute('aria-hidden', 'true');
-      uiToggle.setAttribute('aria-expanded', 'false');
-    };
-    uiToggle.addEventListener('click', () => {
-      const open = uiPanel.classList.toggle('open');
-      uiPanel.setAttribute('aria-hidden', open ? 'false' : 'true');
-      uiToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-    });
-    uiPanel.querySelectorAll('.ui-option').forEach((button) => {
-      button.addEventListener('click', () => {
-        const action = button.getAttribute('data-action');
-        if (action === 'toggle-grain') togglePref('grain');
-        if (action === 'toggle-cursor') togglePref('cursor');
-        if (action === 'toggle-motion') togglePref('motion');
-      });
-    });
-    document.addEventListener('click', (event) => {
-      if (!uiPanel.classList.contains('open')) return;
-      if (uiPanel.contains(event.target) || uiToggle.contains(event.target)) return;
-      closePanel();
-    });
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') closePanel();
-    });
-  }
+function initTicker() {
+  const track = document.getElementById('tech-ticker-track');
+  if (!track || track.dataset.enhanced === 'true') return;
+
+  const items = Array.from(track.children);
+  if (!items.length) return;
+
+  items.forEach((item) => {
+    const clone = item.cloneNode(true);
+    clone.setAttribute('aria-hidden', 'true');
+    track.appendChild(clone);
+  });
+
+  track.dataset.enhanced = 'true';
 }
 
-function syncVisualLabels() {
-  const grain = document.getElementById('grain-state');
-  const cursor = document.getElementById('cursor-state');
-  const motion = document.getElementById('motion-state');
-  if (grain) grain.textContent = prefs.grain === 'on' ? 'On' : 'Off';
-  if (cursor) cursor.textContent = prefs.cursor === 'on' ? 'On' : 'Off';
-  if (motion) motion.textContent = prefs.motion === 'full' ? 'Full' : 'Reduced';
+function initCustomCursor() {
+  const cursor = document.querySelector('.custom-cursor');
+  const dot = document.querySelector('.custom-cursor-dot');
+  if (!cursor || !dot) return;
+
+  if (!supportsFinePointer || isReduced()) {
+    document.body.classList.remove('cursor-enabled');
+    return;
+  }
+
+  const interactiveSelector = 'a, button, input, textarea, select, [data-depth-card], .project-card, .project-filter';
+  document.body.classList.add('cursor-enabled');
+
+  const moveCursor = (event) => {
+    const { clientX, clientY } = event;
+    cursor.style.transform = `translate3d(${clientX}px, ${clientY}px, 0)`;
+    dot.style.transform = `translate3d(${clientX}px, ${clientY}px, 0)`;
+    document.body.classList.toggle('cursor-hover', Boolean(event.target.closest(interactiveSelector)));
+  };
+
+  window.addEventListener('pointermove', moveCursor, { passive: true });
+  window.addEventListener('pointerdown', () => document.body.classList.add('cursor-pressed'));
+  window.addEventListener('pointerup', () => document.body.classList.remove('cursor-pressed'));
+  window.addEventListener('blur', () => document.body.classList.remove('cursor-hover', 'cursor-pressed'));
+}
+
+function initHeroAmbient() {
+  const heroShell = document.querySelector('.hero-shell');
+  if (!heroShell || !supportsFinePointer || isReduced()) return;
+
+  heroShell.addEventListener('pointermove', (event) => {
+    const rect = heroShell.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+
+    const px = ((event.clientX - rect.left) / rect.width) * 100;
+    const py = ((event.clientY - rect.top) / rect.height) * 100;
+    heroShell.style.setProperty('--hero-mouse-x', `${px.toFixed(2)}%`);
+    heroShell.style.setProperty('--hero-mouse-y', `${py.toFixed(2)}%`);
+  });
+
+  heroShell.addEventListener('pointerleave', () => {
+    heroShell.style.setProperty('--hero-mouse-x', '50%');
+    heroShell.style.setProperty('--hero-mouse-y', '50%');
+  });
 }

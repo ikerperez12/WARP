@@ -2,13 +2,12 @@ import { isReduced, reducedMotionMedia } from '../utils/motion.js';
 import { clamp } from '../utils/math.js';
 
 let scrollTicking = false;
+const isEditorialHome = () => document.body.classList.contains('home-editorial');
 
 export function initScroll() {
   initRevealAnimations();
-  initHeroFade();
+  if (!isEditorialHome()) initHeroFade();
   initAnchorLinks();
-
-  // Initial call
   onScroll();
 
   window.addEventListener('scroll', () => {
@@ -20,10 +19,15 @@ export function initScroll() {
     });
   }, { passive: true });
 
-  window.addEventListener('warp:motion-mode', onScroll);
+  window.addEventListener('warp:motion-mode', onMotionChange);
 
-  if (typeof reducedMotionMedia.addEventListener === 'function') reducedMotionMedia.addEventListener('change', onScroll);
-  else if (typeof reducedMotionMedia.addListener === 'function') reducedMotionMedia.addListener(onScroll);
+  if (typeof reducedMotionMedia.addEventListener === 'function') reducedMotionMedia.addEventListener('change', onMotionChange);
+  else if (typeof reducedMotionMedia.addListener === 'function') reducedMotionMedia.addListener(onMotionChange);
+}
+
+function onMotionChange() {
+  initRevealAnimations();
+  onScroll();
 }
 
 function onScroll() {
@@ -32,24 +36,36 @@ function onScroll() {
   updateProgressBar(y);
   updateBackToTop(y);
   updateActiveSection(y);
-  updateHeroEffects(y);
+  updateSectionParallax();
+  updateTimelineProgress();
+  if (isEditorialHome()) updateEditorialHero(y);
+  else updateHeroEffects(y);
   updateShowcase(y);
 }
 
 function initRevealAnimations() {
   const revealNodes = Array.from(document.querySelectorAll('.anim-reveal'));
+  revealNodes.forEach((node, index) => {
+    node.style.setProperty('--reveal-delay', `${Math.min(index % 6, 5) * 70}ms`);
+  });
+
   if (isReduced()) {
     revealNodes.forEach((node) => node.classList.add('visible'));
-  } else {
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry, index) => {
-        if (!entry.isIntersecting) return;
-        window.setTimeout(() => entry.target.classList.add('visible'), index * 70);
-        revealObserver.unobserve(entry.target);
-      });
-    }, { threshold: 0.14, rootMargin: '0px 0px -48px 0px' });
-    revealNodes.forEach((node) => revealObserver.observe(node));
+    return;
   }
+
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    });
+  }, { threshold: 0.14, rootMargin: '0px 0px -52px 0px' });
+
+  revealNodes.forEach((node) => {
+    if (node.classList.contains('visible')) return;
+    revealObserver.observe(node);
+  });
 }
 
 function initHeroFade() {
@@ -72,7 +88,14 @@ function initAnchorLinks() {
       const target = document.querySelector(href);
       if (!target) return;
       event.preventDefault();
-      target.scrollIntoView({ behavior: isReduced() ? 'auto' : 'smooth' });
+      const navbar = document.getElementById('navbar');
+      const navOffset = navbar ? navbar.offsetHeight + 18 : 18;
+      const top = Math.max(target.getBoundingClientRect().top + window.scrollY - navOffset, 0);
+
+      window.scrollTo({
+        top,
+        behavior: isReduced() ? 'auto' : 'smooth',
+      });
     });
   });
 }
@@ -84,10 +107,9 @@ function updateNavbar(y) {
 
 function updateProgressBar(y) {
   const progressBar = document.getElementById('scroll-progress');
-  if (progressBar) {
-    const h = document.documentElement.scrollHeight - window.innerHeight;
-    progressBar.style.width = `${h > 0 ? (y / h) * 100 : 0}%`;
-  }
+  if (!progressBar) return;
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  progressBar.style.width = `${h > 0 ? (y / h) * 100 : 0}%`;
 }
 
 function updateBackToTop(y) {
@@ -98,40 +120,107 @@ function updateBackToTop(y) {
 function updateActiveSection(y) {
   const sections = Array.from(document.querySelectorAll('.section'));
   const navLinks = Array.from(document.querySelectorAll('.nav-link'));
-  const visualSections = new Set([
-    'experience-hero',
-    'experience-cta',
-    'showcase',
-    'motion-reel',
-    'neo-lab',
-    'engineering-focus',
-    'anime-lab',
-    'interaction-deck',
-    'google-services-section',
-    'flow-simulator',
-    'topology-lab',
-    'split-reveal',
-    'elite-cases',
-    'tech-playbook',
-  ]);
+  const railLinks = Array.from(document.querySelectorAll('.section-rail-nav a'));
+  const railCount = document.querySelector('.section-rail-count');
 
   let current = '';
+  let currentIndex = 0;
   sections.forEach((section) => {
     const top = section.offsetTop - 110;
     const height = section.offsetHeight;
-    if (y >= top && y < top + height) current = section.id;
+    if (y >= top && y < top + height) {
+      current = section.id;
+      currentIndex = sections.indexOf(section);
+    }
   });
 
   navLinks.forEach((link) => {
     const key = link.dataset.section || '';
-    const active = (key === 'showcase' || key === 'experience-cta') ? visualSections.has(current) : key === current;
+    const active = key === current;
     link.classList.toggle('active', active);
     if (active) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
   });
+
+  railLinks.forEach((link) => {
+    const active = (link.dataset.railTarget || '') === current;
+    link.classList.toggle('is-active', active);
+    if (active) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  });
+
+  if (railCount && sections.length) {
+    railCount.textContent = `${String(currentIndex + 1).padStart(2, '0')} / ${String(sections.length).padStart(2, '0')}`;
+  }
+
+  document.body.dataset.activeSection = current || '';
+}
+
+function updateSectionParallax() {
+  const sections = Array.from(document.querySelectorAll('.section'));
+  if (isReduced()) {
+    sections.forEach((section) => {
+      section.style.setProperty('--section-shift', '0px');
+      section.style.setProperty('--section-glow', '1');
+    });
+    return;
+  }
+
+  sections.forEach((section) => {
+    const rect = section.getBoundingClientRect();
+    const progress = clamp((window.innerHeight - rect.top) / (window.innerHeight + rect.height), 0, 1);
+    const shift = (0.5 - progress) * 18;
+    section.style.setProperty('--section-shift', `${shift.toFixed(2)}px`);
+    section.style.setProperty('--section-glow', progress.toFixed(3));
+  });
+}
+
+function updateTimelineProgress() {
+  const timeline = document.querySelector('.timeline');
+  if (!timeline) return;
+
+  const rect = timeline.getBoundingClientRect();
+  const progress = clamp((window.innerHeight * 0.72 - rect.top) / Math.max(rect.height, 1), 0, 1);
+  timeline.style.setProperty('--timeline-progress', progress.toFixed(3));
+}
+
+function updateEditorialHero(y) {
+  const heroSection = document.getElementById('hero');
+  const heroShell = document.querySelector('.hero-shell');
+  const heroContent = document.querySelector('.hero-content');
+  const heroAside = document.querySelector('.hero-aside');
+  const heroBadges = document.querySelector('.floating-badges');
+
+  if (!heroSection || !heroShell || !heroContent) return;
+
+  const rect = heroSection.getBoundingClientRect();
+  const progress = clamp(-rect.top / Math.max(heroSection.offsetHeight * 0.9, 1), 0, 1);
+  heroShell.style.setProperty('--hero-progress', progress.toFixed(3));
+
+  if (isReduced()) {
+    heroContent.style.transform = 'none';
+    heroContent.style.opacity = '1';
+    if (heroAside) heroAside.style.transform = 'none';
+    if (heroBadges) {
+      heroBadges.style.transform = 'none';
+      heroBadges.style.opacity = '1';
+    }
+    return;
+  }
+
+  heroContent.style.transform = `translate3d(0, ${progress * 20}px, 0)`;
+  heroContent.style.opacity = String(1 - progress * 0.18);
+
+  if (heroAside) heroAside.style.transform = `translate3d(0, ${progress * -14}px, 0)`;
+  if (heroBadges) {
+    heroBadges.style.transform = `translate3d(${progress * -18}px, ${progress * 10}px, 0)`;
+    heroBadges.style.opacity = String(1 - progress * 0.34);
+  }
 }
 
 function updateHeroEffects(y) {
+  if (isEditorialHome()) return;
+
   const heroSection = document.getElementById('hero');
   const heroContent = document.querySelector('.hero-content');
   const heroBadges = document.querySelector('.floating-badges');
@@ -155,24 +244,14 @@ function updateHeroEffects(y) {
 }
 
 function updateShowcase(y) {
+  if (document.body.classList.contains('home-editorial')) return;
+
   const showcaseScroll = document.getElementById('showcase-scroll');
   const showcaseStage = document.getElementById('showcase-stage');
   const showcaseFrames = Array.from(document.querySelectorAll('.showcase-frame'));
 
   if (showcaseScroll && showcaseStage && showcaseFrames.length) {
     const rect = showcaseScroll.getBoundingClientRect();
-    // Calculate progress based on scroll position relative to the element
-    // rect.top is relative to viewport.
-    // If we want consistent calculation with original code:
-    // const range = Math.max(rect.height - window.innerHeight, 1);
-    // const showcaseProgress = clamp(-rect.top / range, 0, 1);
-    // But onScroll is called inside loop, checking live rect is fine.
-
-    // Original code:
-    // const rect = showcaseScroll.getBoundingClientRect();
-    // const range = Math.max(rect.height - window.innerHeight, 1);
-    // const showcaseProgress = clamp(-rect.top / range, 0, 1);
-
     const range = Math.max(rect.height - window.innerHeight, 1);
     const showcaseProgress = clamp(-rect.top / range, 0, 1);
 
