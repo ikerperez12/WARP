@@ -1,0 +1,34 @@
+.back-to-top {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-magenta), var(--accent-purple));
+  color: #fff;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
+  transition: opacity 0.3s var(--ease-out-expo), transform 0.3s var(--ease-out-expo), box-shadow 0.3s;
+  box-shadow: 0 6px 24px rgba(255, 0, 119, 0.35);
+  z-index: 90;
+}
+
+.back-to-top.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.back-to-top:hover {
+  box-shadow: 0 8px 32px rgba(255, 0, 119, 0.5);
+  transform: translateY(-2px) scale(1.05);
+}
+
+.back-to-top:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 3px;
+}

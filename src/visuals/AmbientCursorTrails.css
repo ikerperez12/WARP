@@ -1,0 +1,28 @@
+.cursor-trails {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 80;
+  mix-blend-mode: screen;
+}
+
+.cursor-trail-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.85), rgba(255, 0, 119, 0.0) 70%);
+  transform: translate(-100px, -100px);
+  will-change: transform, opacity;
+  filter: blur(1px);
+}
+
+@media (pointer: coarse) {
+  .cursor-trails { display: none; }
+}
+
+[data-theme="light"] .cursor-trail-dot {
+  background: radial-gradient(circle, rgba(209, 0, 90, 0.35), rgba(126, 61, 200, 0.0) 70%);
+}

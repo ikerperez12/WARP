@@ -1,0 +1,42 @@
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  background: var(--glass);
+  border: 1px solid var(--border-soft);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  transition: border-color 0.3s var(--ease-out-expo), background 0.3s var(--ease-out-expo);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.lang-toggle:hover {
+  border-color: var(--accent-magenta);
+  background: var(--glass-strong);
+}
+
+.lang-toggle-pill {
+  padding: 0.1rem 0.35rem;
+  border-radius: 6px;
+  transition: color 0.3s var(--ease-out-expo), background 0.3s var(--ease-out-expo);
+}
+
+.lang-toggle-pill.is-active {
+  color: var(--text-primary);
+  background: linear-gradient(135deg, rgba(255, 0, 119, 0.15), rgba(168, 85, 247, 0.15));
+}
+
+.lang-toggle-divider {
+  opacity: 0.35;
+}
+
+.lang-toggle:focus-visible {
+  outline: 2px solid var(--accent-magenta);
+  outline-offset: 3px;
+}

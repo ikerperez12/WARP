@@ -1,0 +1,195 @@
+.terminal-manifest {
+  position: relative;
+  min-height: 100vh;
+  background: #020005;
+  color: #00ff8a;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  overflow: hidden;
+  border-top: 1px solid rgba(0, 255, 138, 0.25);
+  border-bottom: 1px solid rgba(0, 255, 138, 0.25);
+  padding: 4rem 2rem;
+  isolation: isolate;
+}
+
+[data-theme="light"] .terminal-manifest {
+  background: #09120e;
+  color: #1de9b6;
+}
+
+.terminal-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0, 255, 138, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 138, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.55;
+  mask-image: radial-gradient(ellipse at center, #000 40%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 40%, transparent 80%);
+}
+
+.terminal-crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 260px;
+  height: 260px;
+  pointer-events: none;
+}
+
+.terminal-crosshair-ring {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(0, 255, 138, 0.35);
+  border-radius: 50%;
+  animation: terminal-ping 4s ease-in-out infinite;
+}
+
+.terminal-crosshair-h {
+  position: absolute;
+  top: 50%;
+  left: -40px;
+  width: calc(100% + 80px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 255, 138, 0.5), transparent);
+}
+
+.terminal-crosshair-v {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  width: 1px;
+  height: calc(100% + 80px);
+  background: linear-gradient(180deg, transparent, rgba(0, 255, 138, 0.5), transparent);
+}
+
+.terminal-crosshair-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  border: 1px solid #00ff8a;
+}
+
+.terminal-corner {
+  position: absolute;
+  z-index: 2;
+  padding: 0.5rem 0;
+}
+
+.terminal-corner > div {
+  margin-bottom: 0.2rem;
+}
+
+.terminal-tag {
+  margin-top: 0.6rem;
+  color: #ffffff;
+  letter-spacing: 0.3em;
+}
+
+.terminal-corner-tl { top: 1.5rem; left: 2rem; }
+.terminal-corner-tr { top: 1.5rem; right: 2rem; text-align: right; }
+
+.terminal-center {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding-top: 6rem;
+}
+
+.terminal-center-kicker {
+  color: #ffffff;
+  opacity: 0.65;
+  letter-spacing: 0.35em;
+  font-size: 0.75rem;
+  margin: 0 0 1.2rem;
+}
+
+.terminal-center-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 6vw, 5rem);
+  font-weight: 900;
+  margin: 0;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 30px rgba(0, 255, 138, 0.5);
+}
+
+.terminal-center-sub {
+  margin: 1rem 0 0;
+  color: #00ff8a;
+  font-size: 0.92rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+.terminal-log {
+  position: absolute;
+  bottom: 2rem;
+  left: 2rem;
+  width: min(480px, 42vw);
+  z-index: 2;
+  padding-left: 1rem;
+  border-left: 2px solid rgba(0, 255, 138, 0.6);
+}
+
+.terminal-log-line {
+  margin-bottom: 0.2rem;
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  opacity: 0;
+  animation: terminal-line-in 0.4s ease-out forwards;
+}
+
+.terminal-log-line:nth-child(n) {
+  animation-delay: calc(0.08s * var(--i, 0));
+}
+
+.terminal-log-prompt {
+  color: #ff0077;
+  font-weight: 700;
+}
+
+.terminal-cursor {
+  color: #00ff8a;
+}
+
+.terminal-warning {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 2;
+  padding: 0.55rem 1.1rem;
+  border: 1px solid #00ff8a;
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  animation: terminal-blink 2.2s ease-in-out infinite;
+}
+
+@keyframes terminal-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes terminal-ping {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.06); opacity: 0.85; }
+}
+
+@keyframes terminal-line-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (max-width: 760px) {
+  .terminal-log { width: min(360px, 70vw); }
+  .terminal-corner-tl, .terminal-corner-tr { font-size: 0.7rem; }
+}

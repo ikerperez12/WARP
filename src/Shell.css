@@ -1,0 +1,19 @@
+.main-shell {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.main-shell > .interactive,
+.main-shell .interactive {
+  pointer-events: auto;
+}
+
+.main-shell a,
+.main-shell button,
+.main-shell input,
+.main-shell textarea,
+.main-shell select,
+.main-shell [role="button"] {
+  pointer-events: auto;
+}

@@ -1,0 +1,86 @@
+.datamosh-transition {
+  position: relative;
+  min-height: 60vh;
+  background: #030308;
+  overflow: hidden;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  padding: 4rem 1rem;
+}
+
+.datamosh-layers {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.datamosh-slice {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: calc(100% / 22);
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: difference;
+}
+
+.datamosh-slice-content {
+  position: absolute;
+  left: 50%;
+  top: calc(50% * 22 - var(--i) * 100%);
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 14vw, 14rem);
+  font-weight: 900;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255, 0, 119, 0.4);
+  letter-spacing: -0.05em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.datamosh-slice:nth-child(3n) .datamosh-slice-content {
+  -webkit-text-stroke-color: rgba(0, 210, 255, 0.4);
+}
+
+.datamosh-slice:nth-child(5n) .datamosh-slice-content {
+  -webkit-text-stroke-color: rgba(168, 85, 247, 0.4);
+}
+
+.datamosh-center {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: #fff;
+  padding: 2rem;
+  background: rgba(3, 3, 8, 0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+}
+
+.datamosh-center h2 {
+  font-size: clamp(2rem, 5vw, 4rem);
+  margin: 0;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, #ffffff, #ff0077, #a855f7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.datamosh-center p {
+  margin: 0.8rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .datamosh-slice { transform: none !important; }
+}

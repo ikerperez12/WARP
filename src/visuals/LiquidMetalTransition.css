@@ -1,0 +1,95 @@
+.liquid-metal-transition {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.liquid-metal-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.liquid-metal-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  pointer-events: none;
+  width: 100%;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+.liquid-metal-title {
+  font-size: clamp(3rem, 11vw, 10rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+  margin: 0;
+  color: transparent;
+  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.85);
+  mix-blend-mode: difference;
+  line-height: 0.9;
+}
+
+[data-theme="light"] .liquid-metal-title {
+  -webkit-text-stroke: 2px rgba(12, 12, 21, 0.85);
+  mix-blend-mode: normal;
+}
+
+.liquid-metal-subtitle {
+  margin: 1.6rem 0 0;
+  color: var(--text-primary);
+  font-size: clamp(0.8rem, 1.2vw, 1.1rem);
+  font-family: var(--font-mono);
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  mix-blend-mode: difference;
+}
+
+.liquid-metal-corners {
+  position: absolute;
+  inset: 1.5rem;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.liquid-metal-corners span {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  mix-blend-mode: difference;
+}
+
+.liquid-metal-corners span:nth-child(1) {
+  top: 0;
+  left: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.liquid-metal-corners span:nth-child(2) {
+  top: 0;
+  right: 0;
+  border-left: 0;
+  border-bottom: 0;
+}
+
+.liquid-metal-corners span:nth-child(3) {
+  bottom: 0;
+  left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+
+.liquid-metal-corners span:nth-child(4) {
+  bottom: 0;
+  right: 0;
+  border-left: 0;
+  border-top: 0;
+}
