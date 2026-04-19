@@ -1,10 +1,7 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { useI18n } from "../i18n/I18nProvider.jsx";
-import AuroraBackdrop from "../visuals/AuroraBackdrop.jsx";
-import ParticleConstellation from "../visuals/ParticleConstellation.jsx";
 import Magnetic from "../visuals/Magnetic.jsx";
-import SplitText from "../visuals/SplitText.jsx";
 import { useReducedMotion } from "../lib/useReducedMotion.js";
 import "./HeroSection.css";
 
@@ -30,9 +27,6 @@ export default function HeroSection() {
 
   return (
     <section id="hero" className="hero" ref={containerRef}>
-      <AuroraBackdrop />
-      <ParticleConstellation count={150} />
-
       <div className="hero-vignette" aria-hidden="true" />
 
       <div className="hero-content">

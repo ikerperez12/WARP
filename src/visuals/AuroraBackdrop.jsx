@@ -60,8 +60,8 @@ void main() {
 `;
 
 const PALETTES = {
-  dark: { c1: "#0a0a1a", c2: "#2a0b4a", c3: "#a855f7", highlight: 1.0 },
-  light: { c1: "#f6f4ef", c2: "#ffd5e0", c3: "#c7b6ff", highlight: 0.6 },
+  dark: { c1: "#08060f", c2: "#3b0b3a", c3: "#9a1b6b", highlight: 0.9 },
+  light: { c1: "#faf5ef", c2: "#ffe0d2", c3: "#e2a9d0", highlight: 0.55 },
 };
 
 function AuroraMesh({ reduced }) {

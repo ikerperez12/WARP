@@ -226,42 +226,13 @@ function World({ reduced, isDark }) {
         <Suspense fallback={null}>
           <PhysicalModel
             url="/assets/models/duck.glb"
-            position={[-1.8, 1.2, 0.5]}
-            scale={1.8}
+            position={[-5.5, 2.2, -0.5]}
+            scale={1.1}
             mass={1.2}
             reduced={reduced}
           />
-          <PremiumCube position={[2.6, -0.4, 0.5]} reduced={reduced} color="#ff0077" />
-          <PhysicalModel
-            url="/assets/models/toycar.glb"
-            position={[-6.5, -3.6, 1.2]}
-            rotation={[-0.25, Math.PI / 12, 0]}
-            scale={55}
-            isFixed
-            mass={5}
-            reduced={reduced}
-          />
-          <PhysicalModel
-            url="/assets/models/bust.glb"
-            position={[6.8, 2.6, -0.2]}
-            rotation={[0, -Math.PI / 4, 0]}
-            scale={1.3}
-            isFixed
-            mass={5}
-            reduced={reduced}
-          />
-          <PhysicalModel
-            url="/assets/models/elegant.glb"
-            position={[7.2, -3.2, 0.8]}
-            rotation={[0, -Math.PI / 3, 0]}
-            scale={1.3}
-            isFixed
-            mass={5}
-            reduced={reduced}
-          />
+          <PremiumCube position={[5.2, -1.8, -0.3]} reduced={reduced} color="#ff0033" />
         </Suspense>
-        <FloatingIcosahedron position={[-4.8, 2.8, -1]} reduced={reduced} color="#00d2ff" />
-        <FloatingIcosahedron position={[4.5, 3, -1.5]} reduced={reduced} color="#a855f7" />
       </Physics>
 
       <ContactShadows
@@ -305,6 +276,3 @@ export default function PhysicsScene() {
 }
 
 useGLTF.preload("/assets/models/duck.glb");
-useGLTF.preload("/assets/models/toycar.glb");
-useGLTF.preload("/assets/models/bust.glb");
-useGLTF.preload("/assets/models/elegant.glb");

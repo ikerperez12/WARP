@@ -52,7 +52,7 @@ export default function LiquidMetalTransition({ title = "LIQUID ALLOY", subtitle
           <ambientLight intensity={1.4} />
           <directionalLight position={[10, 10, 10]} intensity={2.8} />
           <Suspense fallback={null}>
-            <Environment preset="city" />
+            <Environment preset="sunset" background={false} />
           </Suspense>
           <LiquidMetalShape reduced={reduced} />
           <ContactShadows position={[0, -3.2, 0]} opacity={theme === "dark" ? 0.75 : 0.35} scale={18} blur={2} far={10} color={theme === "dark" ? "#ffffff" : "#0c0c15"} />

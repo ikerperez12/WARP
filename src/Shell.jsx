@@ -8,7 +8,7 @@ import SectionSkeleton from "./components/SectionSkeleton.jsx";
 import HeroSection from "./sections/HeroSection.jsx";
 import AmbientCursorTrails from "./visuals/AmbientCursorTrails.jsx";
 import GlobalNoise from "./visuals/GlobalNoise.jsx";
-import VideoTransition from "./visuals/VideoTransition.jsx";
+import VideoCurtain from "./visuals/VideoCurtain.jsx";
 import ScannerBanner from "./visuals/ScannerBanner.jsx";
 import DatamoshTransition from "./visuals/DatamoshTransition.jsx";
 import TerminalManifest from "./visuals/TerminalManifest.jsx";
@@ -54,7 +54,7 @@ export default function Shell() {
 
         <ErrorBoundary label="vt-1">
           <div className="interactive">
-            <VideoTransition
+            <VideoCurtain
               id="vt-creative"
               src="/assets/videos/creative-vision-1080p.mp4"
               kicker={vtCopy.creative.kicker}
@@ -118,7 +118,7 @@ export default function Shell() {
 
         <ErrorBoundary label="vt-2">
           <div className="interactive">
-            <VideoTransition
+            <VideoCurtain
               id="vt-mastery"
               src="/assets/videos/digital-mastery-1080p.mp4"
               kicker={vtCopy.mastery.kicker}
@@ -156,14 +156,14 @@ export default function Shell() {
 
         <ErrorBoundary label="vt-3">
           <div className="interactive">
-            <VideoTransition
+            <VideoCurtain
               id="vt-contact"
-              src="/assets/videos/15616403_3840_2160_60fps.mp4"
+              src="/assets/videos/creative-vision-1080p.mp4"
               kicker={vtCopy.uplink.kicker}
               title={vtCopy.uplink.title}
               subtitle={vtCopy.uplink.subtitle}
               align="center"
-              overlayOpacity={0.65}
+              overlayOpacity={0.72}
             />
           </div>
         </ErrorBoundary>

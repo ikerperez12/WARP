@@ -6,7 +6,7 @@
   justify-content: center;
   overflow: hidden;
   padding: 8rem 2rem 4rem;
-  isolation: isolate;
+  background: transparent;
 }
 
 .hero-vignette {
@@ -15,8 +15,8 @@
   z-index: 2;
   pointer-events: none;
   background:
-    radial-gradient(ellipse at top, transparent 40%, var(--bg-deep) 100%),
-    radial-gradient(circle at center, transparent 50%, color-mix(in srgb, var(--bg-deep) 70%, transparent) 100%);
+    radial-gradient(ellipse at center, transparent 50%, color-mix(in srgb, var(--bg-deep) 55%, transparent) 100%),
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-deep) 40%, transparent) 0%, transparent 25%, transparent 70%, color-mix(in srgb, var(--bg-deep) 55%, transparent) 100%);
 }
 
 .hero-content {
