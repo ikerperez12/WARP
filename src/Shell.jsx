@@ -18,6 +18,7 @@ import "./Shell.css";
 
 const PhysicsScene = lazy(() => import("./visuals/PhysicsScene.jsx"));
 const AboutSection = lazy(() => import("./sections/AboutSection.jsx"));
+const ServicesSection = lazy(() => import("./sections/ServicesSection.jsx"));
 const StackSection = lazy(() => import("./sections/StackSection.jsx"));
 const ProjectsSection = lazy(() => import("./sections/ProjectsSection.jsx"));
 const ExperienceSection = lazy(() => import("./sections/ExperienceSection.jsx"));
@@ -25,7 +26,10 @@ const ContactSection = lazy(() => import("./sections/ContactSection.jsx"));
 const FooterSection = lazy(() => import("./sections/FooterSection.jsx"));
 const LiquidMetalTransition = lazy(() => import("./visuals/LiquidMetalTransition.jsx"));
 const MorphParticlesTransition = lazy(() => import("./visuals/MorphParticlesTransition.jsx"));
-const HolographicStage = lazy(() => import("./visuals/HolographicStage.jsx"));
+const FrutigerAeroStage = lazy(() => import("./visuals/FrutigerAeroStage.jsx"));
+const BlueprintStage = lazy(() => import("./visuals/BlueprintStage.jsx"));
+const ParticleGalaxyStage = lazy(() => import("./visuals/ParticleGalaxyStage.jsx"));
+const HorizontalShowcase = lazy(() => import("./visuals/HorizontalShowcase.jsx"));
 
 export default function Shell() {
   const { lang } = useI18n();
@@ -61,7 +65,7 @@ export default function Shell() {
               title={vtCopy.creative.title}
               subtitle={vtCopy.creative.subtitle}
               lines={vtCopy.creative.lines}
-              align="left"
+              align="center"
             />
           </div>
         </ErrorBoundary>
@@ -70,6 +74,14 @@ export default function Shell() {
           <div className="interactive">
             <Suspense fallback={<SectionSkeleton />}>
               <AboutSection />
+            </Suspense>
+          </div>
+        </ErrorBoundary>
+
+        <ErrorBoundary label="services">
+          <div id="services" className="interactive">
+            <Suspense fallback={<SectionSkeleton />}>
+              <ServicesSection />
             </Suspense>
           </div>
         </ErrorBoundary>
@@ -89,6 +101,48 @@ export default function Shell() {
               <StackSection />
             </Suspense>
           </div>
+        </ErrorBoundary>
+
+        <ErrorBoundary label="horizontal-showcase">
+          <div className="interactive">
+            <Suspense fallback={<SectionSkeleton />}>
+              <HorizontalShowcase />
+            </Suspense>
+          </div>
+        </ErrorBoundary>
+
+        <ErrorBoundary label="blueprint">
+          <InViewMonitor rootMargin="25% 0px 25% 0px">
+            <Suspense fallback={<SectionSkeleton />}>
+              <BlueprintStage
+                title={lang === "en" ? "System blueprint — ready to ship" : "Blueprint de sistema — listo para enviar"}
+                subtitle={
+                  lang === "en"
+                    ? "Academic foundation (UDC + SICUE-UPM) translated into software that others can maintain. Each discipline treated as a module, wired by clean interfaces."
+                    : "Base académica (UDC + SICUE-UPM) traducida en software que otros pueden mantener. Cada disciplina tratada como un módulo, conectado por interfaces limpias."
+                }
+                lines={
+                  lang === "en"
+                    ? [
+                        { label: "Degree", value: "Computer Engineering · UDC" },
+                        { label: "Exchange", value: "SICUE at ETSISI-UPM" },
+                        { label: "Focus", value: "Backend · Systems · Security" },
+                        { label: "Lang", value: "ES / GL native · EN B2" },
+                        { label: "Location", value: "A Coruña / Galicia" },
+                        { label: "Looking", value: "Internship / Junior role" },
+                      ]
+                    : [
+                        { label: "Grado", value: "Ing. Informática · UDC" },
+                        { label: "Intercambio", value: "SICUE en ETSISI-UPM" },
+                        { label: "Foco", value: "Backend · Sistemas · Seguridad" },
+                        { label: "Idiomas", value: "ES / GL nativo · EN B2" },
+                        { label: "Ubicación", value: "A Coruña / Galicia" },
+                        { label: "Busco", value: "Prácticas / Puesto junior" },
+                      ]
+                }
+              />
+            </Suspense>
+          </InViewMonitor>
         </ErrorBoundary>
 
         <ErrorBoundary label="terminal">
@@ -125,7 +179,7 @@ export default function Shell() {
               title={vtCopy.mastery.title}
               subtitle={vtCopy.mastery.subtitle}
               lines={vtCopy.mastery.lines}
-              align="right"
+              align="center"
             />
           </div>
         </ErrorBoundary>
@@ -138,6 +192,22 @@ export default function Shell() {
               <ExperienceSection />
             </Suspense>
           </div>
+        </ErrorBoundary>
+
+        <ErrorBoundary label="galaxy">
+          <InViewMonitor rootMargin="20% 0px 20% 0px">
+            <Suspense fallback={<SectionSkeleton />}>
+              <ParticleGalaxyStage
+                kicker={lang === "en" ? "From fundamentals to production" : "De los fundamentos a producción"}
+                title={lang === "en" ? "Every node is a tool." : "Cada nodo es una herramienta."}
+                subtitle={
+                  lang === "en"
+                    ? "Distributed systems, databases, cryptography, networks, compilers — each one a branch of the same galaxy."
+                    : "Sistemas distribuidos, bases de datos, criptografía, redes, compiladores — cada uno una rama de la misma galaxia."
+                }
+              />
+            </Suspense>
+          </InViewMonitor>
         </ErrorBoundary>
 
         <ErrorBoundary label="morph">
@@ -154,18 +224,20 @@ export default function Shell() {
           </InViewMonitor>
         </ErrorBoundary>
 
-        <ErrorBoundary label="vt-3">
-          <div className="interactive">
-            <VideoCurtain
-              id="vt-contact"
-              src="/assets/videos/creative-vision-1080p.mp4"
-              kicker={vtCopy.uplink.kicker}
-              title={vtCopy.uplink.title}
-              subtitle={vtCopy.uplink.subtitle}
-              align="center"
-              overlayOpacity={0.72}
-            />
-          </div>
+        <ErrorBoundary label="frutiger">
+          <InViewMonitor rootMargin="25% 0px 25% 0px">
+            <Suspense fallback={<SectionSkeleton />}>
+              <FrutigerAeroStage
+                kicker={lang === "en" ? "Clean surfaces" : "Superficies limpias"}
+                title={lang === "en" ? "Engineering with craft." : "Ingeniería con oficio."}
+                subtitle={
+                  lang === "en"
+                    ? "I write code like I would build something physical — deliberate, clean, with room to grow. Less noise, more signal."
+                    : "Escribo código como construiría algo físico — deliberado, limpio, con sitio para crecer. Menos ruido, más señal."
+                }
+              />
+            </Suspense>
+          </InViewMonitor>
         </ErrorBoundary>
 
         <ErrorBoundary label="contact">
@@ -194,52 +266,50 @@ const VT_COPY = {
   es: {
     creative: {
       kicker: "Creative Vision",
-      title: "Codigo con criterio visual.",
-      subtitle: "Backend solido, operacion limpia y tooling propio — hecho para durar, no para impresionar por diez minutos.",
+      title: "Código con criterio visual.",
+      subtitle:
+        "Backend sólido, operación limpia y tooling propio — hecho para durar, no para impresionar por diez minutos.",
       lines: [
         "APIs mantenibles, contratos estables",
         "Linux, Docker, despliegues reproducibles",
-        "Seguridad aplicada, lectura tecnica del riesgo",
+        "Seguridad aplicada, lectura técnica del riesgo",
       ],
     },
     alloy: {
       title: "LIQUID ALLOY",
-      subtitle: "Cromado fluido / Backend reflejado en material vivo",
+      subtitle: "Cromado fluido · Backend reflejado en material vivo",
     },
     mastery: {
       kicker: "Digital Mastery",
-      title: "Rigor tecnico. Estetica moderna.",
-      subtitle: "Cada proyecto es una iteracion sobre el anterior — arquitectura, seguridad, automatizacion y tooling aplicado.",
+      title: "Rigor técnico. Estética moderna.",
+      subtitle:
+        "Cada proyecto es una iteración sobre el anterior — arquitectura, seguridad, automatización y tooling aplicado.",
       lines: [
         "Servicios desacoplados y testables",
-        "Automatizacion de flujos de trabajo",
-        "Validacion y hardening como parte del diseno",
+        "Automatización de flujos de trabajo",
+        "Validación y hardening como parte del diseño",
       ],
     },
     mosh: {
       title: "DATAMOSH",
-      subtitle: "Transicion temporal / ruido controlado / entropia",
+      subtitle: "Transición temporal · ruido controlado · entropía",
     },
     morph: {
       title: "METAMORFO",
-      subtitle: "Adaptabilidad tecnica",
+      subtitle: "Adaptabilidad técnica",
       lines: [
         "Backend que se reescribe cuando toca",
         "Sistemas que muerden el hardware",
         "Interfaces que cambian de forma sin romperse",
       ],
     },
-    uplink: {
-      kicker: "Establishing Uplink",
-      title: "Conectemos.",
-      subtitle: "Abierto a practicas, colaboracion tecnica y equipos que valoren hacer las cosas bien desde el principio.",
-    },
   },
   en: {
     creative: {
       kicker: "Creative Vision",
       title: "Engineering with visual judgement.",
-      subtitle: "Solid backend, clean operations and internal tooling — built to last, not just to impress for ten minutes.",
+      subtitle:
+        "Solid backend, clean operations and internal tooling — built to last, not just to impress for ten minutes.",
       lines: [
         "Maintainable APIs, stable contracts",
         "Linux, Docker, reproducible deployments",
@@ -248,12 +318,13 @@ const VT_COPY = {
     },
     alloy: {
       title: "LIQUID ALLOY",
-      subtitle: "Fluid chrome / Backend reflected in living material",
+      subtitle: "Fluid chrome · Backend reflected in living material",
     },
     mastery: {
       kicker: "Digital Mastery",
       title: "Technical rigor. Modern aesthetics.",
-      subtitle: "Every project iterates on the last — architecture, security, automation and applied tooling.",
+      subtitle:
+        "Every project iterates on the last — architecture, security, automation and applied tooling.",
       lines: [
         "Decoupled, testable services",
         "Workflow automation",
@@ -262,7 +333,7 @@ const VT_COPY = {
     },
     mosh: {
       title: "DATAMOSH",
-      subtitle: "Temporal transition / controlled noise / entropy",
+      subtitle: "Temporal transition · controlled noise · entropy",
     },
     morph: {
       title: "METAMORPH",
@@ -272,11 +343,6 @@ const VT_COPY = {
         "Systems that bite into hardware",
         "Interfaces that shape-shift without breaking",
       ],
-    },
-    uplink: {
-      kicker: "Establishing Uplink",
-      title: "Let us connect.",
-      subtitle: "Open to internships, technical collaboration, and teams that value doing things right from day one.",
     },
   },
 };

@@ -6,6 +6,9 @@ import "./VideoCurtain.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const CLOSED = "ellipse(12vw 16vh at 50% 50%)";
+const OPEN = "ellipse(160vw 160vh at 50% 50%)";
+
 export default function VideoCurtain({
   id,
   src,
@@ -30,8 +33,8 @@ export default function VideoCurtain({
     if (!section || !media || !text) return;
 
     if (reduced) {
-      media.style.clipPath = "ellipse(150vw 150vh at 50% 50%)";
-      media.style.webkitClipPath = "ellipse(150vw 150vh at 50% 50%)";
+      media.style.clipPath = OPEN;
+      media.style.webkitClipPath = OPEN;
       text.style.opacity = "1";
       video?.play?.().catch(() => {});
       return;
@@ -40,42 +43,57 @@ export default function VideoCurtain({
     video?.play?.().catch(() => {});
 
     const ctx = gsap.context(() => {
-      gsap.set(media, {
-        clipPath: "ellipse(15vw 20vh at 50% 50%)",
-        webkitClipPath: "ellipse(15vw 20vh at 50% 50%)",
-      });
-      gsap.set(text, { opacity: 0, scale: 0.85 });
+      gsap.set(media, { clipPath: CLOSED, webkitClipPath: CLOSED });
+      gsap.set(text, { opacity: 0, scale: 0.88, y: 30 });
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
           start: "top top",
-          end: "+=200%",
-          scrub: true,
+          end: "+=100%",
+          scrub: 0.6,
           pin: true,
           anticipatePin: 1,
           invalidateOnRefresh: true,
         },
       });
 
-      tl.fromTo(
-        media,
-        { clipPath: "ellipse(15vw 20vh at 50% 50%)", webkitClipPath: "ellipse(15vw 20vh at 50% 50%)" },
-        {
-          clipPath: "ellipse(150vw 150vh at 50% 50%)",
-          webkitClipPath: "ellipse(150vw 150vh at 50% 50%)",
-          ease: "power2.inOut",
-          duration: 1,
-        }
-      ).to(
-        text,
-        { opacity: 1, scale: 1.15, ease: "power2.out", duration: 0.5 },
-        "-=0.5"
-      ).to(
-        text,
-        { opacity: 0.92, scale: 1, ease: "none", duration: 0.35 },
-        ">"
-      );
+      // 0 -> 0.35: oval expands to fill screen (iris opens)
+      tl.to(media, {
+        clipPath: OPEN,
+        webkitClipPath: OPEN,
+        ease: "power2.inOut",
+        duration: 0.35,
+      }, 0);
+
+      // 0.15 -> 0.45: text fades in and scales up as oval approaches full
+      tl.to(text, {
+        opacity: 1,
+        scale: 1,
+        y: 0,
+        ease: "power2.out",
+        duration: 0.3,
+      }, 0.15);
+
+      // 0.45 -> 0.65: hold — video plays fullscreen with text visible
+      tl.to({}, { duration: 0.2 }, 0.45);
+
+      // 0.65 -> 0.85: text fades out and scales down
+      tl.to(text, {
+        opacity: 0,
+        scale: 0.92,
+        y: -20,
+        ease: "power2.in",
+        duration: 0.2,
+      }, 0.65);
+
+      // 0.7 -> 1.0: oval closes back (iris closes)
+      tl.to(media, {
+        clipPath: CLOSED,
+        webkitClipPath: CLOSED,
+        ease: "power2.inOut",
+        duration: 0.3,
+      }, 0.7);
     }, section);
 
     return () => ctx.revert();

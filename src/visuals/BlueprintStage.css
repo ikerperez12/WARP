@@ -1,0 +1,100 @@
+.blueprint-stage {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #020510 0%, #040715 60%, #02050c 100%);
+  overflow: hidden;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 4rem 3rem;
+  gap: 2rem;
+}
+
+.blueprint-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0, 210, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 210, 255, 0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse at center, #000 35%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 35%, transparent 80%);
+}
+
+.blueprint-canvas {
+  position: relative;
+  height: min(75vh, 700px);
+  z-index: 1;
+}
+
+.blueprint-text {
+  position: relative;
+  z-index: 2;
+  padding: 2rem;
+  max-width: 520px;
+}
+
+.blueprint-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.35em;
+  color: var(--accent-cyan);
+  margin: 0 0 1rem;
+  text-transform: uppercase;
+}
+
+.blueprint-title {
+  font-size: clamp(2rem, 4.5vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0;
+  color: #ffffff;
+  line-height: 1.05;
+}
+
+.blueprint-subtitle {
+  margin: 1.2rem 0 2rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  font-size: 1rem;
+  max-width: 460px;
+}
+
+.blueprint-specs {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem 1.2rem;
+}
+
+.blueprint-spec {
+  border-left: 2px solid var(--accent-cyan);
+  padding: 0.3rem 0 0.3rem 1rem;
+}
+
+.blueprint-spec dt {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+
+.blueprint-spec dd {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .blueprint-stage {
+    grid-template-columns: 1fr;
+    padding: 3rem 1rem;
+  }
+  .blueprint-canvas { height: 55vh; }
+  .blueprint-text { padding: 1rem; max-width: 100%; }
+}

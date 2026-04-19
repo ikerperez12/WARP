@@ -1,0 +1,56 @@
+.frutiger-stage {
+  position: relative;
+  min-height: 90vh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.frutiger-stage-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.frutiger-stage-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  pointer-events: none;
+  text-align: center;
+  padding: 2rem;
+  width: min(900px, 92vw);
+}
+
+.frutiger-stage-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: #ffffff;
+  opacity: 0.8;
+  margin: 0 0 1.2rem;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+}
+
+.frutiger-stage-title {
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.03em;
+  margin: 0;
+  text-shadow:
+    0 2px 20px rgba(0, 0, 0, 0.4),
+    0 0 50px rgba(136, 255, 204, 0.3);
+  line-height: 1;
+}
+
+.frutiger-stage-subtitle {
+  margin: 1.4rem auto 0;
+  max-width: 620px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  line-height: 1.65;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
+}

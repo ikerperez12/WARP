@@ -1,5 +1,5 @@
 import { useRef, useEffect, Suspense } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import {
   Environment,
   Stars,
@@ -7,77 +7,82 @@ import {
   ContactShadows,
   RoundedBox,
   MeshTransmissionMaterial,
-  Float,
 } from "@react-three/drei";
 import { Physics, RigidBody, CuboidCollider } from "@react-three/rapier";
 import { useReducedMotion } from "../lib/useReducedMotion.js";
 import { useTheme } from "../theme/ThemeProvider.jsx";
 
-function PhysicalModel({
-  url,
-  position,
-  rotation = [0, 0, 0],
-  scale,
-  isFixed = false,
-  mass = 1,
-  reduced,
-  impulseScale = 1,
-}) {
+function FloatingModel({ url, initialPosition, scale, mass = 1, reduced }) {
   const { scene } = useGLTF(url);
   const ref = useRef();
 
   useEffect(() => {
-    if (isFixed || reduced) return;
-    const gentleKick = () => {
-      if (!ref.current) return;
-      ref.current.applyImpulse(
-        {
-          x: (Math.random() - 0.5) * 1.1 * impulseScale,
-          y: (Math.random() - 0.5) * 1.1 * impulseScale,
-          z: (Math.random() - 0.5) * 0.6 * impulseScale,
-        },
-        true
-      );
-      ref.current.applyTorqueImpulse(
-        {
-          x: (Math.random() - 0.5) * 0.35 * impulseScale,
-          y: (Math.random() - 0.5) * 0.35 * impulseScale,
-          z: (Math.random() - 0.5) * 0.25 * impulseScale,
-        },
-        true
-      );
-    };
+    if (reduced) return;
 
+    // Velocidad inicial aleatoria suave pero visible — el objeto empieza en movimiento
     const bootstrap = setTimeout(() => {
       if (!ref.current) return;
-      ref.current.applyImpulse(
+      ref.current.setLinvel(
         {
-          x: (Math.random() - 0.5) * 2.2 * impulseScale,
-          y: (Math.random() - 0.5) * 2.2 * impulseScale,
-          z: (Math.random() - 0.5) * 0.4 * impulseScale,
+          x: (Math.random() - 0.5) * 3.5,
+          y: (Math.random() - 0.5) * 2.8,
+          z: (Math.random() - 0.5) * 1.2,
         },
         true
       );
-    }, 220);
+      ref.current.setAngvel(
+        {
+          x: (Math.random() - 0.5) * 1.4,
+          y: (Math.random() - 0.5) * 1.4,
+          z: (Math.random() - 0.5) * 0.8,
+        },
+        true
+      );
+    }, 180);
 
-    const beat = setInterval(gentleKick, 7500 + Math.random() * 1500);
+    // Pulso de correccion suave: si pierde velocidad, lo empujamos otra vez
+    // Esto mantiene el "DVD screensaver" pero sin violencia
+    const keepAlive = setInterval(() => {
+      if (!ref.current) return;
+      const linvel = ref.current.linvel();
+      const speed = Math.sqrt(linvel.x ** 2 + linvel.y ** 2 + linvel.z ** 2);
+      // Solo empujamos si va demasiado lento
+      if (speed < 1.2) {
+        ref.current.applyImpulse(
+          {
+            x: (Math.random() - 0.5) * 1.8,
+            y: (Math.random() - 0.5) * 1.8,
+            z: (Math.random() - 0.5) * 0.8,
+          },
+          true
+        );
+        ref.current.applyTorqueImpulse(
+          {
+            x: (Math.random() - 0.5) * 0.4,
+            y: (Math.random() - 0.5) * 0.4,
+            z: (Math.random() - 0.5) * 0.25,
+          },
+          true
+        );
+      }
+    }, 1800);
+
     return () => {
       clearTimeout(bootstrap);
-      clearInterval(beat);
+      clearInterval(keepAlive);
     };
-  }, [isFixed, reduced, impulseScale]);
+  }, [reduced]);
 
   return (
     <RigidBody
       ref={ref}
-      type={isFixed ? "fixed" : "dynamic"}
-      position={position}
-      rotation={rotation}
+      type="dynamic"
+      position={initialPosition}
       colliders="hull"
-      restitution={0.75}
-      friction={0.08}
-      linearDamping={0.35}
-      angularDamping={0.3}
+      restitution={0.95}
+      friction={0.02}
+      linearDamping={0.06}
+      angularDamping={0.08}
       mass={mass}
       canSleep={false}
     >
@@ -86,61 +91,72 @@ function PhysicalModel({
   );
 }
 
-function PremiumCube({ position, color = "#ff00aa", reduced, impulseScale = 1 }) {
+function FloatingCube({ initialPosition, color = "#ff0033", reduced }) {
   const ref = useRef();
   useEffect(() => {
     if (reduced) return;
-    const kick = () => {
-      if (!ref.current) return;
-      ref.current.applyImpulse(
-        {
-          x: (Math.random() - 0.5) * 1.1 * impulseScale,
-          y: (Math.random() - 0.5) * 1.1 * impulseScale,
-          z: (Math.random() - 0.5) * 0.5 * impulseScale,
-        },
-        true
-      );
-    };
     const bootstrap = setTimeout(() => {
       if (!ref.current) return;
-      ref.current.applyImpulse(
+      ref.current.setLinvel(
         {
-          x: (Math.random() - 0.5) * 2.0 * impulseScale,
-          y: (Math.random() - 0.5) * 2.0 * impulseScale,
-          z: (Math.random() - 0.5) * 0.4 * impulseScale,
+          x: (Math.random() - 0.5) * 3.2,
+          y: (Math.random() - 0.5) * 2.6,
+          z: (Math.random() - 0.5) * 1,
         },
         true
       );
-    }, 250);
-    const beat = setInterval(kick, 8000 + Math.random() * 1500);
+      ref.current.setAngvel(
+        {
+          x: (Math.random() - 0.5) * 1.2,
+          y: (Math.random() - 0.5) * 1.2,
+          z: (Math.random() - 0.5) * 0.7,
+        },
+        true
+      );
+    }, 200);
+    const keepAlive = setInterval(() => {
+      if (!ref.current) return;
+      const linvel = ref.current.linvel();
+      const speed = Math.sqrt(linvel.x ** 2 + linvel.y ** 2 + linvel.z ** 2);
+      if (speed < 1.2) {
+        ref.current.applyImpulse(
+          {
+            x: (Math.random() - 0.5) * 1.6,
+            y: (Math.random() - 0.5) * 1.6,
+            z: (Math.random() - 0.5) * 0.7,
+          },
+          true
+        );
+      }
+    }, 1800);
     return () => {
       clearTimeout(bootstrap);
-      clearInterval(beat);
+      clearInterval(keepAlive);
     };
-  }, [reduced, impulseScale]);
+  }, [reduced]);
 
   return (
     <RigidBody
       ref={ref}
-      position={position}
+      position={initialPosition}
       colliders="cuboid"
-      restitution={0.7}
-      friction={0.1}
-      linearDamping={0.4}
-      angularDamping={0.35}
+      restitution={0.95}
+      friction={0.02}
+      linearDamping={0.06}
+      angularDamping={0.08}
       mass={2}
       canSleep={false}
     >
-      <RoundedBox args={[1.1, 1.1, 1.1]} radius={0.14} smoothness={4}>
+      <RoundedBox args={[1.15, 1.15, 1.15]} radius={0.15} smoothness={4}>
         <MeshTransmissionMaterial
           backside
           samples={4}
-          thickness={0.8}
-          chromaticAberration={0.45}
+          thickness={0.85}
+          chromaticAberration={0.5}
           anisotropicBlur={0.3}
-          distortion={0.3}
-          distortionScale={0.3}
-          temporalDistortion={0.06}
+          distortion={0.35}
+          distortionScale={0.35}
+          temporalDistortion={0.08}
           color={color}
           attenuationDistance={0.5}
           attenuationColor="#ffffff"
@@ -150,40 +166,16 @@ function PremiumCube({ position, color = "#ff00aa", reduced, impulseScale = 1 })
   );
 }
 
-function FloatingIcosahedron({ position, color = "#00d2ff", reduced }) {
-  const ref = useRef();
-  useFrame((state) => {
-    if (!ref.current || reduced) return;
-    const t = state.clock.getElapsedTime();
-    ref.current.rotation.x = t * 0.15;
-    ref.current.rotation.y = t * 0.2;
-  });
-  return (
-    <Float speed={reduced ? 0 : 1.2} rotationIntensity={0.3} floatIntensity={0.8}>
-      <mesh ref={ref} position={position}>
-        <icosahedronGeometry args={[0.65, 0]} />
-        <meshPhysicalMaterial
-          color={color}
-          metalness={0.85}
-          roughness={0.12}
-          iridescence={1}
-          iridescenceIOR={1.3}
-          iridescenceThicknessRange={[100, 400]}
-        />
-      </mesh>
-    </Float>
-  );
-}
-
 function Boundaries() {
+  // Caja generosa 16x12x8 (wider than viewport, sirve como "parque" de juego)
   return (
     <>
-      <CuboidCollider position={[0, -5, 0]} args={[18, 1.2, 18]} restitution={0.65} friction={0.05} />
-      <CuboidCollider position={[0, 5, 0]} args={[18, 1.2, 18]} restitution={0.65} friction={0.05} />
-      <CuboidCollider position={[-9, 0, 0]} args={[1.2, 9, 18]} restitution={0.65} friction={0.05} />
-      <CuboidCollider position={[9, 0, 0]} args={[1.2, 9, 18]} restitution={0.65} friction={0.05} />
-      <CuboidCollider position={[0, 0, -5]} args={[18, 9, 1.2]} restitution={0.65} friction={0.05} />
-      <CuboidCollider position={[0, 0, 3]} args={[18, 9, 1.2]} restitution={0.65} friction={0.05} />
+      <CuboidCollider position={[0, -6.5, 0]} args={[20, 1.5, 12]} restitution={1} friction={0} />
+      <CuboidCollider position={[0, 6.5, 0]} args={[20, 1.5, 12]} restitution={1} friction={0} />
+      <CuboidCollider position={[-11, 0, 0]} args={[1.5, 10, 12]} restitution={1} friction={0} />
+      <CuboidCollider position={[11, 0, 0]} args={[1.5, 10, 12]} restitution={1} friction={0} />
+      <CuboidCollider position={[0, 0, -4.5]} args={[20, 10, 1.5]} restitution={1} friction={0} />
+      <CuboidCollider position={[0, 0, 3]} args={[20, 10, 1.5]} restitution={1} friction={0} />
     </>
   );
 }
@@ -202,44 +194,44 @@ function World({ reduced, isDark }) {
         position={[9, 10, 9]}
         angle={0.22}
         penumbra={1}
-        intensity={isDark ? 2.4 : 1.4}
+        intensity={isDark ? 2.6 : 1.5}
         color="#a855f7"
         castShadow
       />
-      <pointLight position={[-10, -8, -8]} intensity={isDark ? 1.6 : 0.8} color="#00d2ff" />
-      <pointLight position={[0, 9, -4]} intensity={isDark ? 0.85 : 0.5} color="#ff0077" />
+      <pointLight position={[-10, -8, -8]} intensity={isDark ? 1.7 : 0.9} color="#00d2ff" />
+      <pointLight position={[0, 9, -4]} intensity={isDark ? 0.9 : 0.5} color="#ff0077" />
 
       {isDark && (
         <Stars
-          radius={100}
-          depth={50}
-          count={reduced ? 1200 : 4500}
-          factor={4}
+          radius={120}
+          depth={60}
+          count={reduced ? 1500 : 5500}
+          factor={4.5}
           saturation={0.5}
           fade
-          speed={reduced ? 0 : 0.8}
+          speed={reduced ? 0 : 1}
         />
       )}
 
-      <Physics gravity={[0, 0, 0]} paused={reduced} timeStep={1 / 90}>
+      <Physics gravity={[0, 0, 0]} paused={reduced} timeStep={1 / 120}>
         <Boundaries />
         <Suspense fallback={null}>
-          <PhysicalModel
+          <FloatingModel
             url="/assets/models/duck.glb"
-            position={[-5.5, 2.2, -0.5]}
-            scale={1.1}
-            mass={1.2}
+            initialPosition={[-3.5, 2.2, 0]}
+            scale={1.15}
+            mass={1.1}
             reduced={reduced}
           />
-          <PremiumCube position={[5.2, -1.8, -0.3]} reduced={reduced} color="#ff0033" />
+          <FloatingCube initialPosition={[3.8, -1.5, 0]} color="#ff0033" reduced={reduced} />
         </Suspense>
       </Physics>
 
       <ContactShadows
-        position={[0, -4.8, 0]}
-        opacity={isDark ? 0.5 : 0.28}
-        scale={36}
-        blur={2.2}
+        position={[0, -5.5, 0]}
+        opacity={isDark ? 0.45 : 0.22}
+        scale={38}
+        blur={2.5}
         far={9}
         color={isDark ? "#a855f7" : "#0c0c15"}
       />
@@ -265,7 +257,7 @@ export default function PhysicsScene() {
     >
       <Canvas
         dpr={[1, 2]}
-        camera={{ position: [0, 0, 8.5], fov: 42 }}
+        camera={{ position: [0, 0, 9], fov: 42 }}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         frameloop={reduced ? "demand" : "always"}
       >

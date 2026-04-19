@@ -1,0 +1,58 @@
+.galaxy-stage {
+  position: relative;
+  min-height: 100vh;
+  background: #030010;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.galaxy-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.galaxy-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  text-align: center;
+  padding: 2rem;
+  pointer-events: none;
+  max-width: min(920px, 92vw);
+}
+
+.galaxy-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.4em;
+  color: var(--accent-cyan);
+  margin: 0 0 1rem;
+  text-transform: uppercase;
+  text-shadow: 0 0 18px rgba(0, 210, 255, 0.6);
+}
+
+.galaxy-title {
+  font-size: clamp(2.8rem, 7.5vw, 6.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0;
+  background: linear-gradient(135deg, #ffffff 0%, var(--accent-magenta) 60%, var(--accent-purple) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 6px 34px rgba(255, 0, 119, 0.3));
+  line-height: 1;
+}
+
+.galaxy-subtitle {
+  margin: 1.3rem auto 0;
+  max-width: 620px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+  letter-spacing: 0.03em;
+  line-height: 1.65;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
+}
