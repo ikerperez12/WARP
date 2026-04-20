@@ -10,18 +10,29 @@ const CLOSED = "ellipse(10vw 14vh at 50% 50%)";
 const OPEN = "ellipse(160vw 160vh at 50% 50%)";
 
 /**
- * VideoCurtain — iris-style video reveal WITHOUT scroll hijacking.
+ * VideoCurtain
  *
- * Structure:
- *   .video-curtain (140vh tall outer section)
- *     .video-curtain-sticky (sticky top:0, height: 100vh)
- *       .video-curtain-clip (absolute inset:0, clip-path oval animates)
- *         <video>, overlay
+ * Layout:
+ *   .video-curtain (200vh tall outer section)
+ *     .video-curtain-stage (sticky top:0, height:100vh — holds video centered on viewport)
+ *       .video-curtain-clip (absolute inset:0, clip-path animates open→hold→closed)
  *       .video-curtain-text (absolute, centered over clip)
  *
- * Timeline is scrub-bound to the section crossing the viewport, but NO pin.
- * The oval opens as the section enters and closes as it leaves, at whatever
- * speed the user scrolls.
+ * Scroll arithmetic (section 200vh + viewport 100vh = 300vh of scroll trigger span):
+ *   progress 0.00  — section top at viewport bottom (pre-sticky)
+ *   progress 0.33  — section top at viewport top (sticky locks)
+ *   progress 0.67  — section has moved up 100vh, sticky unlocks
+ *   progress 1.00  — section bottom at viewport top
+ *
+ * Iris timeline aligned to sticky-active window (0.33–0.67):
+ *   0.00–0.33 closed  (pre-viewport)
+ *   0.33–0.45 opening (iris opens while section fills screen)
+ *   0.45–0.55 open + text in
+ *   0.55–0.60 text out
+ *   0.55–0.67 closing
+ *   0.67–1.00 closed  (post-sticky)
+ *
+ * No pin: true. No scroll hijacking. Native scroll + CSS sticky + GSAP scrub.
  */
 export default function VideoCurtain({
   id,
@@ -58,48 +69,56 @@ export default function VideoCurtain({
 
     const ctx = gsap.context(() => {
       gsap.set(media, { clipPath: CLOSED, webkitClipPath: CLOSED });
-      gsap.set(text, { opacity: 0, scale: 0.92, y: 20 });
+      gsap.set(text, { opacity: 0, scale: 0.9, y: 20 });
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
           start: "top bottom",
           end: "bottom top",
-          scrub: 0.4,
+          scrub: 0.35,
         },
       });
 
+      // 0 → 0.33 closed (empty bar)
+      tl.to({}, { duration: 0.33 }, 0);
+
+      // 0.33 → 0.45 iris opens
       tl.to(media, {
         clipPath: OPEN,
         webkitClipPath: OPEN,
-        ease: "power2.out",
-        duration: 0.3,
-      }, 0);
+        ease: "power2.inOut",
+        duration: 0.12,
+      }, 0.33);
 
+      // 0.40 → 0.48 text fades in
       tl.to(text, {
         opacity: 1,
         scale: 1,
         y: 0,
         ease: "power2.out",
-        duration: 0.25,
-      }, 0.18);
+        duration: 0.08,
+      }, 0.40);
 
-      tl.to({}, { duration: 0.2 }, 0.45);
+      // 0.48 → 0.55 hold (fully open with text)
+      tl.to({}, { duration: 0.07 }, 0.48);
 
+      // 0.55 → 0.60 text fades out
       tl.to(text, {
         opacity: 0,
         scale: 0.95,
         y: -15,
         ease: "power2.in",
-        duration: 0.2,
-      }, 0.62);
+        duration: 0.05,
+      }, 0.55);
 
+      // 0.55 → 0.67 iris closes
       tl.to(media, {
         clipPath: CLOSED,
         webkitClipPath: CLOSED,
-        ease: "power2.in",
-        duration: 0.3,
-      }, 0.7);
+        ease: "power2.inOut",
+        duration: 0.12,
+      }, 0.55);
     }, section);
 
     return () => ctx.revert();
@@ -112,7 +131,7 @@ export default function VideoCurtain({
       className={`video-curtain video-curtain-${align}`}
       aria-label={title}
     >
-      <div className="video-curtain-sticky">
+      <div className="video-curtain-stage">
         <div className="video-curtain-clip" ref={mediaRef}>
           <video
             ref={videoRef}

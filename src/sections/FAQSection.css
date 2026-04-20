@@ -1,0 +1,109 @@
+.faq-section {
+  background:
+    radial-gradient(ellipse at 50% 20%, color-mix(in srgb, var(--accent-purple) 6%, transparent), transparent 50%);
+}
+
+.faq-list {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.faq-item {
+  border-radius: 1rem;
+  background: var(--glass);
+  border: 1px solid var(--border-soft);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  overflow: hidden;
+  transition: border-color 0.4s, background 0.4s;
+}
+
+.faq-item:hover {
+  border-color: color-mix(in srgb, var(--accent-magenta) 25%, var(--border-soft));
+}
+
+.faq-item.is-open {
+  border-color: color-mix(in srgb, var(--accent-magenta) 50%, var(--border-soft));
+  background: var(--glass-strong);
+}
+
+.faq-q {
+  width: 100%;
+  padding: 1.3rem 1.6rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1.2rem;
+  align-items: center;
+  text-align: left;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  transition: color 0.3s;
+}
+
+.faq-q:hover {
+  color: var(--accent-magenta);
+}
+
+.faq-q-num {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.25em;
+  color: var(--accent-cyan);
+  font-weight: 600;
+}
+
+.faq-q-text {
+  line-height: 1.4;
+}
+
+.faq-q-icon {
+  font-size: 1.6rem;
+  font-weight: 300;
+  color: var(--accent-magenta);
+  transition: transform 0.3s;
+  line-height: 1;
+}
+
+.faq-item.is-open .faq-q-icon {
+  transform: rotate(180deg);
+}
+
+.faq-a-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s var(--ease-out-expo);
+}
+
+.faq-item.is-open .faq-a-wrap {
+  grid-template-rows: 1fr;
+}
+
+.faq-a-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.faq-a-inner p {
+  margin: 0;
+  padding: 0 1.6rem 1.5rem 4rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 640px) {
+  .faq-q {
+    padding: 1rem 1.1rem;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.7rem;
+    font-size: 0.93rem;
+  }
+  .faq-a-inner p {
+    padding: 0 1.1rem 1.2rem 1.1rem;
+  }
+}

@@ -23,6 +23,9 @@ const StackSection = lazy(() => import("./sections/StackSection.jsx"));
 const TechRadar = lazy(() => import("./sections/TechRadar.jsx"));
 const ProcessPipeline = lazy(() => import("./sections/ProcessPipeline.jsx"));
 const CodeSpotlight = lazy(() => import("./sections/CodeSpotlight.jsx"));
+const PrinciplesSection = lazy(() => import("./sections/PrinciplesSection.jsx"));
+const FAQSection = lazy(() => import("./sections/FAQSection.jsx"));
+const ResumeCTA = lazy(() => import("./sections/ResumeCTA.jsx"));
 const ProjectsSection = lazy(() => import("./sections/ProjectsSection.jsx"));
 const ExperienceSection = lazy(() => import("./sections/ExperienceSection.jsx"));
 const ContactSection = lazy(() => import("./sections/ContactSection.jsx"));
@@ -134,6 +137,14 @@ export default function Shell() {
           </div>
         </ErrorBoundary>
 
+        <ErrorBoundary label="principles">
+          <div className="interactive cv-lazy">
+            <Suspense fallback={<SectionSkeleton />}>
+              <PrinciplesSection />
+            </Suspense>
+          </div>
+        </ErrorBoundary>
+
         <SectionGutter size="sm" />
 
         <ErrorBoundary label="blueprint">
@@ -196,6 +207,22 @@ export default function Shell() {
           <div className="interactive cv-lazy">
             <Suspense fallback={<SectionSkeleton />}>
               <ExperienceSection />
+            </Suspense>
+          </div>
+        </ErrorBoundary>
+
+        <ErrorBoundary label="faq">
+          <div className="interactive cv-lazy">
+            <Suspense fallback={<SectionSkeleton />}>
+              <FAQSection />
+            </Suspense>
+          </div>
+        </ErrorBoundary>
+
+        <ErrorBoundary label="resume-cta">
+          <div className="interactive cv-lazy">
+            <Suspense fallback={<SectionSkeleton />}>
+              <ResumeCTA />
             </Suspense>
           </div>
         </ErrorBoundary>

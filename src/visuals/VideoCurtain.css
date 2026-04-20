@@ -1,13 +1,30 @@
 /*
- * VideoCurtain — standalone 100vh section with video clip that opens/closes as
- * the section crosses the viewport. Uses scroll position (not pin) to animate.
+ * VideoCurtain
+ *   .video-curtain (outer 200vh)
+ *     .video-curtain-stage (sticky top:0, height:100vh — the visible frame)
+ *       .video-curtain-clip (absolute inset:0, clip-path iris animates)
+ *         <video>, overlay
+ *       .video-curtain-text (absolute, centered)
+ *       .video-curtain-corners
+ *
+ * The extra 100vh of section height lets the iris have a "pre-entry" closed
+ * state below the fold and a "post-exit" closed state above the fold, so the
+ * user sees a proper iris open → hold → close arc as they scroll.
  */
 
 .video-curtain {
   position: relative;
-  height: 100vh;
+  height: 200vh;
   overflow: hidden;
   isolation: isolate;
+}
+
+.video-curtain-stage {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .video-curtain-clip {
@@ -136,5 +153,6 @@
 .video-curtain-corners span:nth-child(4) { bottom: 0; right: 0; border-left: 0; border-top: 0; }
 
 @media (max-width: 640px) {
+  .video-curtain { height: 180vh; }
   .video-curtain-text { padding: 1.5rem; }
 }
