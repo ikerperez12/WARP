@@ -4,17 +4,22 @@ import "./SectionDots.css";
 
 const SECTIONS = [
   { id: "hero", selector: "#hero" },
-  { id: "creative", selector: "#vt-creative" },
+  { id: "intro", selector: "#vt-creative" },
   { id: "about", selector: "#about" },
+  { id: "metrics", selector: "#metrics" },
   { id: "services", selector: "#services" },
   { id: "stack", selector: "#stack" },
-  { id: "blueprint", selector: ".blueprint-stage" },
+  { id: "radar", selector: "#tech-radar" },
+  { id: "process", selector: "#process" },
+  { id: "principles", selector: "#principles" },
+  { id: "cv", selector: ".blueprint-stage" },
+  { id: "code", selector: "#code" },
   { id: "alloy", selector: ".liquid-metal-transition" },
   { id: "projects", selector: "#projects" },
-  { id: "mastery", selector: "#vt-mastery" },
-  { id: "experience", selector: "#experience" },
-  { id: "galaxy", selector: ".galaxy-stage" },
-  { id: "morph", selector: "#morph" },
+  { id: "more", selector: "#vt-mastery" },
+  { id: "path", selector: "#experience" },
+  { id: "faq", selector: "#faq" },
+  { id: "hire", selector: "#resume-cta" },
   { id: "contact", selector: "#contact" },
 ];
 

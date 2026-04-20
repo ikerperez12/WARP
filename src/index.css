@@ -53,6 +53,12 @@
 
 html {
   scroll-behavior: smooth;
+  /* Compensate for fixed TopNav so anchor links land below it */
+  scroll-padding-top: 80px;
+}
+
+@media (max-width: 640px) {
+  html { scroll-padding-top: 64px; }
 }
 
 html,
@@ -124,6 +130,21 @@ img, svg, video {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-purple);
+}
+
+/* Image + video rendering hints for perf */
+img, video {
+  image-rendering: auto;
+  content-visibility: auto;
+}
+
+/* Respect keyboard focus on all interactive elements */
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {
