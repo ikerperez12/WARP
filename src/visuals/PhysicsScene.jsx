@@ -1,4 +1,4 @@
-import { useRef, useEffect, Suspense } from "react";
+import { useRef, useEffect, Suspense, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import {
   Environment,
@@ -245,6 +245,21 @@ export default function PhysicsScene() {
   const isDark = theme === "dark";
   const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
 
+  // Pause the physics canvas when the page has scrolled past the hero area.
+  // This is the biggest perf win: Rapier + 3D render at 60fps is expensive,
+  // and the scene is visually behind other content below the fold anyway.
+  const [inHero, setInHero] = useState(true);
+  useEffect(() => {
+    const onScroll = () => {
+      setInHero(window.scrollY < window.innerHeight * 1.3);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const activeFrameloop = reduced || !inHero ? "demand" : "always";
+
   return (
     <div
       className="physics-scene"
@@ -254,15 +269,17 @@ export default function PhysicsScene() {
         inset: 0,
         zIndex: -1,
         pointerEvents: "none",
+        opacity: inHero ? 1 : 0.35,
+        transition: "opacity 0.6s ease",
       }}
     >
       <Canvas
         dpr={isMobile ? [1, 1.5] : [1, 2]}
         camera={{ position: [0, 0, 9], fov: 42 }}
         gl={{ antialias: !isMobile, alpha: true, powerPreference: "high-performance" }}
-        frameloop={reduced ? "demand" : "always"}
+        frameloop={activeFrameloop}
       >
-        <World reduced={reduced} isDark={isDark} isMobile={isMobile} />
+        <World reduced={reduced || !inHero} isDark={isDark} isMobile={isMobile} />
       </Canvas>
     </div>
   );

@@ -1,25 +1,13 @@
 /*
- * VideoCurtain
- *   .video-curtain (outer, 140vh tall)
- *     .video-curtain-sticky (sticky top:0, height:100vh — holds everything)
- *       .video-curtain-clip (absolute inset:0, clip-path animates)
- *       .video-curtain-text (absolute, centered over clip)
- *       .video-curtain-corners (absolute, decorative)
+ * VideoCurtain — standalone 100vh section with video clip that opens/closes as
+ * the section crosses the viewport. Uses scroll position (not pin) to animate.
  */
 
 .video-curtain {
   position: relative;
-  height: 160vh;
-  overflow: hidden;
-  isolation: isolate;
-}
-
-.video-curtain-sticky {
-  position: sticky;
-  top: 0;
-  width: 100%;
   height: 100vh;
   overflow: hidden;
+  isolation: isolate;
 }
 
 .video-curtain-clip {
@@ -148,6 +136,5 @@
 .video-curtain-corners span:nth-child(4) { bottom: 0; right: 0; border-left: 0; border-top: 0; }
 
 @media (max-width: 640px) {
-  .video-curtain { height: 140vh; }
   .video-curtain-text { padding: 1.5rem; }
 }

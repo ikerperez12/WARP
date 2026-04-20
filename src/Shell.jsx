@@ -17,22 +17,24 @@ import "./Shell.css";
 
 const PhysicsScene = lazy(() => import("./visuals/PhysicsScene.jsx"));
 const AboutSection = lazy(() => import("./sections/AboutSection.jsx"));
+const MetricsDashboard = lazy(() => import("./sections/MetricsDashboard.jsx"));
 const ServicesSection = lazy(() => import("./sections/ServicesSection.jsx"));
 const StackSection = lazy(() => import("./sections/StackSection.jsx"));
+const TechRadar = lazy(() => import("./sections/TechRadar.jsx"));
+const ProcessPipeline = lazy(() => import("./sections/ProcessPipeline.jsx"));
+const CodeSpotlight = lazy(() => import("./sections/CodeSpotlight.jsx"));
 const ProjectsSection = lazy(() => import("./sections/ProjectsSection.jsx"));
 const ExperienceSection = lazy(() => import("./sections/ExperienceSection.jsx"));
 const ContactSection = lazy(() => import("./sections/ContactSection.jsx"));
 const FooterSection = lazy(() => import("./sections/FooterSection.jsx"));
 const LiquidMetalTransition = lazy(() => import("./visuals/LiquidMetalTransition.jsx"));
-const MorphParticlesTransition = lazy(() => import("./visuals/MorphParticlesTransition.jsx"));
 const FrutigerAeroStage = lazy(() => import("./visuals/FrutigerAeroStage.jsx"));
 const BlueprintStage = lazy(() => import("./visuals/BlueprintStage.jsx"));
-const ParticleGalaxyStage = lazy(() => import("./visuals/ParticleGalaxyStage.jsx"));
 const HorizontalShowcase = lazy(() => import("./visuals/HorizontalShowcase.jsx"));
 
 export default function Shell() {
   const { lang } = useI18n();
-  const vtCopy = VT_COPY[lang];
+  const c = COPY[lang];
 
   return (
     <>
@@ -60,28 +62,32 @@ export default function Shell() {
             <VideoCurtain
               id="vt-creative"
               src="/assets/videos/creative-vision-1080p.mp4"
-              kicker={vtCopy.creative.kicker}
-              title={vtCopy.creative.title}
-              subtitle={vtCopy.creative.subtitle}
-              lines={vtCopy.creative.lines}
-              align="center"
-              pinLength={120}
+              kicker={c.vt1.kicker}
+              title={c.vt1.title}
+              subtitle={c.vt1.subtitle}
+              lines={c.vt1.lines}
             />
           </div>
         </ErrorBoundary>
 
-        <SectionGutter />
-
         <ErrorBoundary label="about">
-          <div className="interactive">
+          <div className="interactive cv-lazy">
             <Suspense fallback={<SectionSkeleton />}>
               <AboutSection />
             </Suspense>
           </div>
         </ErrorBoundary>
 
+        <ErrorBoundary label="metrics">
+          <div className="interactive cv-lazy">
+            <Suspense fallback={<SectionSkeleton />}>
+              <MetricsDashboard />
+            </Suspense>
+          </div>
+        </ErrorBoundary>
+
         <ErrorBoundary label="services">
-          <div id="services" className="interactive">
+          <div id="services" className="interactive cv-lazy">
             <Suspense fallback={<SectionSkeleton />}>
               <ServicesSection />
             </Suspense>
@@ -89,7 +95,6 @@ export default function Shell() {
         </ErrorBoundary>
 
         <ScannerBanner
-          label="SCAN"
           items={
             lang === "en"
               ? ["BACKEND", "SYSTEMS", "SECURITY", "AUTOMATION", "TOOLING", "LINUX", "DOCKER", "APIs"]
@@ -98,9 +103,17 @@ export default function Shell() {
         />
 
         <ErrorBoundary label="stack">
-          <div className="interactive">
+          <div className="interactive cv-lazy">
             <Suspense fallback={<SectionSkeleton />}>
               <StackSection />
+            </Suspense>
+          </div>
+        </ErrorBoundary>
+
+        <ErrorBoundary label="tech-radar">
+          <div className="interactive cv-lazy">
+            <Suspense fallback={<SectionSkeleton />}>
+              <TechRadar />
             </Suspense>
           </div>
         </ErrorBoundary>
@@ -113,59 +126,53 @@ export default function Shell() {
           </div>
         </ErrorBoundary>
 
-        <SectionGutter size="lg" />
+        <ErrorBoundary label="process">
+          <div className="interactive cv-lazy">
+            <Suspense fallback={<SectionSkeleton />}>
+              <ProcessPipeline />
+            </Suspense>
+          </div>
+        </ErrorBoundary>
+
+        <SectionGutter size="sm" />
 
         <ErrorBoundary label="blueprint">
           <InViewMonitor rootMargin="20% 0px 20% 0px">
             <Suspense fallback={<SectionSkeleton />}>
               <BlueprintStage
-                title={lang === "en" ? "Engineering background — UDC + SICUE-UPM" : "Formación — UDC + SICUE-UPM"}
-                subtitle={
-                  lang === "en"
-                    ? "Four years inside a Computer Engineering degree covering algorithms, operating systems, networking, databases, AI and distributed systems. Plus a SICUE exchange at ETSISI-UPM to broaden the view of enterprise systems."
-                    : "Cuatro años de Grado en Ingeniería Informática: algoritmos, sistemas operativos, redes, bases de datos, IA y sistemas distribuidos. Más un intercambio SICUE en ETSISI-UPM ampliando la visión de sistemas empresariales."
-                }
-                lines={
-                  lang === "en"
-                    ? [
-                        { label: "Degree", value: "Computer Engineering · UDC" },
-                        { label: "Exchange", value: "SICUE · ETSISI-UPM" },
-                        { label: "Focus", value: "Backend · Systems · Security" },
-                        { label: "Languages", value: "ES / GL native · EN B2" },
-                        { label: "Location", value: "A Coruña / Galicia" },
-                        { label: "Availability", value: "Internship / Junior role" },
-                      ]
-                    : [
-                        { label: "Grado", value: "Ing. Informática · UDC" },
-                        { label: "Intercambio", value: "SICUE · ETSISI-UPM" },
-                        { label: "Foco", value: "Backend · Sistemas · Seguridad" },
-                        { label: "Idiomas", value: "ES / GL nativo · EN B2" },
-                        { label: "Ubicación", value: "A Coruña / Galicia" },
-                        { label: "Disponibilidad", value: "Prácticas / Junior" },
-                      ]
-                }
+                title={c.blueprint.title}
+                subtitle={c.blueprint.subtitle}
+                lines={c.blueprint.lines}
               />
             </Suspense>
           </InViewMonitor>
         </ErrorBoundary>
 
-        <SectionGutter />
+        <SectionGutter size="sm" />
+
+        <ErrorBoundary label="code">
+          <div className="interactive cv-lazy">
+            <Suspense fallback={<SectionSkeleton />}>
+              <CodeSpotlight />
+            </Suspense>
+          </div>
+        </ErrorBoundary>
 
         <ErrorBoundary label="liquid-metal">
           <InViewMonitor rootMargin="20% 0px 20% 0px">
             <Suspense fallback={<SectionSkeleton />}>
               <LiquidMetalTransition
-                title={vtCopy.alloy.title}
-                subtitle={vtCopy.alloy.subtitle}
+                title={c.alloy.title}
+                subtitle={c.alloy.subtitle}
               />
             </Suspense>
           </InViewMonitor>
         </ErrorBoundary>
 
-        <SectionGutter />
+        <SectionGutter size="sm" />
 
         <ErrorBoundary label="projects">
-          <div className="interactive">
+          <div className="interactive cv-lazy">
             <Suspense fallback={<SectionSkeleton />}>
               <ProjectsSection />
             </Suspense>
@@ -177,92 +184,38 @@ export default function Shell() {
             <VideoCurtain
               id="vt-mastery"
               src="/assets/videos/digital-mastery-1080p.mp4"
-              kicker={vtCopy.mastery.kicker}
-              title={vtCopy.mastery.title}
-              subtitle={vtCopy.mastery.subtitle}
-              lines={vtCopy.mastery.lines}
-              align="center"
-              pinLength={180}
+              kicker={c.vt2.kicker}
+              title={c.vt2.title}
+              subtitle={c.vt2.subtitle}
+              lines={c.vt2.lines}
             />
           </div>
         </ErrorBoundary>
 
-        <SectionGutter />
-
         <ErrorBoundary label="experience">
-          <div className="interactive">
+          <div className="interactive cv-lazy">
             <Suspense fallback={<SectionSkeleton />}>
               <ExperienceSection />
             </Suspense>
           </div>
         </ErrorBoundary>
 
-        <SectionGutter size="lg" />
-
-        <ErrorBoundary label="galaxy">
-          <InViewMonitor rootMargin="20% 0px 20% 0px">
-            <Suspense fallback={<SectionSkeleton />}>
-              <ParticleGalaxyStage
-                kicker={lang === "en" ? "Technical breadth" : "Alcance técnico"}
-                title={lang === "en" ? "One galaxy of domains." : "Una galaxia de dominios."}
-                subtitle={
-                  lang === "en"
-                    ? "Distributed systems, databases, operating systems, networks, cryptography and AI. Each a branch I have walked through the degree — and still explore in the lab."
-                    : "Sistemas distribuidos, bases de datos, sistemas operativos, redes, criptografía e IA. Cada rama una he recorrido en el grado — y sigo explorando en el laboratorio."
-                }
-              />
-            </Suspense>
-          </InViewMonitor>
-        </ErrorBoundary>
-
-        <SectionGutter size="lg" />
-
-        <ErrorBoundary label="morph">
-          <InViewMonitor rootMargin="20% 0px 20% 0px">
-            <div id="morph" className="interactive">
-              <Suspense fallback={<SectionSkeleton />}>
-                <MorphParticlesTransition
-                  title={lang === "en" ? "ADAPT" : "ADAPTAR"}
-                  subtitle={lang === "en" ? "From problem → system → maintainable software" : "De problema → sistema → software mantenible"}
-                  lines={
-                    lang === "en"
-                      ? [
-                          "Translate business need into technical contract",
-                          "Architecture that survives the second requirement change",
-                          "Tests and validation as part of the build",
-                        ]
-                      : [
-                          "Traducir necesidad de negocio a contrato técnico",
-                          "Arquitectura que aguanta el segundo cambio de requisitos",
-                          "Tests y validación como parte del build",
-                        ]
-                  }
-                />
-              </Suspense>
-            </div>
-          </InViewMonitor>
-        </ErrorBoundary>
-
-        <SectionGutter size="lg" />
+        <SectionGutter size="md" />
 
         <ErrorBoundary label="frutiger">
           <InViewMonitor rootMargin="20% 0px 20% 0px">
             <Suspense fallback={<SectionSkeleton />}>
               <FrutigerAeroStage
-                kicker={lang === "en" ? "Ready to join a team" : "Listo para un equipo"}
-                title={lang === "en" ? "Let's build something useful." : "Construyamos algo útil."}
-                subtitle={
-                  lang === "en"
-                    ? "Open to internships and junior roles in backend, systems and applied security. A Coruña, remote or hybrid — wherever there's a team that values doing things properly."
-                    : "Disponible para prácticas y puesto junior en backend, sistemas y seguridad aplicada. A Coruña, remoto o híbrido — donde haya un equipo al que le importe hacer las cosas bien."
-                }
+                kicker={c.frutiger.kicker}
+                title={c.frutiger.title}
+                subtitle={c.frutiger.subtitle}
               />
             </Suspense>
           </InViewMonitor>
         </ErrorBoundary>
 
         <ErrorBoundary label="contact">
-          <div className="interactive">
+          <div className="interactive cv-lazy">
             <Suspense fallback={<SectionSkeleton />}>
               <ContactSection />
             </Suspense>
@@ -283,63 +236,101 @@ export default function Shell() {
   );
 }
 
-const VT_COPY = {
+const COPY = {
   es: {
-    creative: {
-      kicker: "Presentación",
-      title: "Backend con criterio.",
+    vt1: {
+      kicker: "Perfil técnico",
+      title: "Iker Pérez · Ingeniero junior.",
       subtitle:
-        "Ingeniero informático en formación enfocado en APIs, Linux, Docker y seguridad aplicada. Busco prácticas y primer puesto junior donde aportar trabajo real desde el primer día.",
+        "Grado en Ingeniería Informática (UDC) con intercambio SICUE en ETSISI-UPM. Busco prácticas y primer puesto junior en backend, sistemas o seguridad aplicada. A Coruña · Remoto · Híbrido.",
       lines: [
-        "APIs mantenibles con contratos explícitos",
-        "Linux + Docker + despliegues reproducibles",
-        "Seguridad aplicada y validación técnica",
+        "Java · Python · PostgreSQL · Docker · Linux",
+        "APIs REST mantenibles con contratos claros",
+        "Seguridad aplicada · PQC · Análisis de tráfico",
       ],
     },
     alloy: {
-      title: "LIQUID ALLOY",
-      subtitle: "Sección visual · Cambio de ritmo entre bloques",
+      title: "DISPONIBLE",
+      subtitle: "Prácticas · Junior · Backend / Sistemas / Seguridad · A Coruña / Remoto",
     },
-    mastery: {
-      kicker: "Proyectos destacados",
-      title: "Iteración técnica real.",
+    vt2: {
+      kicker: "Cuatro repositorios · Cuatro disciplinas",
+      title: "Proyectos propios con lectura técnica.",
       subtitle:
-        "Cada repositorio es una vuelta más al problema — arquitectura, seguridad, automatización y tooling interno. Proyectos académicos y personales con lectura técnica clara.",
+        "Selección corta de GitHub: servicios distribuidos con Docker, auditoría de criptografía postcuántica, CLI de automatización con LLMs y programación de sistemas sobre POSIX.",
       lines: [
-        "ISD · Internet y Sistemas Distribuidos",
-        "Auditoría PQC · Criptografía postcuántica",
-        "GPT CMD · CLI de automatización con IA",
-        "SO-SHELL · Programación de sistemas",
+        "ISD · Java + PostgreSQL + Docker (backend distribuido)",
+        "Auditoría PQC · Python + Wireshark (seguridad aplicada)",
+        "GPT CMD · CLI Python + LLM Ops (automatización)",
+        "SO-SHELL · C + POSIX (programación de sistemas)",
       ],
+    },
+    blueprint: {
+      title: "Formación sólida, aplicada.",
+      subtitle:
+        "Cuatro años dentro del Grado en Ingeniería Informática de la UDC cubriendo algoritmos, sistemas operativos, redes, bases de datos, inteligencia artificial y sistemas distribuidos. Un curso de intercambio SICUE en ETSISI-UPM ampliando visión de sistemas de información empresariales.",
+      lines: [
+        { label: "Grado", value: "Ing. Informática · UDC" },
+        { label: "Intercambio", value: "SICUE · ETSISI-UPM" },
+        { label: "Foco", value: "Backend · Sistemas · Seguridad" },
+        { label: "Idiomas", value: "ES / GL nativo · EN B2" },
+        { label: "Ubicación", value: "A Coruña / Galicia" },
+        { label: "Disponibilidad", value: "Prácticas / Junior" },
+      ],
+    },
+    frutiger: {
+      kicker: "Listo para incorporarme",
+      title: "Contactar.",
+      subtitle:
+        "Abierto a prácticas curriculares, extracurriculares y puesto junior. Respuesta por email o LinkedIn en menos de 24 h. iker.perez@udc.es · linkedin.com/in/ikerperez",
     },
   },
   en: {
-    creative: {
-      kicker: "Introduction",
-      title: "Backend with judgement.",
+    vt1: {
+      kicker: "Technical profile",
+      title: "Iker Pérez · Junior engineer.",
       subtitle:
-        "Computer engineering student focused on APIs, Linux, Docker and applied security. Looking for internships and a first junior role where I can contribute real work from day one.",
+        "Computer Engineering degree (UDC) with SICUE exchange at ETSISI-UPM. Looking for internships and first junior role in backend, systems or applied security. A Coruña · Remote · Hybrid.",
       lines: [
-        "Maintainable APIs with explicit contracts",
-        "Linux + Docker + reproducible deployments",
-        "Applied security and technical validation",
+        "Java · Python · PostgreSQL · Docker · Linux",
+        "Maintainable REST APIs with clear contracts",
+        "Applied security · PQC · Traffic analysis",
       ],
     },
     alloy: {
-      title: "LIQUID ALLOY",
-      subtitle: "Visual break · Pace change between blocks",
+      title: "AVAILABLE",
+      subtitle: "Internship · Junior · Backend / Systems / Security · A Coruña / Remote",
     },
-    mastery: {
-      kicker: "Selected projects",
-      title: "Real technical iteration.",
+    vt2: {
+      kicker: "Four repositories · Four disciplines",
+      title: "Personal projects with technical reading.",
       subtitle:
-        "Every repository is another pass at the problem — architecture, security, automation and internal tooling. Academic and personal projects with clear technical reading.",
+        "Short GitHub selection: distributed services with Docker, post-quantum cryptography audit, automation CLI with LLMs, and systems programming on POSIX.",
       lines: [
-        "ISD · Internet and Distributed Systems",
-        "PQC Audit · Post-quantum cryptography",
-        "GPT CMD · Automation CLI with AI",
-        "SO-SHELL · Systems programming",
+        "ISD · Java + PostgreSQL + Docker (distributed backend)",
+        "PQC Audit · Python + Wireshark (applied security)",
+        "GPT CMD · Python CLI + LLM Ops (automation)",
+        "SO-SHELL · C + POSIX (systems programming)",
       ],
+    },
+    blueprint: {
+      title: "Solid foundation, applied.",
+      subtitle:
+        "Four years inside UDC's Computer Engineering degree covering algorithms, operating systems, networking, databases, AI and distributed systems. A SICUE exchange year at ETSISI-UPM broadening the view of enterprise information systems.",
+      lines: [
+        { label: "Degree", value: "Computer Engineering · UDC" },
+        { label: "Exchange", value: "SICUE · ETSISI-UPM" },
+        { label: "Focus", value: "Backend · Systems · Security" },
+        { label: "Languages", value: "ES / GL native · EN B2" },
+        { label: "Location", value: "A Coruña / Galicia" },
+        { label: "Availability", value: "Internship / Junior" },
+      ],
+    },
+    frutiger: {
+      kicker: "Ready to join",
+      title: "Get in touch.",
+      subtitle:
+        "Open to curricular and extracurricular internships and a first junior role. Reply within 24 h via email or LinkedIn. iker.perez@udc.es · linkedin.com/in/ikerperez",
     },
   },
 };

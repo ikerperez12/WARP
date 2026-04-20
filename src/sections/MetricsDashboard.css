@@ -1,0 +1,84 @@
+.metrics-section {
+  background:
+    radial-gradient(ellipse at 50% 20%, color-mix(in srgb, var(--accent-magenta) 6%, transparent), transparent 50%);
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.2rem;
+}
+
+.metric-card {
+  position: relative;
+  padding: 2.5rem 2rem;
+  border-radius: 1.4rem;
+  background: var(--glass);
+  border: 1px solid var(--border-soft);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  overflow: hidden;
+  transition: transform 0.5s var(--ease-out-expo), border-color 0.4s;
+}
+
+.metric-card:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--accent-magenta) 40%, var(--border-soft));
+}
+
+.metric-card-glow {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent-magenta) 25%, transparent), transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.metric-card-value {
+  display: flex;
+  align-items: baseline;
+  gap: 0.1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.metric-card-num {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 6vw, 4.8rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  background: linear-gradient(135deg, #ffffff 0%, var(--accent-magenta) 70%, var(--accent-purple) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.metric-card-suffix {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  color: var(--accent-cyan);
+  font-weight: 700;
+}
+
+.metric-card-label {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin: 0.8rem 0 0.4rem;
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+}
+
+.metric-card-sub {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  position: relative;
+  z-index: 1;
+}

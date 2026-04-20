@@ -4,6 +4,12 @@
   pointer-events: none;
 }
 
+/* Perf: browser skips rendering until near viewport. Keeps effects intact. */
+.cv-lazy {
+  content-visibility: auto;
+  contain-intrinsic-size: 1000px 1200px;
+}
+
 .main-shell > .interactive,
 .main-shell .interactive {
   pointer-events: auto;
