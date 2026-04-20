@@ -13,10 +13,14 @@ export function LenisProvider({ children }) {
     if (reduced) return;
 
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      // More responsive: lower duration + higher wheelMultiplier = fluid, fast, doesn't hold back
+      duration: 0.7,
+      easing: (t) => 1 - Math.pow(1 - t, 3),
       smoothWheel: true,
       smoothTouch: false,
+      wheelMultiplier: 1.4,
+      touchMultiplier: 1.2,
+      lerp: 0.14,
     });
 
     lenis.on("scroll", ScrollTrigger.update);

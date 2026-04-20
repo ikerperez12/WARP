@@ -6,14 +6,15 @@ const SECTIONS = [
   { id: "hero", selector: "#hero" },
   { id: "creative", selector: "#vt-creative" },
   { id: "about", selector: "#about" },
+  { id: "services", selector: "#services" },
   { id: "stack", selector: "#stack" },
-  { id: "terminal", selector: "#terminal" },
+  { id: "blueprint", selector: ".blueprint-stage" },
   { id: "alloy", selector: ".liquid-metal-transition" },
   { id: "projects", selector: "#projects" },
   { id: "mastery", selector: "#vt-mastery" },
-  { id: "morph", selector: "#morph" },
   { id: "experience", selector: "#experience" },
-  { id: "uplink", selector: "#vt-contact" },
+  { id: "galaxy", selector: ".galaxy-stage" },
+  { id: "morph", selector: "#morph" },
   { id: "contact", selector: "#contact" },
 ];
 

@@ -1,0 +1,109 @@
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: #020205;
+  display: grid;
+  place-items: center;
+  transition: opacity 0.45s var(--ease-out-expo);
+  isolation: isolate;
+}
+
+.preloader.is-ready {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.preloader::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 40%, rgba(2, 2, 5, 1) 100%),
+    radial-gradient(circle at 30% 20%, rgba(168, 85, 247, 0.15), transparent 50%),
+    radial-gradient(circle at 70% 80%, rgba(255, 0, 119, 0.12), transparent 50%);
+  pointer-events: none;
+}
+
+.preloader-center {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  min-width: min(420px, 80vw);
+}
+
+.preloader-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-family: var(--font-display);
+  font-size: 3.2rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  filter: drop-shadow(0 0 28px rgba(255, 0, 119, 0.35));
+}
+
+.preloader-bracket {
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 300;
+}
+
+.preloader-initials {
+  background: linear-gradient(90deg, #00d2ff, #ff0077, #a855f7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.preloader-track {
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  border-radius: 999px;
+  position: relative;
+}
+
+.preloader-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00d2ff, #ff0077, #a855f7);
+  border-radius: 999px;
+  transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 0 12px rgba(255, 0, 119, 0.65);
+}
+
+.preloader-meta {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+}
+
+.preloader-pct {
+  color: #ffffff;
+}
+
+.preloader-corner {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(255, 0, 119, 0.5);
+  z-index: 1;
+}
+
+.preloader-tl { top: 2rem; left: 2rem; border-right: 0; border-bottom: 0; }
+.preloader-tr { top: 2rem; right: 2rem; border-left: 0; border-bottom: 0; }
+.preloader-bl { bottom: 2rem; left: 2rem; border-right: 0; border-top: 0; }
+.preloader-br { bottom: 2rem; right: 2rem; border-left: 0; border-top: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .preloader { transition: opacity 0.15s; }
+  .preloader-fill { transition: width 0.1s linear; }
+}

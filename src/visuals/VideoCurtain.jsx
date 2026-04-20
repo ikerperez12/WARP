@@ -18,6 +18,7 @@ export default function VideoCurtain({
   subtitle,
   lines = [],
   align = "center",
+  pinLength = 120,
 }) {
   const curtainRef = useRef(null);
   const mediaRef = useRef(null);
@@ -50,9 +51,10 @@ export default function VideoCurtain({
         scrollTrigger: {
           trigger: section,
           start: "top top",
-          end: "+=100%",
+          end: `+=${pinLength}%`,
           scrub: 0.6,
           pin: true,
+          pinSpacing: true,
           anticipatePin: 1,
           invalidateOnRefresh: true,
         },
@@ -97,7 +99,7 @@ export default function VideoCurtain({
     }, section);
 
     return () => ctx.revert();
-  }, [reduced]);
+  }, [reduced, pinLength]);
 
   return (
     <section

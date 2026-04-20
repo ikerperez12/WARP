@@ -4,15 +4,18 @@ import { ThemeProvider } from "./theme/ThemeProvider.jsx";
 import { LenisProvider } from "./lib/LenisProvider.jsx";
 import Shell from "./Shell.jsx";
 import LoaderOverlay from "./components/LoaderOverlay.jsx";
+import Preloader from "./components/Preloader.jsx";
 
 export default function App() {
   return (
     <ThemeProvider>
       <I18nProvider>
         <LenisProvider>
-          <Suspense fallback={<LoaderOverlay />}>
-            <Shell />
-          </Suspense>
+          <Preloader>
+            <Suspense fallback={<LoaderOverlay />}>
+              <Shell />
+            </Suspense>
+          </Preloader>
         </LenisProvider>
       </I18nProvider>
     </ThemeProvider>

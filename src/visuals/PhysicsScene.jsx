@@ -180,7 +180,7 @@ function Boundaries() {
   );
 }
 
-function World({ reduced, isDark }) {
+function World({ reduced, isDark, isMobile }) {
   const bg = isDark ? "#020205" : "#f6f4ef";
   return (
     <>
@@ -205,7 +205,7 @@ function World({ reduced, isDark }) {
         <Stars
           radius={120}
           depth={60}
-          count={reduced ? 1500 : 5500}
+          count={reduced ? 800 : (isMobile ? 1200 : 2500)}
           factor={4.5}
           saturation={0.5}
           fade
@@ -243,6 +243,7 @@ export default function PhysicsScene() {
   const reduced = useReducedMotion();
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
 
   return (
     <div
@@ -256,12 +257,12 @@ export default function PhysicsScene() {
       }}
     >
       <Canvas
-        dpr={[1, 2]}
+        dpr={isMobile ? [1, 1.5] : [1, 2]}
         camera={{ position: [0, 0, 9], fov: 42 }}
-        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        gl={{ antialias: !isMobile, alpha: true, powerPreference: "high-performance" }}
         frameloop={reduced ? "demand" : "always"}
       >
-        <World reduced={reduced} isDark={isDark} />
+        <World reduced={reduced} isDark={isDark} isMobile={isMobile} />
       </Canvas>
     </div>
   );

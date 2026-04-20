@@ -6,7 +6,7 @@ import { useReducedMotion } from "../lib/useReducedMotion.js";
 import { useTheme } from "../theme/ThemeProvider.jsx";
 import "./MorphParticlesTransition.css";
 
-const COUNT = 3500;
+const COUNT = typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches ? 1000 : 2000;
 
 function MorphPoints({ shape, reduced, accent }) {
   const ref = useRef();

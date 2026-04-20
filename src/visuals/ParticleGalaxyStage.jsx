@@ -5,7 +5,7 @@ import { useReducedMotion } from "../lib/useReducedMotion.js";
 import "./ParticleGalaxyStage.css";
 
 const PARAMS = {
-  count: 6000,
+  count: typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches ? 1800 : 3500,
   radius: 5,
   branches: 4,
   spin: 1.4,

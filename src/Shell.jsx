@@ -10,9 +10,8 @@ import AmbientCursorTrails from "./visuals/AmbientCursorTrails.jsx";
 import GlobalNoise from "./visuals/GlobalNoise.jsx";
 import VideoCurtain from "./visuals/VideoCurtain.jsx";
 import ScannerBanner from "./visuals/ScannerBanner.jsx";
-import DatamoshTransition from "./visuals/DatamoshTransition.jsx";
-import TerminalManifest from "./visuals/TerminalManifest.jsx";
 import InViewMonitor from "./visuals/InViewMonitor.jsx";
+import SectionGutter from "./components/SectionGutter.jsx";
 import { useI18n } from "./i18n/I18nProvider.jsx";
 import "./Shell.css";
 
@@ -66,9 +65,12 @@ export default function Shell() {
               subtitle={vtCopy.creative.subtitle}
               lines={vtCopy.creative.lines}
               align="center"
+              pinLength={120}
             />
           </div>
         </ErrorBoundary>
+
+        <SectionGutter />
 
         <ErrorBoundary label="about">
           <div className="interactive">
@@ -111,33 +113,35 @@ export default function Shell() {
           </div>
         </ErrorBoundary>
 
+        <SectionGutter size="lg" />
+
         <ErrorBoundary label="blueprint">
-          <InViewMonitor rootMargin="25% 0px 25% 0px">
+          <InViewMonitor rootMargin="20% 0px 20% 0px">
             <Suspense fallback={<SectionSkeleton />}>
               <BlueprintStage
-                title={lang === "en" ? "System blueprint — ready to ship" : "Blueprint de sistema — listo para enviar"}
+                title={lang === "en" ? "Engineering background — UDC + SICUE-UPM" : "Formación — UDC + SICUE-UPM"}
                 subtitle={
                   lang === "en"
-                    ? "Academic foundation (UDC + SICUE-UPM) translated into software that others can maintain. Each discipline treated as a module, wired by clean interfaces."
-                    : "Base académica (UDC + SICUE-UPM) traducida en software que otros pueden mantener. Cada disciplina tratada como un módulo, conectado por interfaces limpias."
+                    ? "Four years inside a Computer Engineering degree covering algorithms, operating systems, networking, databases, AI and distributed systems. Plus a SICUE exchange at ETSISI-UPM to broaden the view of enterprise systems."
+                    : "Cuatro años de Grado en Ingeniería Informática: algoritmos, sistemas operativos, redes, bases de datos, IA y sistemas distribuidos. Más un intercambio SICUE en ETSISI-UPM ampliando la visión de sistemas empresariales."
                 }
                 lines={
                   lang === "en"
                     ? [
                         { label: "Degree", value: "Computer Engineering · UDC" },
-                        { label: "Exchange", value: "SICUE at ETSISI-UPM" },
+                        { label: "Exchange", value: "SICUE · ETSISI-UPM" },
                         { label: "Focus", value: "Backend · Systems · Security" },
-                        { label: "Lang", value: "ES / GL native · EN B2" },
+                        { label: "Languages", value: "ES / GL native · EN B2" },
                         { label: "Location", value: "A Coruña / Galicia" },
-                        { label: "Looking", value: "Internship / Junior role" },
+                        { label: "Availability", value: "Internship / Junior role" },
                       ]
                     : [
                         { label: "Grado", value: "Ing. Informática · UDC" },
-                        { label: "Intercambio", value: "SICUE en ETSISI-UPM" },
+                        { label: "Intercambio", value: "SICUE · ETSISI-UPM" },
                         { label: "Foco", value: "Backend · Sistemas · Seguridad" },
                         { label: "Idiomas", value: "ES / GL nativo · EN B2" },
                         { label: "Ubicación", value: "A Coruña / Galicia" },
-                        { label: "Busco", value: "Prácticas / Puesto junior" },
+                        { label: "Disponibilidad", value: "Prácticas / Junior" },
                       ]
                 }
               />
@@ -145,14 +149,10 @@ export default function Shell() {
           </InViewMonitor>
         </ErrorBoundary>
 
-        <ErrorBoundary label="terminal">
-          <div id="terminal" className="interactive">
-            <TerminalManifest />
-          </div>
-        </ErrorBoundary>
+        <SectionGutter />
 
         <ErrorBoundary label="liquid-metal">
-          <InViewMonitor rootMargin="25% 0px 25% 0px">
+          <InViewMonitor rootMargin="20% 0px 20% 0px">
             <Suspense fallback={<SectionSkeleton />}>
               <LiquidMetalTransition
                 title={vtCopy.alloy.title}
@@ -161,6 +161,8 @@ export default function Shell() {
             </Suspense>
           </InViewMonitor>
         </ErrorBoundary>
+
+        <SectionGutter />
 
         <ErrorBoundary label="projects">
           <div className="interactive">
@@ -180,11 +182,12 @@ export default function Shell() {
               subtitle={vtCopy.mastery.subtitle}
               lines={vtCopy.mastery.lines}
               align="center"
+              pinLength={180}
             />
           </div>
         </ErrorBoundary>
 
-        <DatamoshTransition title={vtCopy.mosh.title} subtitle={vtCopy.mosh.subtitle} />
+        <SectionGutter />
 
         <ErrorBoundary label="experience">
           <div className="interactive">
@@ -194,46 +197,64 @@ export default function Shell() {
           </div>
         </ErrorBoundary>
 
+        <SectionGutter size="lg" />
+
         <ErrorBoundary label="galaxy">
           <InViewMonitor rootMargin="20% 0px 20% 0px">
             <Suspense fallback={<SectionSkeleton />}>
               <ParticleGalaxyStage
-                kicker={lang === "en" ? "From fundamentals to production" : "De los fundamentos a producción"}
-                title={lang === "en" ? "Every node is a tool." : "Cada nodo es una herramienta."}
+                kicker={lang === "en" ? "Technical breadth" : "Alcance técnico"}
+                title={lang === "en" ? "One galaxy of domains." : "Una galaxia de dominios."}
                 subtitle={
                   lang === "en"
-                    ? "Distributed systems, databases, cryptography, networks, compilers — each one a branch of the same galaxy."
-                    : "Sistemas distribuidos, bases de datos, criptografía, redes, compiladores — cada uno una rama de la misma galaxia."
+                    ? "Distributed systems, databases, operating systems, networks, cryptography and AI. Each a branch I have walked through the degree — and still explore in the lab."
+                    : "Sistemas distribuidos, bases de datos, sistemas operativos, redes, criptografía e IA. Cada rama una he recorrido en el grado — y sigo explorando en el laboratorio."
                 }
               />
             </Suspense>
           </InViewMonitor>
         </ErrorBoundary>
 
+        <SectionGutter size="lg" />
+
         <ErrorBoundary label="morph">
-          <InViewMonitor rootMargin="25% 0px 25% 0px">
+          <InViewMonitor rootMargin="20% 0px 20% 0px">
             <div id="morph" className="interactive">
               <Suspense fallback={<SectionSkeleton />}>
                 <MorphParticlesTransition
-                  title={vtCopy.morph.title}
-                  subtitle={vtCopy.morph.subtitle}
-                  lines={vtCopy.morph.lines}
+                  title={lang === "en" ? "ADAPT" : "ADAPTAR"}
+                  subtitle={lang === "en" ? "From problem → system → maintainable software" : "De problema → sistema → software mantenible"}
+                  lines={
+                    lang === "en"
+                      ? [
+                          "Translate business need into technical contract",
+                          "Architecture that survives the second requirement change",
+                          "Tests and validation as part of the build",
+                        ]
+                      : [
+                          "Traducir necesidad de negocio a contrato técnico",
+                          "Arquitectura que aguanta el segundo cambio de requisitos",
+                          "Tests y validación como parte del build",
+                        ]
+                  }
                 />
               </Suspense>
             </div>
           </InViewMonitor>
         </ErrorBoundary>
 
+        <SectionGutter size="lg" />
+
         <ErrorBoundary label="frutiger">
-          <InViewMonitor rootMargin="25% 0px 25% 0px">
+          <InViewMonitor rootMargin="20% 0px 20% 0px">
             <Suspense fallback={<SectionSkeleton />}>
               <FrutigerAeroStage
-                kicker={lang === "en" ? "Clean surfaces" : "Superficies limpias"}
-                title={lang === "en" ? "Engineering with craft." : "Ingeniería con oficio."}
+                kicker={lang === "en" ? "Ready to join a team" : "Listo para un equipo"}
+                title={lang === "en" ? "Let's build something useful." : "Construyamos algo útil."}
                 subtitle={
                   lang === "en"
-                    ? "I write code like I would build something physical — deliberate, clean, with room to grow. Less noise, more signal."
-                    : "Escribo código como construiría algo físico — deliberado, limpio, con sitio para crecer. Menos ruido, más señal."
+                    ? "Open to internships and junior roles in backend, systems and applied security. A Coruña, remote or hybrid — wherever there's a team that values doing things properly."
+                    : "Disponible para prácticas y puesto junior en backend, sistemas y seguridad aplicada. A Coruña, remoto o híbrido — donde haya un equipo al que le importe hacer las cosas bien."
                 }
               />
             </Suspense>
@@ -265,83 +286,59 @@ export default function Shell() {
 const VT_COPY = {
   es: {
     creative: {
-      kicker: "Creative Vision",
-      title: "Código con criterio visual.",
+      kicker: "Presentación",
+      title: "Backend con criterio.",
       subtitle:
-        "Backend sólido, operación limpia y tooling propio — hecho para durar, no para impresionar por diez minutos.",
+        "Ingeniero informático en formación enfocado en APIs, Linux, Docker y seguridad aplicada. Busco prácticas y primer puesto junior donde aportar trabajo real desde el primer día.",
       lines: [
-        "APIs mantenibles, contratos estables",
-        "Linux, Docker, despliegues reproducibles",
-        "Seguridad aplicada, lectura técnica del riesgo",
+        "APIs mantenibles con contratos explícitos",
+        "Linux + Docker + despliegues reproducibles",
+        "Seguridad aplicada y validación técnica",
       ],
     },
     alloy: {
       title: "LIQUID ALLOY",
-      subtitle: "Cromado fluido · Backend reflejado en material vivo",
+      subtitle: "Sección visual · Cambio de ritmo entre bloques",
     },
     mastery: {
-      kicker: "Digital Mastery",
-      title: "Rigor técnico. Estética moderna.",
+      kicker: "Proyectos destacados",
+      title: "Iteración técnica real.",
       subtitle:
-        "Cada proyecto es una iteración sobre el anterior — arquitectura, seguridad, automatización y tooling aplicado.",
+        "Cada repositorio es una vuelta más al problema — arquitectura, seguridad, automatización y tooling interno. Proyectos académicos y personales con lectura técnica clara.",
       lines: [
-        "Servicios desacoplados y testables",
-        "Automatización de flujos de trabajo",
-        "Validación y hardening como parte del diseño",
-      ],
-    },
-    mosh: {
-      title: "DATAMOSH",
-      subtitle: "Transición temporal · ruido controlado · entropía",
-    },
-    morph: {
-      title: "METAMORFO",
-      subtitle: "Adaptabilidad técnica",
-      lines: [
-        "Backend que se reescribe cuando toca",
-        "Sistemas que muerden el hardware",
-        "Interfaces que cambian de forma sin romperse",
+        "ISD · Internet y Sistemas Distribuidos",
+        "Auditoría PQC · Criptografía postcuántica",
+        "GPT CMD · CLI de automatización con IA",
+        "SO-SHELL · Programación de sistemas",
       ],
     },
   },
   en: {
     creative: {
-      kicker: "Creative Vision",
-      title: "Engineering with visual judgement.",
+      kicker: "Introduction",
+      title: "Backend with judgement.",
       subtitle:
-        "Solid backend, clean operations and internal tooling — built to last, not just to impress for ten minutes.",
+        "Computer engineering student focused on APIs, Linux, Docker and applied security. Looking for internships and a first junior role where I can contribute real work from day one.",
       lines: [
-        "Maintainable APIs, stable contracts",
-        "Linux, Docker, reproducible deployments",
-        "Applied security, technical risk reading",
+        "Maintainable APIs with explicit contracts",
+        "Linux + Docker + reproducible deployments",
+        "Applied security and technical validation",
       ],
     },
     alloy: {
       title: "LIQUID ALLOY",
-      subtitle: "Fluid chrome · Backend reflected in living material",
+      subtitle: "Visual break · Pace change between blocks",
     },
     mastery: {
-      kicker: "Digital Mastery",
-      title: "Technical rigor. Modern aesthetics.",
+      kicker: "Selected projects",
+      title: "Real technical iteration.",
       subtitle:
-        "Every project iterates on the last — architecture, security, automation and applied tooling.",
+        "Every repository is another pass at the problem — architecture, security, automation and internal tooling. Academic and personal projects with clear technical reading.",
       lines: [
-        "Decoupled, testable services",
-        "Workflow automation",
-        "Validation and hardening as part of the design",
-      ],
-    },
-    mosh: {
-      title: "DATAMOSH",
-      subtitle: "Temporal transition · controlled noise · entropy",
-    },
-    morph: {
-      title: "METAMORPH",
-      subtitle: "Technical adaptability",
-      lines: [
-        "Backend that rewrites itself when it should",
-        "Systems that bite into hardware",
-        "Interfaces that shape-shift without breaking",
+        "ISD · Internet and Distributed Systems",
+        "PQC Audit · Post-quantum cryptography",
+        "GPT CMD · Automation CLI with AI",
+        "SO-SHELL · Systems programming",
       ],
     },
   },
