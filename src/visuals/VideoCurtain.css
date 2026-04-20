@@ -1,6 +1,6 @@
 .video-curtain {
   position: relative;
-  min-height: 100vh;
+  min-height: 140vh;
   overflow: hidden;
   isolation: isolate;
   display: flex;
@@ -22,10 +22,12 @@
 }
 
 .video-curtain-clip {
-  position: absolute;
-  inset: 0;
-  clip-path: ellipse(15vw 20vh at 50% 50%);
-  -webkit-clip-path: ellipse(15vw 20vh at 50% 50%);
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  clip-path: ellipse(12vw 16vh at 50% 50%);
+  -webkit-clip-path: ellipse(12vw 16vh at 50% 50%);
   overflow: hidden;
   background: #020205;
   will-change: clip-path;

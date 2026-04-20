@@ -9,6 +9,15 @@ gsap.registerPlugin(ScrollTrigger);
 const CLOSED = "ellipse(12vw 16vh at 50% 50%)";
 const OPEN = "ellipse(160vw 160vh at 50% 50%)";
 
+/**
+ * VideoCurtain — iris-style video reveal.
+ *
+ * NO pinning. NO scroll hijacking. The section is 120vh tall and the iris
+ * animation is scrub-bound to the section's position in the viewport. As the
+ * user scrolls, the oval expands while the section crosses the screen and
+ * closes again as it leaves. User can scroll through at any speed, it will
+ * feel natural because the iris simply tracks scroll position.
+ */
 export default function VideoCurtain({
   id,
   src,
@@ -18,7 +27,6 @@ export default function VideoCurtain({
   subtitle,
   lines = [],
   align = "center",
-  pinLength = 120,
 }) {
   const curtainRef = useRef(null);
   const mediaRef = useRef(null);
@@ -45,61 +53,75 @@ export default function VideoCurtain({
 
     const ctx = gsap.context(() => {
       gsap.set(media, { clipPath: CLOSED, webkitClipPath: CLOSED });
-      gsap.set(text, { opacity: 0, scale: 0.88, y: 30 });
+      gsap.set(text, { opacity: 0, scale: 0.92, y: 20 });
 
+      // Scrub-bound timeline without pin. Triggered by the section crossing
+      // the viewport. Fast scroll = fast animation. Slow scroll = slow animation.
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
-          start: "top top",
-          end: `+=${pinLength}%`,
-          scrub: 0.6,
-          pin: true,
-          pinSpacing: true,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 0.4,
         },
       });
 
-      // 0 -> 0.35: oval expands to fill screen (iris opens)
-      tl.to(media, {
-        clipPath: OPEN,
-        webkitClipPath: OPEN,
-        ease: "power2.inOut",
-        duration: 0.35,
-      }, 0);
+      // 0 -> 0.30: oval opens as section enters viewport
+      tl.to(
+        media,
+        {
+          clipPath: OPEN,
+          webkitClipPath: OPEN,
+          ease: "power2.out",
+          duration: 0.3,
+        },
+        0
+      );
 
-      // 0.15 -> 0.45: text fades in and scales up as oval approaches full
-      tl.to(text, {
-        opacity: 1,
-        scale: 1,
-        y: 0,
-        ease: "power2.out",
-        duration: 0.3,
-      }, 0.15);
+      // 0.15 -> 0.40: text fades in
+      tl.to(
+        text,
+        {
+          opacity: 1,
+          scale: 1,
+          y: 0,
+          ease: "power2.out",
+          duration: 0.25,
+        },
+        0.15
+      );
 
-      // 0.45 -> 0.65: hold — video plays fullscreen with text visible
-      tl.to({}, { duration: 0.2 }, 0.45);
+      // 0.40 -> 0.60: hold (empty time so user can read)
+      tl.to({}, { duration: 0.2 }, 0.4);
 
-      // 0.65 -> 0.85: text fades out and scales down
-      tl.to(text, {
-        opacity: 0,
-        scale: 0.92,
-        y: -20,
-        ease: "power2.in",
-        duration: 0.2,
-      }, 0.65);
+      // 0.60 -> 0.85: text fades out
+      tl.to(
+        text,
+        {
+          opacity: 0,
+          scale: 0.95,
+          y: -15,
+          ease: "power2.in",
+          duration: 0.25,
+        },
+        0.6
+      );
 
-      // 0.7 -> 1.0: oval closes back (iris closes)
-      tl.to(media, {
-        clipPath: CLOSED,
-        webkitClipPath: CLOSED,
-        ease: "power2.inOut",
-        duration: 0.3,
-      }, 0.7);
+      // 0.70 -> 1.00: oval closes as section exits
+      tl.to(
+        media,
+        {
+          clipPath: CLOSED,
+          webkitClipPath: CLOSED,
+          ease: "power2.in",
+          duration: 0.3,
+        },
+        0.7
+      );
     }, section);
 
     return () => ctx.revert();
-  }, [reduced, pinLength]);
+  }, [reduced]);
 
   return (
     <section
