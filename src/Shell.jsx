@@ -74,7 +74,7 @@ export default function Shell() {
               title={c.vt1.title}
               subtitle={c.vt1.subtitle}
               lines={c.vt1.lines}
-              pinLength="+=220%"
+              pinLength="+=300%"
             />
           </div>
         </ErrorBoundary>
@@ -236,7 +236,7 @@ export default function Shell() {
               title={c.vt2.title}
               subtitle={c.vt2.subtitle}
               lines={c.vt2.lines}
-              pinLength="+=240%"
+              pinLength="+=320%"
             />
           </div>
         </ErrorBoundary>

@@ -6,6 +6,7 @@
     "role": "Backend y sistemas distribuidos",
     "year": "2025",
     "status": "Academico",
+    "language": "Java",
     "summary": "Servicios desacoplados, APIs REST y despliegue reproducible con Docker y PostgreSQL.",
     "problem": "Disenar una base backend clara para comunicacion entre servicios, persistencia relacional y despliegue consistente.",
     "outcome": "Muestra una base solida en arquitectura backend, endpoints, contenedores y trabajo con bases de datos relacionales.",
@@ -15,7 +16,7 @@
       "Trabajo orientado a arquitectura, integracion y mantenibilidad."
     ],
     "featuredTech": ["java", "docker", "github"],
-    "stack": ["Java", "REST", "Docker", "PostgreSQL"],
+    "stack": ["Java", "Spring", "REST", "Docker", "PostgreSQL"],
     "categories": ["backend", "systems"],
     "githubUrl": "https://github.com/ikerperez12/ISD",
     "demoUrl": "",
@@ -28,6 +29,7 @@
     "role": "Investigacion en seguridad",
     "year": "2026",
     "status": "Investigacion",
+    "language": "Python",
     "summary": "Analisis tecnico de criptografia postcuantica, trafico de red y validacion de protocolos.",
     "problem": "Comprobar comportamiento real de protocolos y detectar puntos de riesgo desde capturas y revision tecnica.",
     "outcome": "Refuerza criterio en seguridad aplicada, lectura defensiva del sistema y documentacion de hallazgos.",
@@ -37,9 +39,32 @@
       "Documentacion tecnica de hallazgos y superficie de riesgo."
     ],
     "featuredTech": ["python", "linux", "github"],
-    "stack": ["Python", "PQC", "Wireshark", "Auditoria"],
+    "stack": ["Python", "PQC", "Wireshark", "TLS", "Auditoria"],
     "categories": ["security", "systems"],
     "githubUrl": "https://github.com/ikerperez12/1.2-AuditoriaPQC",
+    "demoUrl": "",
+    "featured": true
+  },
+  {
+    "id": "basketball-api",
+    "repoName": "Basketball-API",
+    "name": "Basketball API",
+    "role": "Backend · API REST + frontend",
+    "year": "2024",
+    "status": "Proyecto completo",
+    "language": "Python",
+    "summary": "API REST completa con Django: modelado de datos, endpoints tipados, persistencia relacional y frontend integrado.",
+    "problem": "Construir una API REST real con modelo de dominio consistente, validacion de entrada y una capa de vista conectada.",
+    "outcome": "Backend funcional + frontend integrado como demostracion punta-a-punta de un servicio tipico de produccion.",
+    "highlights": [
+      "Django REST Framework con serializers y validaciones explicitas.",
+      "Modelo de datos relacional con migraciones versionadas.",
+      "Frontend integrado consumiendo la API en tiempo real."
+    ],
+    "featuredTech": ["python", "django", "github"],
+    "stack": ["Python", "Django", "Django REST", "SQLite", "REST"],
+    "categories": ["backend"],
+    "githubUrl": "https://github.com/ikerperez12/Basketball-API",
     "demoUrl": "",
     "featured": true
   },
@@ -50,6 +75,7 @@
     "role": "CLI y automatizacion",
     "year": "2026",
     "status": "Automatizacion",
+    "language": "Python",
     "summary": "CLI para automatizar tareas tecnicas repetitivas con apoyo de IA y trabajo desde terminal.",
     "problem": "Reducir friccion en operaciones repetidas, prompting y ejecucion diaria manteniendo control tecnico.",
     "outcome": "Demuestra iniciativa en tooling interno, automatizacion local y utilidades orientadas a productividad.",
@@ -59,9 +85,32 @@
       "Base util para evolucionar agentes y tooling interno."
     ],
     "featuredTech": ["python", "copilot", "github"],
-    "stack": ["Python", "CLI", "Automatizacion", "LLM Ops"],
+    "stack": ["Python", "CLI", "LLM Ops", "Automatizacion"],
     "categories": ["automation", "backend"],
     "githubUrl": "https://github.com/ikerperez12/GPT_CMD",
+    "demoUrl": "",
+    "featured": true
+  },
+  {
+    "id": "signal-nn",
+    "repoName": "SIGNAL-NEURALNETWORK",
+    "name": "Signal · Neural Network",
+    "role": "Machine learning aplicado",
+    "year": "2025",
+    "status": "Investigacion",
+    "language": "Python",
+    "summary": "Red neuronal para procesamiento de senales con enfoque practico en entrenamiento y evaluacion.",
+    "problem": "Explorar arquitecturas de red y tratamiento de datos temporales para clasificacion de senales reales.",
+    "outcome": "Base tecnica para ampliar perfil hacia ML aplicado con criterio sobre overfitting, regularizacion y metricas.",
+    "highlights": [
+      "Preparacion y normalizacion de datasets de senal.",
+      "Entrenamiento con validacion cruzada y seguimiento de metricas.",
+      "Evaluacion critica de la red y del pipeline completo."
+    ],
+    "featuredTech": ["python", "github", "copilot"],
+    "stack": ["Python", "NumPy", "ML", "Signal processing"],
+    "categories": ["automation", "backend"],
+    "githubUrl": "https://github.com/ikerperez12/SIGNAL-NEURALNETWORK",
     "demoUrl": "",
     "featured": true
   },
@@ -72,6 +121,7 @@
     "role": "Programacion de sistemas",
     "year": "2024",
     "status": "Sistemas",
+    "language": "C",
     "summary": "Procesos, shell y fundamentos de sistemas con mentalidad de entorno operativo real.",
     "problem": "Trabajar cerca del sistema operativo para entender procesos, recursos y ejecucion en entorno POSIX.",
     "outcome": "Refuerza base de bajo nivel, diagnostico y razonamiento sobre comportamiento del sistema.",
@@ -90,23 +140,47 @@
   {
     "id": "software-design",
     "repoName": "Software-Design",
-    "name": "Software Design",
-    "role": "Arquitectura de software",
+    "name": "Software Design · Patrones",
+    "role": "Diseno de software",
     "year": "2024",
-    "status": "Diseno",
-    "summary": "Modelado de dominio, patrones y estructura pensada para mantenerse con el tiempo.",
-    "problem": "Traducir requisitos a una base de codigo con responsabilidades claras y buena evolucion tecnica.",
-    "outcome": "Aporta criterio en analisis, diseno y mantenibilidad de sistemas mas complejos.",
+    "status": "Academico",
+    "language": "Java",
+    "summary": "Proyecto de diseno de software aplicando patrones y estructuras orientadas a mantenibilidad.",
+    "problem": "Traducir requisitos en arquitectura orientada a objetos con responsabilidades separadas y codigo testeable.",
+    "outcome": "Base de criterio en refactor, abstraccion correcta y decisiones de arquitectura en Java.",
     "highlights": [
-      "Modelado de dominio y separacion de responsabilidades.",
-      "Uso de patrones para mejorar claridad y mantenibilidad.",
-      "Enfoque en estructura, lectura y calidad de codigo."
+      "Aplicacion deliberada de patrones GoF donde aportan valor.",
+      "Separacion por capas y contratos claros entre modulos.",
+      "Ejercicio de trade-offs entre simplicidad y extensibilidad."
     ],
     "featuredTech": ["java", "github"],
-    "stack": ["Java", "Modelado", "Patrones"],
-    "categories": ["backend"],
+    "stack": ["Java", "OOP", "Design Patterns", "Arquitectura"],
+    "categories": ["backend", "systems"],
     "githubUrl": "https://github.com/ikerperez12/Software-Design",
     "demoUrl": "",
-    "featured": false
+    "featured": true
+  },
+  {
+    "id": "ui-toolkit",
+    "repoName": "UI-IP-Toolkit-v4.0",
+    "name": "UI · IP Toolkit",
+    "role": "Frontend · Toolkit propio",
+    "year": "2026",
+    "status": "Frontend",
+    "language": "HTML",
+    "summary": "Toolkit de componentes UI y utilidades frontend desplegado en Vercel como sandbox de experimentacion visual.",
+    "problem": "Tener una base propia de piezas UI reutilizables, probadas en navegador real y fuera del ruido de frameworks pesados.",
+    "outcome": "Laboratorio personal de frontend y despliegue continuo, util para iterar patrones visuales y aprender deploy real.",
+    "highlights": [
+      "HTML/CSS/JS sin framework pesado para medir lo basico con claridad.",
+      "Desplegado en Vercel con ciclo continuo de push y verificacion.",
+      "Coleccion de piezas reutilizables para prototipos rapidos."
+    ],
+    "featuredTech": ["github"],
+    "stack": ["HTML5", "CSS3", "JavaScript", "Vercel"],
+    "categories": ["automation"],
+    "githubUrl": "https://github.com/ikerperez12/UI-IP-Toolkit-v4.0",
+    "demoUrl": "https://ui-ip-toolkit.vercel.app/",
+    "featured": true
   }
 ]
