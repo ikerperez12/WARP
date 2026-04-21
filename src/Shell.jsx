@@ -67,6 +67,8 @@ export default function Shell() {
           </div>
         </ErrorBoundary>
 
+        <SectionGutter size="sm" />
+
         <ErrorBoundary label="vt-1">
           <div className="interactive">
             <VideoCurtain
@@ -80,6 +82,8 @@ export default function Shell() {
           </div>
         </ErrorBoundary>
 
+        <SectionGutter size="md" />
+
         <ErrorBoundary label="about">
           <div className="interactive cv-lazy">
             <Suspense fallback={<SectionSkeleton />}>
@@ -88,6 +92,8 @@ export default function Shell() {
           </div>
         </ErrorBoundary>
 
+        <SectionGutter size="sm" />
+
         <ErrorBoundary label="metrics">
           <div className="interactive cv-lazy">
             <Suspense fallback={<SectionSkeleton />}>
@@ -95,6 +101,8 @@ export default function Shell() {
             </Suspense>
           </div>
         </ErrorBoundary>
+
+        <SectionGutter size="sm" />
 
         <ErrorBoundary label="services">
           <div id="services" className="interactive cv-lazy">
@@ -112,6 +120,8 @@ export default function Shell() {
           }
         />
 
+        <SectionGutter size="sm" />
+
         <ErrorBoundary label="stack">
           <div className="interactive cv-lazy">
             <Suspense fallback={<SectionSkeleton />}>
@@ -119,6 +129,8 @@ export default function Shell() {
             </Suspense>
           </div>
         </ErrorBoundary>
+
+        <SectionGutter size="md" />
 
         <ErrorBoundary label="tech-radar">
           <div className="interactive cv-lazy">
@@ -128,6 +140,8 @@ export default function Shell() {
           </div>
         </ErrorBoundary>
 
+        <SectionGutter size="md" />
+
         <ErrorBoundary label="horizontal-showcase">
           <div className="interactive">
             <Suspense fallback={<SectionSkeleton />}>
@@ -135,6 +149,8 @@ export default function Shell() {
             </Suspense>
           </div>
         </ErrorBoundary>
+
+        <SectionGutter size="md" />
 
         <ErrorBoundary label="process">
           <div className="interactive cv-lazy">
@@ -144,6 +160,8 @@ export default function Shell() {
           </div>
         </ErrorBoundary>
 
+        <SectionGutter size="sm" />
+
         <ErrorBoundary label="principles">
           <div className="interactive cv-lazy">
             <Suspense fallback={<SectionSkeleton />}>
@@ -151,6 +169,8 @@ export default function Shell() {
             </Suspense>
           </div>
         </ErrorBoundary>
+
+        <SectionGutter size="sm" />
 
         <ErrorBoundary label="now">
           <div className="interactive cv-lazy">
@@ -160,7 +180,7 @@ export default function Shell() {
           </div>
         </ErrorBoundary>
 
-        <SectionGutter size="sm" />
+        <SectionGutter size="md" />
 
         <ErrorBoundary label="blueprint">
           <InViewMonitor rootMargin="20% 0px 20% 0px">
@@ -184,6 +204,8 @@ export default function Shell() {
           </div>
         </ErrorBoundary>
 
+        <SectionGutter size="md" />
+
         <ErrorBoundary label="liquid-metal">
           <InViewMonitor rootMargin="20% 0px 20% 0px">
             <Suspense fallback={<SectionSkeleton />}>
@@ -195,7 +217,7 @@ export default function Shell() {
           </InViewMonitor>
         </ErrorBoundary>
 
-        <SectionGutter size="sm" />
+        <SectionGutter size="md" />
 
         <ErrorBoundary label="projects">
           <div className="interactive cv-lazy">
@@ -213,6 +235,8 @@ export default function Shell() {
           </div>
         </ErrorBoundary>
 
+        <SectionGutter size="md" />
+
         <ErrorBoundary label="vt-2">
           <div className="interactive">
             <VideoCurtain
@@ -225,6 +249,8 @@ export default function Shell() {
             />
           </div>
         </ErrorBoundary>
+
+        <SectionGutter size="md" />
 
         <ErrorBoundary label="experience">
           <div className="interactive cv-lazy">

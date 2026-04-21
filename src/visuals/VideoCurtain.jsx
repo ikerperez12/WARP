@@ -10,26 +10,29 @@ const CLOSED = "ellipse(10vw 14vh at 50% 50%)";
 const OPEN = "ellipse(160vw 160vh at 50% 50%)";
 
 /**
- * VideoCurtain — iris open / hold / close, scrub-driven, NO pin.
+ * VideoCurtain
  *
  * Layout:
- *   .video-curtain        — outer 240vh (gives room for full iris arc)
- *     .video-curtain-stage — sticky top:0, height:100vh (the visible frame)
- *       .video-curtain-clip — absolute inset:0, clip-path iris animates
- *       .video-curtain-text — absolute center
+ *   .video-curtain (200vh tall outer section)
+ *     .video-curtain-stage (sticky top:0, height:100vh — holds video centered on viewport)
+ *       .video-curtain-clip (absolute inset:0, clip-path animates open→hold→closed)
+ *       .video-curtain-text (absolute, centered over clip)
  *
- * Trigger spans section top → bottom crossing viewport, total scroll = 240vh
- * (section) + 100vh (viewport) = 340vh. Sticky is pinned for the middle 100vh,
- * which maps to trigger progress ~0.29 → ~0.71.
+ * Scroll arithmetic (section 200vh + viewport 100vh = 300vh of scroll trigger span):
+ *   progress 0.00  — section top at viewport bottom (pre-sticky)
+ *   progress 0.33  — section top at viewport top (sticky locks)
+ *   progress 0.67  — section has moved up 100vh, sticky unlocks
+ *   progress 1.00  — section bottom at viewport top
  *
- * Timeline (symmetric around sticky window):
- *   0.00–0.20  closed (pre-entry)
- *   0.20–0.45  iris opens  — user watches the oval grow as section rises
- *   0.40–0.55  text in
- *   0.45–0.60  hold fully open (text visible during sticky peak)
- *   0.55–0.70  text out
- *   0.60–0.85  iris closes — user watches the oval shrink as section exits
- *   0.85–1.00  closed (post-exit)
+ * Iris timeline aligned to sticky-active window (0.33–0.67):
+ *   0.00–0.33 closed  (pre-viewport)
+ *   0.33–0.45 opening (iris opens while section fills screen)
+ *   0.45–0.55 open + text in
+ *   0.55–0.60 text out
+ *   0.55–0.67 closing
+ *   0.67–1.00 closed  (post-sticky)
+ *
+ * No pin: true. No scroll hijacking. Native scroll + CSS sticky + GSAP scrub.
  */
 export default function VideoCurtain({
   id,
@@ -73,47 +76,49 @@ export default function VideoCurtain({
           trigger: section,
           start: "top bottom",
           end: "bottom top",
-          scrub: true,
-          invalidateOnRefresh: true,
+          scrub: 0.35,
         },
       });
 
-      // phase 1: iris OPENS (0.20 → 0.45)
+      // 0 → 0.33 closed (empty bar)
+      tl.to({}, { duration: 0.33 }, 0);
+
+      // 0.33 → 0.45 iris opens
       tl.to(media, {
         clipPath: OPEN,
         webkitClipPath: OPEN,
-        ease: "power2.out",
-        duration: 0.25,
-      }, 0.20);
+        ease: "power2.inOut",
+        duration: 0.12,
+      }, 0.33);
 
-      // text fades in (0.40 → 0.52)
+      // 0.40 → 0.48 text fades in
       tl.to(text, {
         opacity: 1,
         scale: 1,
         y: 0,
         ease: "power2.out",
-        duration: 0.12,
+        duration: 0.08,
       }, 0.40);
 
-      // hold (0.52 → 0.58)
-      tl.to({}, { duration: 0.06 }, 0.52);
+      // 0.48 → 0.55 hold (fully open with text)
+      tl.to({}, { duration: 0.07 }, 0.48);
 
-      // text fades out (0.58 → 0.70)
+      // 0.55 → 0.60 text fades out
       tl.to(text, {
         opacity: 0,
         scale: 0.95,
         y: -15,
         ease: "power2.in",
-        duration: 0.12,
-      }, 0.58);
+        duration: 0.05,
+      }, 0.55);
 
-      // phase 2: iris CLOSES (0.60 → 0.85)
+      // 0.55 → 0.67 iris closes
       tl.to(media, {
         clipPath: CLOSED,
         webkitClipPath: CLOSED,
-        ease: "power2.in",
-        duration: 0.25,
-      }, 0.60);
+        ease: "power2.inOut",
+        duration: 0.12,
+      }, 0.55);
     }, section);
 
     return () => ctx.revert();

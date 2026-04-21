@@ -14,7 +14,7 @@
 
 .video-curtain {
   position: relative;
-  height: 240vh;
+  height: 200vh;
   overflow: hidden;
   isolation: isolate;
 }
@@ -153,6 +153,6 @@
 .video-curtain-corners span:nth-child(4) { bottom: 0; right: 0; border-left: 0; border-top: 0; }
 
 @media (max-width: 640px) {
-  .video-curtain { height: 220vh; }
+  .video-curtain { height: 180vh; }
   .video-curtain-text { padding: 1.5rem; }
 }

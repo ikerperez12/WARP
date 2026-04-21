@@ -40,52 +40,27 @@ function LiquidMetalShape({ reduced }) {
   );
 }
 
-/**
- * LiquidMetal transition — floating chrome torusknot on TRANSPARENT background
- * so the persistent PhysicsScene (duck + cube + stars) shows through behind it.
- * Gives a layered depth: stars far away, duck/cube midground, chrome upfront.
- */
-export default function LiquidMetalTransition({
-  title = "DISPONIBLE",
-  subtitle = "Prácticas · Junior · Backend / Sistemas / Seguridad",
-}) {
+export default function LiquidMetalTransition({ title = "LIQUID ALLOY", subtitle = "CHROMETYPE & FLUID DISTORTION" }) {
   const reduced = useReducedMotion();
   const { theme } = useTheme();
+  const bg = theme === "dark" ? "#080810" : "#ece9e0";
   return (
-    <section className="liquid-metal-transition">
+    <section className="liquid-metal-transition" style={{ background: bg }}>
       <div className="liquid-metal-canvas">
-        <Canvas
-          dpr={[1, 2]}
-          camera={{ position: [0, 0, 10], fov: 35 }}
-          gl={{ antialias: true, alpha: true, premultipliedAlpha: false }}
-          frameloop={reduced ? "demand" : "always"}
-        >
-          {/* NO background fill — the canvas is transparent so PhysicsScene
-              shows through from z-index -1 behind the page. */}
-          <ambientLight intensity={1.2} />
-          <directionalLight position={[10, 10, 10]} intensity={2.4} color="#ffffff" />
-          <directionalLight position={[-10, -4, -6]} intensity={1.2} color="#ff0077" />
-          <directionalLight position={[6, -6, 8]} intensity={1.0} color="#00d2ff" />
+        <Canvas dpr={[1, 2]} camera={{ position: [0, 0, 10], fov: 35 }} gl={{ antialias: true, alpha: false }} frameloop={reduced ? "demand" : "always"}>
+          <color attach="background" args={[bg]} />
+          <ambientLight intensity={1.4} />
+          <directionalLight position={[10, 10, 10]} intensity={2.8} />
           <Suspense fallback={null}>
-            <Environment preset="warehouse" background={false} />
+            <Environment preset="sunset" background={false} />
           </Suspense>
           <LiquidMetalShape reduced={reduced} />
-          <ContactShadows
-            position={[0, -3.2, 0]}
-            opacity={theme === "dark" ? 0.55 : 0.3}
-            scale={18}
-            blur={2.5}
-            far={10}
-            color={theme === "dark" ? "#a855f7" : "#0c0c15"}
-          />
+          <ContactShadows position={[0, -3.2, 0]} opacity={theme === "dark" ? 0.75 : 0.35} scale={18} blur={2} far={10} color={theme === "dark" ? "#ffffff" : "#0c0c15"} />
         </Canvas>
       </div>
 
       <div className="liquid-metal-text">
-        <span className="liquid-metal-badge">
-          <span className="liquid-metal-badge-dot" aria-hidden="true" />
-          {title}
-        </span>
+        <h2 className="liquid-metal-title">{title}</h2>
         <p className="liquid-metal-subtitle">{subtitle}</p>
       </div>
 
