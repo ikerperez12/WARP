@@ -1,32 +1,32 @@
+/*
+ * HorizontalShowcase — 100vh section. GSAP pins it and translates the inner
+ * track horizontally. No CSS sticky, no manual measurement of pin-spacer —
+ * GSAP handles everything.
+ */
+
 .horizontal-showcase {
   position: relative;
-  min-height: 100vh;
-  overflow: clip;
-  background: linear-gradient(180deg, #030306 0%, #0a0614 50%, #030306 100%);
-  isolation: isolate;
-}
-
-.horizontal-showcase-stage {
-  position: sticky;
-  top: 0;
+  width: 100%;
   height: 100vh;
   overflow: hidden;
+  background: linear-gradient(180deg, #030306 0%, #0a0614 50%, #030306 100%);
+  isolation: isolate;
   display: flex;
   align-items: center;
-  will-change: transform, opacity;
 }
 
 .horizontal-showcase-track {
   display: inline-flex;
-  min-height: 100vh;
   align-items: center;
   gap: 1rem;
   padding: 0 4vw;
+  height: 100%;
+  min-height: 100vh;
   will-change: transform;
 }
 
 .horizontal-showcase-intro {
-  min-width: clamp(360px, 48vw, 700px);
+  min-width: clamp(360px, 46vw, 640px);
   padding: 2rem 1rem 2rem 0;
   display: flex;
   flex-direction: column;
@@ -36,7 +36,7 @@
 
 .horizontal-showcase-kicker {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   letter-spacing: 0.3em;
   color: var(--accent-cyan);
   margin: 0;
@@ -147,22 +147,20 @@
   text-transform: uppercase;
 }
 
+/* Mobile / reduced-motion fallback: stack cards vertically, no pin */
 .horizontal-showcase.is-linear {
-  height: auto !important;
-}
-
-.horizontal-showcase.is-linear .horizontal-showcase-stage {
-  position: relative;
   height: auto;
-  overflow: visible;
+  display: block;
+  padding: 2rem 0;
 }
 
 .horizontal-showcase.is-linear .horizontal-showcase-track {
   display: grid;
-  min-height: 0;
   grid-template-columns: 1fr;
   gap: 1.25rem;
   padding: 2rem 1rem;
+  min-height: 0;
+  height: auto;
 }
 
 .horizontal-showcase.is-linear .horizontal-showcase-intro,
@@ -178,14 +176,6 @@
 }
 
 @media (max-width: 760px) {
-  .horizontal-showcase-intro {
-    min-width: 90vw;
-    padding: 1.5rem;
-  }
-
-  .horizontal-card {
-    width: 85vw;
-    height: 420px;
-    padding: 1.5rem;
-  }
+  .horizontal-showcase-intro { min-width: 90vw; padding: 1.5rem; }
+  .horizontal-card { width: 85vw; height: 420px; padding: 1.5rem; }
 }

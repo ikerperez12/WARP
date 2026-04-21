@@ -1,33 +1,25 @@
+/*
+ * VideoCurtain — 100vh section that GSAP pins in place while iris animates.
+ *
+ * NO sticky here. GSAP does the pinning via its pin-spacer mechanism; we just
+ * need the section to be 100vh so it exactly fills the viewport at pin time,
+ * and overflow:hidden so the clip-path doesn't bleed.
+ */
+
 .video-curtain {
   position: relative;
-  min-height: 100vh;
-  overflow: clip;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(12, 12, 18, 0.18) 0%, rgba(2, 2, 5, 0.86) 72%, #020205 100%);
-  isolation: isolate;
-}
-
-.video-curtain-stage {
-  position: sticky;
-  top: 0;
   width: 100%;
   height: 100vh;
   overflow: hidden;
-  will-change: transform, opacity;
-}
-
-.video-curtain-shell {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+  isolation: isolate;
+  background: #020205;
 }
 
 .video-curtain-clip {
   position: absolute;
   inset: 0;
-  clip-path: ellipse(18vw 22vh at 50% 50%);
-  -webkit-clip-path: ellipse(18vw 22vh at 50% 50%);
+  clip-path: ellipse(15vw 20vh at 50% 50%);
+  -webkit-clip-path: ellipse(15vw 20vh at 50% 50%);
   overflow: hidden;
   background: #020205;
   will-change: clip-path;
@@ -40,15 +32,15 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: saturate(1.08) contrast(1.05);
+  filter: saturate(1.08) contrast(1.04);
 }
 
 .video-curtain-overlay {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at center, transparent 42%, color-mix(in srgb, var(--bg-deep) 52%, transparent) 100%),
-    linear-gradient(180deg, color-mix(in srgb, var(--bg-deep) 58%, transparent) 0%, transparent 22%, transparent 74%, color-mix(in srgb, var(--bg-deep) 58%, transparent) 100%);
+    radial-gradient(ellipse at center, transparent 45%, color-mix(in srgb, var(--bg-deep) 55%, transparent) 100%),
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-deep) 55%, transparent) 0%, transparent 30%, transparent 70%, color-mix(in srgb, var(--bg-deep) 55%, transparent) 100%);
   pointer-events: none;
 }
 
@@ -149,7 +141,5 @@
 .video-curtain-corners span:nth-child(4) { bottom: 0; right: 0; border-left: 0; border-top: 0; }
 
 @media (max-width: 640px) {
-  .video-curtain-text {
-    padding: 1.5rem;
-  }
+  .video-curtain-text { padding: 1.5rem; }
 }

@@ -70,16 +70,11 @@ export default function Shell() {
             <VideoCurtain
               id="vt-creative"
               src="/assets/videos/creative-vision-1080p.mp4"
-              preload="auto"
-              entryVh={4}
-              openVh={66}
-              holdVh={96}
-              closeVh={88}
-              tailVh={24}
               kicker={c.vt1.kicker}
               title={c.vt1.title}
               subtitle={c.vt1.subtitle}
               lines={c.vt1.lines}
+              pinLength="+=220%"
             />
           </div>
         </ErrorBoundary>
@@ -237,16 +232,11 @@ export default function Shell() {
             <VideoCurtain
               id="vt-mastery"
               src="/assets/videos/digital-mastery-1080p.mp4"
-              preload="metadata"
-              entryVh={10}
-              openVh={68}
-              holdVh={92}
-              closeVh={86}
-              tailVh={12}
               kicker={c.vt2.kicker}
               title={c.vt2.title}
               subtitle={c.vt2.subtitle}
               lines={c.vt2.lines}
+              pinLength="+=240%"
             />
           </div>
         </ErrorBoundary>
