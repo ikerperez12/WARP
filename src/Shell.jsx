@@ -12,6 +12,8 @@ import VideoCurtain from "./visuals/VideoCurtain.jsx";
 import ScannerBanner from "./visuals/ScannerBanner.jsx";
 import InViewMonitor from "./visuals/InViewMonitor.jsx";
 import SectionGutter from "./components/SectionGutter.jsx";
+import KeyboardShortcuts from "./components/KeyboardShortcuts.jsx";
+import { useScrollReveal } from "./lib/useScrollReveal.js";
 import { useI18n } from "./i18n/I18nProvider.jsx";
 import "./Shell.css";
 
@@ -24,6 +26,9 @@ const TechRadar = lazy(() => import("./sections/TechRadar.jsx"));
 const ProcessPipeline = lazy(() => import("./sections/ProcessPipeline.jsx"));
 const CodeSpotlight = lazy(() => import("./sections/CodeSpotlight.jsx"));
 const PrinciplesSection = lazy(() => import("./sections/PrinciplesSection.jsx"));
+const NowSection = lazy(() => import("./sections/NowSection.jsx"));
+const CaseStudy = lazy(() => import("./sections/CaseStudy.jsx"));
+const AchievementsSection = lazy(() => import("./sections/AchievementsSection.jsx"));
 const FAQSection = lazy(() => import("./sections/FAQSection.jsx"));
 const ResumeCTA = lazy(() => import("./sections/ResumeCTA.jsx"));
 const ProjectsSection = lazy(() => import("./sections/ProjectsSection.jsx"));
@@ -38,6 +43,7 @@ const HorizontalShowcase = lazy(() => import("./visuals/HorizontalShowcase.jsx")
 export default function Shell() {
   const { lang } = useI18n();
   const c = COPY[lang];
+  useScrollReveal();
 
   return (
     <>
@@ -52,6 +58,7 @@ export default function Shell() {
       <ScrollProgress />
       <TopNav />
       <SectionDots />
+      <KeyboardShortcuts />
 
       <main id="main" className="main-shell">
         <ErrorBoundary label="hero">
@@ -145,6 +152,14 @@ export default function Shell() {
           </div>
         </ErrorBoundary>
 
+        <ErrorBoundary label="now">
+          <div className="interactive cv-lazy">
+            <Suspense fallback={<SectionSkeleton />}>
+              <NowSection />
+            </Suspense>
+          </div>
+        </ErrorBoundary>
+
         <SectionGutter size="sm" />
 
         <ErrorBoundary label="blueprint">
@@ -190,6 +205,14 @@ export default function Shell() {
           </div>
         </ErrorBoundary>
 
+        <ErrorBoundary label="case-study">
+          <div className="interactive cv-lazy">
+            <Suspense fallback={<SectionSkeleton />}>
+              <CaseStudy />
+            </Suspense>
+          </div>
+        </ErrorBoundary>
+
         <ErrorBoundary label="vt-2">
           <div className="interactive">
             <VideoCurtain
@@ -207,6 +230,14 @@ export default function Shell() {
           <div className="interactive cv-lazy">
             <Suspense fallback={<SectionSkeleton />}>
               <ExperienceSection />
+            </Suspense>
+          </div>
+        </ErrorBoundary>
+
+        <ErrorBoundary label="achievements">
+          <div className="interactive cv-lazy">
+            <Suspense fallback={<SectionSkeleton />}>
+              <AchievementsSection />
             </Suspense>
           </div>
         </ErrorBoundary>

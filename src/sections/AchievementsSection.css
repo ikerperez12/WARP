@@ -1,0 +1,88 @@
+.achievements-section {
+  background:
+    radial-gradient(ellipse at 30% 50%, color-mix(in srgb, var(--accent-magenta) 7%, transparent), transparent 55%);
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.achievement-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.6rem 1.4rem;
+  border-radius: 1rem;
+  background: var(--glass);
+  border: 1px solid var(--border-soft);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  color: inherit;
+  transition: transform 0.5s var(--ease-out-expo), border-color 0.4s, background 0.4s;
+  overflow: hidden;
+}
+
+.achievement-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--accent-dot, var(--accent-magenta)), transparent 70%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+
+.achievement-card:hover {
+  transform: translateY(-3px);
+  background: var(--glass-strong);
+}
+
+.achievement-card:hover::before {
+  opacity: 1;
+}
+
+.achievement-magenta { --accent-dot: var(--accent-magenta); }
+.achievement-cyan { --accent-dot: var(--accent-cyan); }
+.achievement-purple { --accent-dot: var(--accent-purple); }
+.achievement-neon { --accent-dot: var(--accent-neon); }
+
+.achievement-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--accent-dot);
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--accent-dot) 50%, transparent));
+  margin-bottom: 0.6rem;
+}
+
+.achievement-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.achievement-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+}
+
+.achievement-sub {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: 0.2rem;
+}

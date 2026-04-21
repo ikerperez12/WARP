@@ -1,0 +1,20 @@
+{
+  "name": "Iker Perez Garcia — Portfolio",
+  "short_name": "IP Portfolio",
+  "description": "Portfolio técnico de Iker Pérez García. Backend, sistemas y seguridad aplicada.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020205",
+  "theme_color": "#020205",
+  "orientation": "portrait-primary",
+  "lang": "es",
+  "categories": ["portfolio", "developer", "engineering"],
+  "icons": [
+    {
+      "src": "/media/icons/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

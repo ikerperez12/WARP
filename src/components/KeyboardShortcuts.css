@@ -1,0 +1,188 @@
+.ks-hint {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  z-index: 90;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--bg-deep) 75%, transparent);
+  border: 1px solid var(--border-soft);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: grid;
+  place-items: center;
+  opacity: 0.55;
+  transition: opacity 0.3s var(--ease-out-expo), transform 0.3s, border-color 0.3s;
+}
+
+.ks-hint:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+  border-color: var(--accent-magenta);
+}
+
+.ks-hint kbd {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  background: transparent;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+}
+
+.ks-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  pointer-events: auto;
+}
+
+.ks-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 2, 5, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  animation: ks-fade 0.3s ease-out;
+}
+
+.ks-panel {
+  position: relative;
+  width: min(520px, 100%);
+  border-radius: 1.4rem;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--bg-panel) 80%, transparent), color-mix(in srgb, var(--bg-deep) 90%, transparent));
+  border: 1px solid color-mix(in srgb, var(--accent-magenta) 30%, var(--border-strong));
+  padding: 2rem;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+  animation: ks-rise 0.4s var(--ease-out-expo);
+}
+
+.ks-header {
+  position: relative;
+  padding-bottom: 1.4rem;
+  border-bottom: 1px solid var(--border-soft);
+  margin-bottom: 1.4rem;
+}
+
+.ks-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+  margin: 0 0 0.5rem;
+}
+
+.ks-title {
+  font-size: 1.35rem;
+  margin: 0;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #ffffff, var(--accent-magenta));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ks-close {
+  position: absolute;
+  top: -0.4rem;
+  right: -0.4rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--glass);
+  border: 1px solid var(--border-soft);
+  color: var(--text-primary);
+  font-size: 1.4rem;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.ks-close:hover {
+  background: var(--accent-magenta);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.ks-list {
+  list-style: none;
+  margin: 0 0 1.4rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ks-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.55rem 0.6rem;
+  border-radius: 0.55rem;
+  transition: background 0.3s;
+}
+
+.ks-row:hover {
+  background: var(--glass);
+}
+
+.ks-keys {
+  display: inline-flex;
+  gap: 0.3rem;
+}
+
+.ks-keys kbd,
+.ks-footer kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 0.4rem;
+  border-radius: 5px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--bg-deep) 85%, transparent);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.ks-label {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.ks-footer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-soft);
+}
+
+@keyframes ks-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ks-rise {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 640px) {
+  .ks-hint { display: none; }
+  .ks-panel { padding: 1.5rem; }
+  .ks-row { grid-template-columns: 100px 1fr; }
+}

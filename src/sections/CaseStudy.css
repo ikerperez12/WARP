@@ -1,0 +1,188 @@
+.case-section {
+  background:
+    radial-gradient(ellipse at 10% 40%, color-mix(in srgb, var(--accent-cyan) 7%, transparent), transparent 50%),
+    radial-gradient(ellipse at 90% 80%, color-mix(in srgb, var(--accent-purple) 6%, transparent), transparent 50%);
+}
+
+.case-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 3rem;
+  padding: 1.6rem;
+  border-radius: 1.2rem;
+  background: var(--glass);
+  border: 1px solid var(--border-soft);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.case-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  text-align: center;
+}
+
+.case-stat-v {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #ffffff, var(--accent-magenta));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.case-stat-l {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.case-blocks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  counter-reset: case;
+}
+
+.case-block {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 1.5rem;
+  padding: 1.8rem 2rem;
+  border-radius: 1.2rem;
+  background: var(--glass);
+  border: 1px solid var(--border-soft);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: transform 0.5s var(--ease-out-expo), border-color 0.4s;
+}
+
+.case-block:hover {
+  transform: translateX(4px);
+  border-color: color-mix(in srgb, var(--accent-magenta) 40%, var(--border-soft));
+}
+
+.case-block-tag {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-right: 1.5rem;
+  border-right: 1px solid var(--border-soft);
+}
+
+.case-block-n {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--accent-magenta);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.case-block-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.case-block-body h3 {
+  font-size: 1.2rem;
+  margin: 0 0 0.8rem;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.case-block-body p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.65;
+  font-size: 0.95rem;
+}
+
+.case-stack {
+  margin-top: 3rem;
+  padding: 2rem;
+  border-radius: 1.2rem;
+  background: var(--glass);
+  border: 1px solid var(--border-soft);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.case-stack-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  font-weight: 600;
+}
+
+.case-stack-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.case-stack-chip {
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: color-mix(in srgb, var(--accent-cyan) 10%, var(--glass));
+  border: 1px solid color-mix(in srgb, var(--accent-cyan) 30%, transparent);
+  color: var(--text-primary);
+}
+
+.case-stack-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.2rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent-magenta), var(--accent-purple));
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.88rem;
+  transition: transform 0.3s var(--ease-out-expo), box-shadow 0.3s;
+}
+
+.case-stack-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--accent-magenta) 40%, transparent);
+}
+
+@media (max-width: 760px) {
+  .case-block {
+    grid-template-columns: 1fr;
+    padding: 1.4rem;
+  }
+  .case-block-tag {
+    flex-direction: row;
+    align-items: baseline;
+    padding-right: 0;
+    padding-bottom: 0.6rem;
+    border-right: 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .case-stack {
+    grid-template-columns: 1fr;
+  }
+}
