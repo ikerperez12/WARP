@@ -1,0 +1,176 @@
+.visuals-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--accent-magenta) 10%, transparent), transparent 36%),
+    linear-gradient(180deg, var(--bg-deep) 0%, color-mix(in srgb, var(--bg-panel) 88%, var(--bg-deep)) 100%);
+}
+
+.visuals-page-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.4rem;
+  background: color-mix(in srgb, var(--bg-deep) 70%, transparent);
+  border-bottom: 1px solid var(--border-soft);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+.visuals-page-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.visuals-page-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.visuals-page-main {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 8vw, 6rem);
+  padding-bottom: clamp(4rem, 8vw, 7rem);
+}
+
+.visuals-hero,
+.visuals-copy-block,
+.visuals-page-footer {
+  width: min(1180px, calc(100% - 2rem));
+  margin: 0 auto;
+}
+
+.visuals-hero {
+  padding-top: clamp(4rem, 8vw, 7rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.visuals-hero-kicker,
+.visuals-block-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  margin: 0;
+}
+
+.visuals-hero-title {
+  font-size: clamp(3.2rem, 10vw, 8rem);
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+  background: linear-gradient(135deg, #ffffff 0%, color-mix(in srgb, var(--accent-magenta) 72%, #ffffff) 70%, var(--accent-purple) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[data-theme="light"] .visuals-hero-title {
+  background: linear-gradient(135deg, #0c0c15 0%, color-mix(in srgb, var(--accent-magenta) 68%, #0c0c15) 72%, var(--accent-purple) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.visuals-hero-description,
+.visuals-block-body {
+  max-width: 760px;
+  color: var(--text-muted);
+  font-size: clamp(1rem, 1.35vw, 1.15rem);
+  line-height: 1.8;
+  margin: 0;
+}
+
+.visuals-hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.visuals-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0.95rem 1.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: transform 0.25s var(--ease-out-expo), box-shadow 0.25s var(--ease-out-expo), border-color 0.25s;
+}
+
+.visuals-link:hover {
+  transform: translateY(-2px);
+}
+
+.visuals-link-primary {
+  background: linear-gradient(135deg, var(--accent-magenta), var(--accent-purple));
+  color: #fff;
+  box-shadow: 0 12px 32px rgba(255, 0, 119, 0.22);
+}
+
+.visuals-link-secondary {
+  background: var(--glass);
+  border: 1px solid var(--border-strong);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.visuals-copy-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.visuals-block-title {
+  font-size: clamp(2.2rem, 6vw, 4.6rem);
+  letter-spacing: -0.04em;
+}
+
+.visuals-page-footer {
+  padding-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border-soft);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.visuals-page-footer-links {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.visuals-page-footer a:hover {
+  color: var(--accent-magenta);
+}
+
+@media (max-width: 760px) {
+  .visuals-page-header {
+    padding-inline: 1rem;
+  }
+
+  .visuals-hero,
+  .visuals-copy-block,
+  .visuals-page-footer {
+    width: min(100% - 1.4rem, 1180px);
+  }
+}

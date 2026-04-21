@@ -419,6 +419,12 @@ export default {
       return handleContact(request, env);
     }
 
+    if (url.pathname === '/visuals') {
+      const rewrittenUrl = new URL(request.url);
+      rewrittenUrl.pathname = '/visuals/';
+      return env.ASSETS.fetch(new Request(rewrittenUrl, request));
+    }
+
     return env.ASSETS.fetch(request);
   },
 };

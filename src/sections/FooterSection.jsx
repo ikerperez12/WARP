@@ -30,6 +30,7 @@ export default function FooterSection() {
         </nav>
 
         <div className="site-footer-social">
+          <a href="/visuals/">Visuals</a>
           <a href={`mailto:${CONTACT_INFO.email}`}>Email</a>
           <a href={CONTACT_INFO.github} target="_blank" rel="noopener noreferrer">GitHub</a>
           <a href={CONTACT_INFO.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>

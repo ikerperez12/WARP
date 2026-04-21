@@ -82,3 +82,22 @@
 .mobile-menu-link:hover {
   color: var(--accent-magenta);
 }
+
+.mobile-menu-secondary {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-soft);
+}
+
+.mobile-menu-visuals-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  padding: 0.9rem 1.3rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent-magenta), var(--accent-purple));
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 12px 30px rgba(255, 0, 119, 0.22);
+}

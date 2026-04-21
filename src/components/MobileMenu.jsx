@@ -35,6 +35,11 @@ export default function MobileMenu({ open, onClose }) {
             </a>
           ))}
         </nav>
+        <div className="mobile-menu-secondary">
+          <a href="/visuals/" onClick={onClose} className="mobile-menu-visuals-link">
+            {t.nav[0] === "Profile" ? "Open visuals" : "Abrir visuals"}
+          </a>
+        </div>
       </div>
     </div>
   );

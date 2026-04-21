@@ -4,12 +4,13 @@ import "./Preloader.css";
 /**
  * Preloader 0-100%.
  *
- * Why it exists: the first render mounts several WebGL Canvases + GLB models + 2 videos.
+ * Why it exists: the first render mounts the global 3D background, the hero,
+ * and the first pinned video curtain.
  * If we show the page before everything is decoded, the scroll feels stuttery for a few
  * seconds. Giving the browser a quiet moment to preload assets pays off in fluidity.
  *
- * Strategy: listen to drei's `useProgress` for GLB/texture loading AND track video
- * `canplaythrough` for the 2 curtain videos, then fade out when both are done or
+ * Strategy: listen to drei's `useProgress` for GLB/texture loading AND track the
+ * first curtain video, then fade out when both are done or
  * after a hard timeout (5s) so the user never gets stuck on a 99% bar.
  */
 export default function Preloader({ children }) {
@@ -37,10 +38,7 @@ export default function Preloader({ children }) {
     })();
 
     // 2. Track video load
-    const videos = [
-      "/assets/videos/creative-vision-1080p.mp4",
-      "/assets/videos/digital-mastery-1080p.mp4",
-    ];
+    const videos = ["/assets/videos/creative-vision-1080p.mp4"];
     let loaded = 0;
     videos.forEach((src) => {
       const v = document.createElement("video");
@@ -59,7 +57,7 @@ export default function Preloader({ children }) {
 
     // 3. Combined progress tick + hard timeout
     const start = performance.now();
-    const HARD_TIMEOUT = 5000;
+    const HARD_TIMEOUT = 3200;
 
     const loop = () => {
       const elapsed = performance.now() - start;

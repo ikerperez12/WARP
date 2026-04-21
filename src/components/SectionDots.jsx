@@ -15,7 +15,7 @@ const SECTIONS = [
   { id: "now", selector: "#now" },
   { id: "cv", selector: ".blueprint-stage" },
   { id: "code", selector: "#code" },
-  { id: "alloy", selector: ".liquid-metal-transition" },
+  { id: "visuals", selector: "#visuals-bridge" },
   { id: "projects", selector: "#projects" },
   { id: "case", selector: "#case-study" },
   { id: "more", selector: "#vt-mastery" },

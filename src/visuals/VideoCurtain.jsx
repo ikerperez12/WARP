@@ -6,34 +6,14 @@ import "./VideoCurtain.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const CLOSED = "ellipse(10vw 14vh at 50% 50%)";
-const OPEN = "ellipse(160vw 160vh at 50% 50%)";
+const CLOSED = { x: 18, y: 22 };
+const CLOSED_END = { x: 10, y: 14 };
+const OPEN = { x: 160, y: 160 };
 
-/**
- * VideoCurtain
- *
- * Layout:
- *   .video-curtain (200vh tall outer section)
- *     .video-curtain-stage (sticky top:0, height:100vh — holds video centered on viewport)
- *       .video-curtain-clip (absolute inset:0, clip-path animates open→hold→closed)
- *       .video-curtain-text (absolute, centered over clip)
- *
- * Scroll arithmetic (section 200vh + viewport 100vh = 300vh of scroll trigger span):
- *   progress 0.00  — section top at viewport bottom (pre-sticky)
- *   progress 0.33  — section top at viewport top (sticky locks)
- *   progress 0.67  — section has moved up 100vh, sticky unlocks
- *   progress 1.00  — section bottom at viewport top
- *
- * Iris timeline aligned to sticky-active window (0.33–0.67):
- *   0.00–0.33 closed  (pre-viewport)
- *   0.33–0.45 opening (iris opens while section fills screen)
- *   0.45–0.55 open + text in
- *   0.55–0.60 text out
- *   0.55–0.67 closing
- *   0.67–1.00 closed  (post-sticky)
- *
- * No pin: true. No scroll hijacking. Native scroll + CSS sticky + GSAP scrub.
- */
+const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+const mix = (from, to, progress) => from + (to - from) * progress;
+const ellipse = ({ x, y }) => `ellipse(${x}vw ${y}vh at 50% 50%)`;
+
 export default function VideoCurtain({
   id,
   src,
@@ -42,128 +22,202 @@ export default function VideoCurtain({
   title,
   subtitle,
   lines = [],
-  align = "center",
+  entryVh = 10,
+  openVh = 68,
+  holdVh = 92,
+  closeVh = 82,
+  tailVh = 30,
+  preload = "metadata",
 }) {
-  const curtainRef = useRef(null);
+  const sectionRef = useRef(null);
+  const stageRef = useRef(null);
   const mediaRef = useRef(null);
   const textRef = useRef(null);
   const videoRef = useRef(null);
   const reduced = useReducedMotion();
 
   useEffect(() => {
-    const section = curtainRef.current;
+    const section = sectionRef.current;
+    const stage = stageRef.current;
     const media = mediaRef.current;
     const text = textRef.current;
     const video = videoRef.current;
-    if (!section || !media || !text) return;
+    if (!section || !stage || !media || !text) return;
 
     if (reduced) {
-      media.style.clipPath = OPEN;
-      media.style.webkitClipPath = OPEN;
-      text.style.opacity = "1";
+      section.style.removeProperty("height");
+      gsap.set(stage, { clearProps: "opacity,transform" });
+      gsap.set(media, { clipPath: ellipse(OPEN), webkitClipPath: ellipse(OPEN) });
+      gsap.set(text, { autoAlpha: 1, scale: 1, y: 0 });
       video?.play?.().catch(() => {});
       return;
     }
 
-    video?.play?.().catch(() => {});
-
     const ctx = gsap.context(() => {
-      gsap.set(media, { clipPath: CLOSED, webkitClipPath: CLOSED });
-      gsap.set(text, { opacity: 0, scale: 0.9, y: 20 });
+      let entry = 0;
+      let open = 0;
+      let hold = 0;
+      let close = 0;
+      let tail = 0;
+      let total = 0;
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 0.35,
+      const applyState = (offset) => {
+        const actionOffset = clamp(offset - entry, 0, open + hold + close);
+        const holdStart = open;
+        const closeStart = open + hold;
+        const closeEnd = open + hold + close;
+        const entryProgress = clamp(offset / Math.max(entry, 1), 0, 1);
+        const tailProgress = clamp((offset - entry - open - hold - close) / Math.max(tail, 1), 0, 1);
+        const stageOpacity = tailProgress > 0 ? 1 - tailProgress : mix(0.9, 1, entryProgress);
+        const stageY = tailProgress > 0 ? mix(0, -10, tailProgress) : mix(8, 0, entryProgress);
+
+        gsap.set(stage, { autoAlpha: stageOpacity, yPercent: stageY });
+
+        let clipState = CLOSED;
+
+        if (actionOffset < holdStart) {
+          const progress = clamp(actionOffset / Math.max(open, 1), 0, 1);
+          clipState = {
+            x: mix(CLOSED.x, OPEN.x, progress),
+            y: mix(CLOSED.y, OPEN.y, progress),
+          };
+        } else if (actionOffset < closeStart) {
+          clipState = OPEN;
+        } else if (actionOffset < closeEnd) {
+          const progress = clamp((actionOffset - closeStart) / Math.max(close, 1), 0, 1);
+          clipState = {
+            x: mix(OPEN.x, CLOSED_END.x, progress),
+            y: mix(OPEN.y, CLOSED_END.y, progress),
+          };
+        } else {
+          clipState = CLOSED_END;
+        }
+
+        const clipPath = ellipse(clipState);
+        gsap.set(media, { clipPath, webkitClipPath: clipPath });
+
+        const textInStart = open * 0.24;
+        const textInEnd = open * 0.62;
+        const textOutStart = open + hold * 0.46;
+        const textOutEnd = open + hold * 0.8;
+
+        let autoAlpha = 0;
+        let scale = 0.92;
+        let y = 28;
+
+        if (actionOffset >= textInStart && actionOffset < textInEnd) {
+          const progress = clamp((actionOffset - textInStart) / Math.max(textInEnd - textInStart, 1), 0, 1);
+          autoAlpha = progress;
+          scale = mix(0.92, 1.04, progress);
+          y = mix(28, 0, progress);
+        } else if (actionOffset >= textInEnd && actionOffset < textOutStart) {
+          autoAlpha = 1;
+          scale = 1.04;
+          y = 0;
+        } else if (actionOffset >= textOutStart && actionOffset < textOutEnd) {
+          const progress = clamp((actionOffset - textOutStart) / Math.max(textOutEnd - textOutStart, 1), 0, 1);
+          autoAlpha = 1 - progress;
+          scale = mix(1.04, 1.18, progress);
+          y = mix(0, -74, progress);
+        }
+
+        gsap.set(text, { autoAlpha, scale, y });
+      };
+
+      const measure = () => {
+        const vh = window.innerHeight;
+        entry = Math.round((vh * entryVh) / 100);
+        open = Math.round((vh * openVh) / 100);
+        hold = Math.round((vh * holdVh) / 100);
+        close = Math.round((vh * closeVh) / 100);
+        tail = Math.round((vh * tailVh) / 100);
+        total = entry + open + hold + close + tail;
+        section.style.height = `${vh + total}px`;
+      };
+
+      measure();
+      applyState(0);
+
+      const trigger = ScrollTrigger.create({
+        trigger: section,
+        start: "top top",
+        end: () => `+=${Math.max(total, 1)}`,
+        invalidateOnRefresh: true,
+        onEnter: () => {
+          video?.play?.().catch(() => {});
+        },
+        onEnterBack: () => {
+          video?.play?.().catch(() => {});
+        },
+        onRefreshInit: measure,
+        onRefresh: (self) => {
+          applyState(self.progress * total);
+        },
+        onUpdate: (self) => {
+          if (self.isActive) {
+            video?.play?.().catch(() => {});
+          }
+          applyState(self.progress * total);
         },
       });
 
-      // 0 → 0.33 closed (empty bar)
-      tl.to({}, { duration: 0.33 }, 0);
+      const onResize = () => {
+        trigger.refresh();
+      };
 
-      // 0.33 → 0.45 iris opens
-      tl.to(media, {
-        clipPath: OPEN,
-        webkitClipPath: OPEN,
-        ease: "power2.inOut",
-        duration: 0.12,
-      }, 0.33);
+      window.addEventListener("resize", onResize);
 
-      // 0.40 → 0.48 text fades in
-      tl.to(text, {
-        opacity: 1,
-        scale: 1,
-        y: 0,
-        ease: "power2.out",
-        duration: 0.08,
-      }, 0.40);
-
-      // 0.48 → 0.55 hold (fully open with text)
-      tl.to({}, { duration: 0.07 }, 0.48);
-
-      // 0.55 → 0.60 text fades out
-      tl.to(text, {
-        opacity: 0,
-        scale: 0.95,
-        y: -15,
-        ease: "power2.in",
-        duration: 0.05,
-      }, 0.55);
-
-      // 0.55 → 0.67 iris closes
-      tl.to(media, {
-        clipPath: CLOSED,
-        webkitClipPath: CLOSED,
-        ease: "power2.inOut",
-        duration: 0.12,
-      }, 0.55);
+      return () => {
+        window.removeEventListener("resize", onResize);
+        trigger.kill();
+        section.style.removeProperty("height");
+        gsap.set(stage, { clearProps: "opacity,transform" });
+      };
     }, section);
 
     return () => ctx.revert();
-  }, [reduced]);
+  }, [closeVh, entryVh, holdVh, openVh, reduced, tailVh]);
 
   return (
-    <section
-      id={id}
-      ref={curtainRef}
-      className={`video-curtain video-curtain-${align}`}
-      aria-label={title}
-    >
-      <div className="video-curtain-stage">
-        <div className="video-curtain-clip" ref={mediaRef}>
-          <video
-            ref={videoRef}
-            src={src}
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="auto"
-            poster={poster}
-          />
-          <div className="video-curtain-overlay" />
-        </div>
+    <section id={id} ref={sectionRef} className="video-curtain" aria-label={title}>
+      <div className="video-curtain-stage" ref={stageRef}>
+        <div className="video-curtain-shell">
+          <div className="video-curtain-clip" ref={mediaRef}>
+            <video
+              ref={videoRef}
+              src={src}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload={preload}
+              poster={poster}
+            />
+            <div className="video-curtain-overlay" />
+          </div>
 
-        <div className="video-curtain-text" ref={textRef}>
-          {kicker && <p className="video-curtain-kicker">{kicker}</p>}
-          <h2 className="video-curtain-title">{title}</h2>
-          {subtitle && <p className="video-curtain-subtitle">{subtitle}</p>}
-          {lines.length > 0 && (
-            <ul className="video-curtain-lines">
-              {lines.map((line, i) => (
-                <li key={i} style={{ "--i": i }}>
-                  <span aria-hidden="true">//</span>
-                  {line}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+          <div className="video-curtain-text" ref={textRef}>
+            {kicker && <p className="video-curtain-kicker">{kicker}</p>}
+            <h2 className="video-curtain-title">{title}</h2>
+            {subtitle && <p className="video-curtain-subtitle">{subtitle}</p>}
+            {lines.length > 0 && (
+              <ul className="video-curtain-lines">
+                {lines.map((line, i) => (
+                  <li key={i}>
+                    <span aria-hidden="true">//</span>
+                    {line}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
 
-        <div className="video-curtain-corners" aria-hidden="true">
-          <span /><span /><span /><span />
+          <div className="video-curtain-corners" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
         </div>
       </div>
     </section>

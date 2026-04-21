@@ -1,21 +1,9 @@
-/*
- * VideoCurtain
- *   .video-curtain (outer 200vh)
- *     .video-curtain-stage (sticky top:0, height:100vh — the visible frame)
- *       .video-curtain-clip (absolute inset:0, clip-path iris animates)
- *         <video>, overlay
- *       .video-curtain-text (absolute, centered)
- *       .video-curtain-corners
- *
- * The extra 100vh of section height lets the iris have a "pre-entry" closed
- * state below the fold and a "post-exit" closed state above the fold, so the
- * user sees a proper iris open → hold → close arc as they scroll.
- */
-
 .video-curtain {
   position: relative;
-  height: 200vh;
-  overflow: hidden;
+  min-height: 100vh;
+  overflow: clip;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(12, 12, 18, 0.18) 0%, rgba(2, 2, 5, 0.86) 72%, #020205 100%);
   isolation: isolate;
 }
 
@@ -25,13 +13,21 @@
   width: 100%;
   height: 100vh;
   overflow: hidden;
+  will-change: transform, opacity;
+}
+
+.video-curtain-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 .video-curtain-clip {
   position: absolute;
   inset: 0;
-  clip-path: ellipse(10vw 14vh at 50% 50%);
-  -webkit-clip-path: ellipse(10vw 14vh at 50% 50%);
+  clip-path: ellipse(18vw 22vh at 50% 50%);
+  -webkit-clip-path: ellipse(18vw 22vh at 50% 50%);
   overflow: hidden;
   background: #020205;
   will-change: clip-path;
@@ -44,15 +40,15 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: saturate(1.1) contrast(1.05);
+  filter: saturate(1.08) contrast(1.05);
 }
 
 .video-curtain-overlay {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at center, transparent 40%, color-mix(in srgb, var(--bg-deep) 55%, transparent) 100%),
-    linear-gradient(180deg, color-mix(in srgb, var(--bg-deep) 55%, transparent) 0%, transparent 30%, transparent 70%, color-mix(in srgb, var(--bg-deep) 55%, transparent) 100%);
+    radial-gradient(ellipse at center, transparent 42%, color-mix(in srgb, var(--bg-deep) 52%, transparent) 100%),
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-deep) 58%, transparent) 0%, transparent 22%, transparent 74%, color-mix(in srgb, var(--bg-deep) 58%, transparent) 100%);
   pointer-events: none;
 }
 
@@ -153,6 +149,7 @@
 .video-curtain-corners span:nth-child(4) { bottom: 0; right: 0; border-left: 0; border-top: 0; }
 
 @media (max-width: 640px) {
-  .video-curtain { height: 180vh; }
-  .video-curtain-text { padding: 1.5rem; }
+  .video-curtain-text {
+    padding: 1.5rem;
+  }
 }

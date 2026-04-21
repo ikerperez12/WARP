@@ -1,4 +1,5 @@
 const SIZES = {
+  xs: "2vh",
   sm: "30vh",
   md: "45vh",
   lg: "60vh",

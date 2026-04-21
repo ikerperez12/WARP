@@ -244,21 +244,19 @@ export default function PhysicsScene() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
+  const [visible, setVisible] = useState(true);
 
-  // Pause the physics canvas when the page has scrolled past the hero area.
-  // This is the biggest perf win: Rapier + 3D render at 60fps is expensive,
-  // and the scene is visually behind other content below the fold anyway.
-  const [inHero, setInHero] = useState(true);
   useEffect(() => {
-    const onScroll = () => {
-      setInHero(window.scrollY < window.innerHeight * 1.3);
+    const syncVisibility = () => {
+      setVisible(document.visibilityState !== "hidden");
     };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+
+    syncVisibility();
+    document.addEventListener("visibilitychange", syncVisibility);
+    return () => document.removeEventListener("visibilitychange", syncVisibility);
   }, []);
 
-  const activeFrameloop = reduced || !inHero ? "demand" : "always";
+  const activeFrameloop = reduced || !visible ? "demand" : "always";
 
   return (
     <div
@@ -269,8 +267,7 @@ export default function PhysicsScene() {
         inset: 0,
         zIndex: -1,
         pointerEvents: "none",
-        opacity: inHero ? 1 : 0.35,
-        transition: "opacity 0.6s ease",
+        opacity: 1,
       }}
     >
       <Canvas
@@ -279,7 +276,7 @@ export default function PhysicsScene() {
         gl={{ antialias: !isMobile, alpha: true, powerPreference: "high-performance" }}
         frameloop={activeFrameloop}
       >
-        <World reduced={reduced || !inHero} isDark={isDark} isMobile={isMobile} />
+        <World reduced={reduced || !visible} isDark={isDark} isMobile={isMobile} />
       </Canvas>
     </div>
   );

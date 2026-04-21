@@ -13,7 +13,7 @@
     "preview": "vite preview",
     "cf:dev": "wrangler dev",
     "cf:deploy": "wrangler deploy",
-    "test": "playwright test",
+    "test": "node --test \"tests/**/*.test.js\"",
     "lint": "eslint ."
   },
   "dependencies": {

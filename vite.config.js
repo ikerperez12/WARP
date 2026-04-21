@@ -1,3 +1,4 @@
+import { resolve } from "node:path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
@@ -11,6 +12,10 @@ export default defineConfig({
     target: "es2022",
     sourcemap: false,
     rollupOptions: {
+      input: {
+        main: resolve(__dirname, "index.html"),
+        visuals: resolve(__dirname, "visuals/index.html"),
+      },
       output: {
         manualChunks: (id) => {
           if (!id.includes("node_modules")) return;

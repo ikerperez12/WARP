@@ -10,11 +10,11 @@ import AmbientCursorTrails from "./visuals/AmbientCursorTrails.jsx";
 import GlobalNoise from "./visuals/GlobalNoise.jsx";
 import VideoCurtain from "./visuals/VideoCurtain.jsx";
 import ScannerBanner from "./visuals/ScannerBanner.jsx";
-import InViewMonitor from "./visuals/InViewMonitor.jsx";
 import SectionGutter from "./components/SectionGutter.jsx";
 import KeyboardShortcuts from "./components/KeyboardShortcuts.jsx";
 import { useScrollReveal } from "./lib/useScrollReveal.js";
 import { useI18n } from "./i18n/I18nProvider.jsx";
+import VisualsGatewaySection from "./sections/VisualsGatewaySection.jsx";
 import "./Shell.css";
 
 const PhysicsScene = lazy(() => import("./visuals/PhysicsScene.jsx"));
@@ -35,8 +35,6 @@ const ProjectsSection = lazy(() => import("./sections/ProjectsSection.jsx"));
 const ExperienceSection = lazy(() => import("./sections/ExperienceSection.jsx"));
 const ContactSection = lazy(() => import("./sections/ContactSection.jsx"));
 const FooterSection = lazy(() => import("./sections/FooterSection.jsx"));
-const LiquidMetalTransition = lazy(() => import("./visuals/LiquidMetalTransition.jsx"));
-const FrutigerAeroStage = lazy(() => import("./visuals/FrutigerAeroStage.jsx"));
 const BlueprintStage = lazy(() => import("./visuals/BlueprintStage.jsx"));
 const HorizontalShowcase = lazy(() => import("./visuals/HorizontalShowcase.jsx"));
 
@@ -67,13 +65,17 @@ export default function Shell() {
           </div>
         </ErrorBoundary>
 
-        <SectionGutter size="sm" />
-
         <ErrorBoundary label="vt-1">
           <div className="interactive">
             <VideoCurtain
               id="vt-creative"
               src="/assets/videos/creative-vision-1080p.mp4"
+              preload="auto"
+              entryVh={4}
+              openVh={66}
+              holdVh={96}
+              closeVh={88}
+              tailVh={24}
               kicker={c.vt1.kicker}
               title={c.vt1.title}
               subtitle={c.vt1.subtitle}
@@ -183,15 +185,13 @@ export default function Shell() {
         <SectionGutter size="md" />
 
         <ErrorBoundary label="blueprint">
-          <InViewMonitor rootMargin="20% 0px 20% 0px">
-            <Suspense fallback={<SectionSkeleton />}>
-              <BlueprintStage
-                title={c.blueprint.title}
-                subtitle={c.blueprint.subtitle}
-                lines={c.blueprint.lines}
-              />
-            </Suspense>
-          </InViewMonitor>
+          <Suspense fallback={<SectionSkeleton />}>
+            <BlueprintStage
+              title={c.blueprint.title}
+              subtitle={c.blueprint.subtitle}
+              lines={c.blueprint.lines}
+            />
+          </Suspense>
         </ErrorBoundary>
 
         <SectionGutter size="sm" />
@@ -206,15 +206,10 @@ export default function Shell() {
 
         <SectionGutter size="md" />
 
-        <ErrorBoundary label="liquid-metal">
-          <InViewMonitor rootMargin="20% 0px 20% 0px">
-            <Suspense fallback={<SectionSkeleton />}>
-              <LiquidMetalTransition
-                title={c.alloy.title}
-                subtitle={c.alloy.subtitle}
-              />
-            </Suspense>
-          </InViewMonitor>
+        <ErrorBoundary label="visuals-bridge">
+          <div className="interactive cv-lazy">
+            <VisualsGatewaySection />
+          </div>
         </ErrorBoundary>
 
         <SectionGutter size="md" />
@@ -242,6 +237,12 @@ export default function Shell() {
             <VideoCurtain
               id="vt-mastery"
               src="/assets/videos/digital-mastery-1080p.mp4"
+              preload="metadata"
+              entryVh={10}
+              openVh={68}
+              holdVh={92}
+              closeVh={86}
+              tailVh={12}
               kicker={c.vt2.kicker}
               title={c.vt2.title}
               subtitle={c.vt2.subtitle}
@@ -282,20 +283,6 @@ export default function Shell() {
               <ResumeCTA />
             </Suspense>
           </div>
-        </ErrorBoundary>
-
-        <SectionGutter size="md" />
-
-        <ErrorBoundary label="frutiger">
-          <InViewMonitor rootMargin="20% 0px 20% 0px">
-            <Suspense fallback={<SectionSkeleton />}>
-              <FrutigerAeroStage
-                kicker={c.frutiger.kicker}
-                title={c.frutiger.title}
-                subtitle={c.frutiger.subtitle}
-              />
-            </Suspense>
-          </InViewMonitor>
         </ErrorBoundary>
 
         <ErrorBoundary label="contact">

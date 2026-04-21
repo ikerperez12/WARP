@@ -16,11 +16,34 @@ gsap.registerPlugin(ScrollTrigger);
  */
 export function LenisProvider({ children }) {
   useEffect(() => {
+    let rafId = 0;
+
+    const scheduleRefresh = () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        rafId = 0;
+        ScrollTrigger.refresh();
+      });
+    };
+
     // ScrollTrigger uses window scroll events natively when no proxy is set.
-    // Make sure it refreshes after layout settles.
-    const refresh = () => ScrollTrigger.refresh();
-    window.addEventListener("load", refresh);
-    return () => window.removeEventListener("load", refresh);
+    // Refresh both after load and whenever the document height changes because
+    // cv-lazy sections expand later and can desync far-down triggers.
+    const resizeObserver = new ResizeObserver(() => {
+      scheduleRefresh();
+    });
+
+    window.addEventListener("load", scheduleRefresh);
+    window.addEventListener("resize", scheduleRefresh);
+    resizeObserver.observe(document.body);
+    resizeObserver.observe(document.documentElement);
+
+    return () => {
+      window.removeEventListener("load", scheduleRefresh);
+      window.removeEventListener("resize", scheduleRefresh);
+      resizeObserver.disconnect();
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   return children;
