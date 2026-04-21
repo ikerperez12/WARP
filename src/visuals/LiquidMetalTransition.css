@@ -1,14 +1,28 @@
+/*
+ * LiquidMetal transition — chrome torusknot flotando sobre fondo transparente
+ * para que la PhysicsScene persistente (pato + cubo + estrellas, z-index -1)
+ * se vea detrás como capa profunda.
+ */
+
 .liquid-metal-transition {
   position: relative;
-  min-height: 100vh;
+  min-height: 170vh;
   overflow: hidden;
   isolation: isolate;
+  /* Sin background — la capa -1 muestra PhysicsScene por detrás */
+  background: transparent;
 }
 
 .liquid-metal-canvas {
-  position: absolute;
-  inset: 0;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
   z-index: 0;
+}
+
+.liquid-metal-canvas > canvas {
+  background: transparent !important;
 }
 
 .liquid-metal-text {
@@ -23,73 +37,114 @@
   padding: 0 1rem;
 }
 
-.liquid-metal-title {
-  font-size: clamp(3rem, 11vw, 10rem);
-  font-weight: 900;
+.liquid-metal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.75rem 1.6rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-deep) 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-neon) 50%, var(--border-strong));
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  color: var(--accent-neon);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
-  letter-spacing: -0.05em;
-  margin: 0;
-  color: transparent;
-  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.85);
-  mix-blend-mode: difference;
-  line-height: 0.9;
+  font-weight: 700;
+  text-shadow: 0 0 20px color-mix(in srgb, var(--accent-neon) 60%, transparent);
+  box-shadow:
+    0 6px 26px color-mix(in srgb, var(--accent-neon) 18%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-[data-theme="light"] .liquid-metal-title {
-  -webkit-text-stroke: 2px rgba(12, 12, 21, 0.85);
-  mix-blend-mode: normal;
+.liquid-metal-badge-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-neon);
+  box-shadow: 0 0 0 0 var(--accent-neon);
+  animation: liquid-pulse 1.8s ease-out infinite;
+}
+
+@keyframes liquid-pulse {
+  0% { box-shadow: 0 0 0 0 var(--accent-neon); opacity: 1; }
+  80% { box-shadow: 0 0 0 14px transparent; opacity: 0.5; }
+  100% { box-shadow: 0 0 0 0 transparent; opacity: 1; }
 }
 
 .liquid-metal-subtitle {
-  margin: 1.6rem 0 0;
-  color: var(--text-primary);
-  font-size: clamp(0.8rem, 1.2vw, 1.1rem);
-  font-family: var(--font-mono);
-  font-weight: 400;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  mix-blend-mode: difference;
+  margin: 1.4rem auto 0;
+  max-width: 640px;
+  font-family: var(--font-body);
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
+  mix-blend-mode: normal;
+}
+
+[data-theme="light"] .liquid-metal-subtitle {
+  color: rgba(12, 12, 21, 0.95);
+  text-shadow: 0 2px 10px rgba(255, 255, 255, 0.6);
 }
 
 .liquid-metal-corners {
-  position: absolute;
-  inset: 1.5rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
   pointer-events: none;
   z-index: 3;
+  display: block;
 }
 
 .liquid-metal-corners span {
   position: absolute;
-  width: 22px;
-  height: 22px;
-  border: 2px solid rgba(255, 255, 255, 0.35);
+  width: 26px;
+  height: 26px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
   mix-blend-mode: difference;
 }
 
+[data-theme="light"] .liquid-metal-corners span {
+  mix-blend-mode: normal;
+  border-color: rgba(12, 12, 21, 0.3);
+}
+
 .liquid-metal-corners span:nth-child(1) {
-  top: 0;
-  left: 0;
+  top: 2rem;
+  left: 2rem;
   border-right: 0;
   border-bottom: 0;
 }
 
 .liquid-metal-corners span:nth-child(2) {
-  top: 0;
-  right: 0;
+  top: 2rem;
+  right: 2rem;
   border-left: 0;
   border-bottom: 0;
 }
 
 .liquid-metal-corners span:nth-child(3) {
-  bottom: 0;
-  left: 0;
+  bottom: 2rem;
+  left: 2rem;
   border-right: 0;
   border-top: 0;
 }
 
 .liquid-metal-corners span:nth-child(4) {
-  bottom: 0;
-  right: 0;
+  bottom: 2rem;
+  right: 2rem;
   border-left: 0;
   border-top: 0;
+}
+
+@media (max-width: 640px) {
+  .liquid-metal-transition { min-height: 150vh; }
+  .liquid-metal-badge {
+    font-size: 0.75rem;
+    padding: 0.6rem 1.2rem;
+  }
 }

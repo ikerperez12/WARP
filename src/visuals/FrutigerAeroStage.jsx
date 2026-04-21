@@ -3,6 +3,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Float, MeshTransmissionMaterial, Sphere } from "@react-three/drei";
 import { useReducedMotion } from "../lib/useReducedMotion.js";
 import { useTheme } from "../theme/ThemeProvider.jsx";
+import FloatingTechIcons from "./FloatingTechIcons.jsx";
 import "./FrutigerAeroStage.css";
 
 function Bubble({ position, size, reduced }) {
@@ -65,16 +66,19 @@ export default function FrutigerAeroStage({ title, subtitle, kicker }) {
 
   return (
     <section className="frutiger-stage" style={{ background: bg }}>
+      <FloatingTechIcons count={14} depth={0.55} />
+
       <div className="frutiger-stage-canvas">
         <Canvas
           dpr={[1, 2]}
           camera={{ position: [0, 0, 8], fov: 45 }}
-          gl={{ antialias: true, alpha: false }}
+          gl={{ antialias: true, alpha: true }}
           frameloop={reduced ? "demand" : "always"}
         >
-          <ambientLight intensity={1.4} />
-          <pointLight position={[10, 10, 10]} intensity={1.5} color="#ffffff" />
-          <pointLight position={[-10, -5, 5]} intensity={1} color="#88ffcc" />
+          <ambientLight intensity={1.3} />
+          <pointLight position={[10, 10, 10]} intensity={1.6} color="#ffffff" />
+          <pointLight position={[-10, -5, 5]} intensity={1.1} color="#88ffcc" />
+          <pointLight position={[0, -8, 6]} intensity={0.8} color="#ff80c8" />
           <Suspense fallback={null}>
             <Environment preset="sunset" />
           </Suspense>

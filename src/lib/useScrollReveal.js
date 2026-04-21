@@ -28,7 +28,14 @@ export function useScrollReveal(selector = ".reveal", options = {}) {
           }
         });
       },
-      { threshold: 0.15, rootMargin: "-10% 0px -10% 0px", ...options }
+      {
+        // Trigger as soon as any part of the section touches the viewport.
+        // Positive rootMargin extends the "active" area beyond the viewport,
+        // so cards appear before the user fully scrolls to them.
+        threshold: 0,
+        rootMargin: "0px 0px -5% 0px",
+        ...options,
+      }
     );
 
     observerRef.current = io;

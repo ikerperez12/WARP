@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useI18n } from "../i18n/I18nProvider.jsx";
 import "./SectionDots.css";
 
@@ -12,35 +12,80 @@ const SECTIONS = [
   { id: "radar", selector: "#tech-radar" },
   { id: "process", selector: "#process" },
   { id: "principles", selector: "#principles" },
+  { id: "now", selector: "#now" },
   { id: "cv", selector: ".blueprint-stage" },
   { id: "code", selector: "#code" },
   { id: "alloy", selector: ".liquid-metal-transition" },
   { id: "projects", selector: "#projects" },
+  { id: "case", selector: "#case-study" },
   { id: "more", selector: "#vt-mastery" },
   { id: "path", selector: "#experience" },
+  { id: "awards", selector: "#achievements" },
   { id: "faq", selector: "#faq" },
   { id: "hire", selector: "#resume-cta" },
   { id: "contact", selector: "#contact" },
 ];
 
+/**
+ * Section tracking via scroll position. Pick the section whose top edge is
+ * closest to (but not below) the viewport's upper third. Updated on every
+ * scroll tick using requestAnimationFrame throttle so the highlight never
+ * lags behind the actual scroll.
+ */
 export default function SectionDots() {
   const [active, setActive] = useState(0);
   const { lang } = useI18n();
+  const rafRef = useRef(0);
 
   useEffect(() => {
-    const observers = SECTIONS.map((section, i) => {
-      const el = document.querySelector(section.selector);
-      if (!el) return null;
-      const io = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) setActive(i);
-        },
-        { threshold: 0.3, rootMargin: "-30% 0px -30% 0px" }
-      );
-      io.observe(el);
-      return io;
-    });
-    return () => observers.forEach((o) => o?.disconnect());
+    const elements = SECTIONS.map((s) => document.querySelector(s.selector));
+
+    const update = () => {
+      const target = window.innerHeight * 0.35;
+      let best = 0;
+      let bestDelta = Infinity;
+      elements.forEach((el, i) => {
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        // Pick the section whose top is closest to target line, preferring
+        // sections whose top is at or above the target (already in view).
+        const delta = rect.top - target;
+        const absPenalty = delta > 0 ? delta * 1.2 : -delta;
+        if (absPenalty < bestDelta) {
+          bestDelta = absPenalty;
+          best = i;
+        }
+      });
+      setActive(best);
+    };
+
+    const onScroll = () => {
+      if (rafRef.current) return;
+      rafRef.current = requestAnimationFrame(() => {
+        update();
+        rafRef.current = 0;
+      });
+    };
+
+    // Re-query in case lazy sections mount after initial paint
+    const rescan = () => {
+      SECTIONS.forEach((s, i) => {
+        if (!elements[i]) elements[i] = document.querySelector(s.selector);
+      });
+      update();
+    };
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    const rescanInterval = setInterval(rescan, 1500);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      clearInterval(rescanInterval);
+    };
   }, []);
 
   const jumpTo = (selector) => {
@@ -50,7 +95,10 @@ export default function SectionDots() {
   };
 
   return (
-    <nav className="section-dots" aria-label={lang === "en" ? "Section navigation" : "Navegacion por seccion"}>
+    <nav
+      className="section-dots"
+      aria-label={lang === "en" ? "Section navigation" : "Navegacion por seccion"}
+    >
       <span className="section-dots-rail" aria-hidden="true" />
       {SECTIONS.map((section, i) => (
         <button
