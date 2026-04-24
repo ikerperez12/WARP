@@ -11,16 +11,29 @@ export default function HeroSection() {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    if (reduced || !containerRef.current) return;
+    if (!containerRef.current) return;
+
     const ctx = gsap.context(() => {
-      gsap.from(".hero-reveal", {
-        opacity: 0,
-        y: 30,
-        duration: 0.9,
-        stagger: 0.12,
-        ease: "power3.out",
-        delay: 0.3,
-      });
+      const nodes = gsap.utils.toArray(".hero-reveal");
+
+      if (reduced) {
+        gsap.set(nodes, { clearProps: "opacity,transform" });
+        return;
+      }
+
+      gsap.fromTo(
+        nodes,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          stagger: 0.12,
+          ease: "power3.out",
+          delay: 0.3,
+          clearProps: "opacity,transform",
+        }
+      );
     }, containerRef);
     return () => ctx.revert();
   }, [reduced]);

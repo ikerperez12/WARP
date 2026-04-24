@@ -57,8 +57,16 @@ html {
   scroll-padding-top: 80px;
 }
 
+[id] {
+  scroll-margin-top: 88px;
+}
+
 @media (max-width: 640px) {
-  html { scroll-padding-top: 64px; }
+  html { scroll-padding-top: 72px; }
+
+  [id] {
+    scroll-margin-top: 72px;
+  }
 }
 
 html,

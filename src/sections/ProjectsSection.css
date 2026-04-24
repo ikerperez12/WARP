@@ -25,6 +25,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  min-height: 44px;
   padding: 0.55rem 1.1rem;
   border-radius: 999px;
   font-family: var(--font-mono);
@@ -376,6 +377,23 @@
 }
 
 @media (max-width: 640px) {
+  .projects-filters {
+    justify-content: flex-start;
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .projects-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .projects-filter {
+    flex: 0 0 auto;
+  }
+
   .project-card {
     padding: 1.4rem;
   }

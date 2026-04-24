@@ -5,11 +5,32 @@ import "./BackToTop.css";
 export default function BackToTop() {
   const { t } = useI18n();
   const [visible, setVisible] = useState(false);
+  const [contactVisible, setContactVisible] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > 600);
+    const mobileQuery = window.matchMedia("(max-width: 640px)");
+    const onScroll = () => {
+      setVisible(window.scrollY > 600);
+
+      const contact = document.getElementById("contact");
+      if (!mobileQuery.matches || !contact) {
+        setContactVisible(false);
+        return;
+      }
+
+      const rect = contact.getBoundingClientRect();
+      setContactVisible(rect.top < window.innerHeight * 0.92 && rect.bottom > window.innerHeight * 0.12);
+    };
+
+    const onMediaChange = () => onScroll();
+
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    mobileQuery.addEventListener("change", onMediaChange);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      mobileQuery.removeEventListener("change", onMediaChange);
+    };
   }, []);
 
   const up = () => {
@@ -20,7 +41,7 @@ export default function BackToTop() {
     <button
       type="button"
       aria-label={t.misc.backTop}
-      className={`back-to-top ${visible ? "is-visible" : ""}`}
+      className={`back-to-top ${visible ? "is-visible" : ""} ${contactVisible ? "is-contact-visible" : ""}`}
       onClick={up}
     >
       <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">

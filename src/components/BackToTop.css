@@ -32,3 +32,11 @@
   outline: 2px solid var(--accent-cyan);
   outline-offset: 3px;
 }
+
+@media (max-width: 640px) {
+  .back-to-top.is-contact-visible {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(18px);
+  }
+}

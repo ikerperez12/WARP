@@ -2,6 +2,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
+  min-height: 34px;
   padding: 0.45rem 0.9rem;
   border-radius: 999px;
   background: var(--glass);
@@ -14,6 +15,12 @@
   transition: border-color 0.3s var(--ease-out-expo), background 0.3s var(--ease-out-expo);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+}
+
+@media (max-width: 960px) {
+  .lang-toggle {
+    min-height: 44px;
+  }
 }
 
 .lang-toggle:hover {

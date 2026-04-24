@@ -139,3 +139,18 @@
   .theme-toggle-star { animation: none; }
   .theme-toggle-orb { transition: left 0.2s linear; }
 }
+
+@media (max-width: 960px) {
+  .theme-toggle {
+    --h: 44px;
+  }
+
+  .theme-toggle-orb {
+    width: 34px;
+    height: 34px;
+  }
+
+  .theme-toggle.is-light .theme-toggle-orb {
+    left: calc(100% - 38px);
+  }
+}

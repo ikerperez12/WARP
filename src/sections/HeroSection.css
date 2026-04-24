@@ -213,4 +213,9 @@
 @media (max-width: 640px) {
   .hero { padding: 6rem 1rem 4rem; }
   .hero-title { font-size: clamp(2.6rem, 14vw, 4rem); }
+
+  .hero-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
